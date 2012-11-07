@@ -355,16 +355,20 @@ uint8 Sdm2000SensorRead(void) {
 	return TRUE;
 }
 
+//	argu1: 0x30--钞箱出币总数 0x31--出币总数
+//	argu2: 0x30--读取，0x31--清零
+//	
 uint8 Sdm2000TotalCounterReadClear(uint8 argu1,uint8 argu2) {
 	uint8 err;
 	memset(&cmd_temp,0,sizeof(_sdm2000_cmd_s));
 	cmd_temp.cmd = 0x46;
 	cmd_temp.exe_time = 0;
-	cmd_temp.len = 1;
+	cmd_temp.len = 1+2;
 	cmd_temp.dat[0] = argu1;
 	cmd_temp.dat[1] = argu2;
 	
 	err = SDM2000CommandHandle(&cmd_temp);
+	
 	return err;
 }
 
@@ -625,9 +629,13 @@ init:
 				break;
 			case NOTE_MACHINE_CHANGE_RUNNING:
 				RequestHardResource();
+				err = Sdm2000TotalCounterReadClear(0x31,0x31);
+				if (err != SYS_NO_ERR)
+				{
+					state = NOTE_MACHINE_ABNORMAL;
+					break;
+				}
 				err = Sdm2000MultiCassetteDispense(note_machine_cmd.cass1,note_machine_cmd.cass2);
-				FreeHardResource();
-				note_machine_cmd.note.exe_st = CMD_EXE_END;
 				if (err == SYS_NO_ERR)
 				{
 					device_control.trade.cr.note_errcode = rec_data[1];
@@ -635,6 +643,19 @@ init:
 					device_control.trade.cr.cass2_dis = rec_data[11];
 					device_control.trade.cr.cass1_reject = rec_data[18];
 					device_control.trade.cr.cass2_reject = rec_data[19];
+					
+					err = Sdm2000TotalCounterReadClear(0x31,0x30);
+					if (err == SYS_NO_ERR)
+					{
+						device_control.trade.cr.cass1_dis = rec_data[5];
+						device_control.trade.cr.cass2_dis = rec_data[9];
+					}
+					err = SYS_NO_ERR;
+				}
+				FreeHardResource();
+				note_machine_cmd.note.exe_st = CMD_EXE_END;
+				if (err == SYS_NO_ERR)
+				{
 					switch (rec_data[1]) {
 						case SDM_NORMAL:
 							state = NOTE_MACHINE_NORMAL;
