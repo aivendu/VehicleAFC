@@ -100,7 +100,7 @@ typedef struct {
 
 
 
-
+extern char promptmess[100];
 extern uint8 old_station;
 extern uint8 curr_station;
 extern uint8 run_direction;
@@ -109,5 +109,6 @@ extern uint8 changesite_flag;
 extern void PadCommInit(void);
 extern void TaskDeviceCommand(void *pdata);
 extern void TaskPADRecHandle(void *pdata);
+extern uint16 DisplayMessage(void *arg);
 
 #endif

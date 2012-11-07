@@ -257,7 +257,10 @@ void TaskChipComm(void *pdata) {
 					if(device_control.trade.tm.changemoney > 99)
 					{
 						device_control.cmd.changemoney.exe_st = EXE_WAIT;
-						DisplayMessage("’“¡„¥ÌŒÛ:01");
+						memset(promptmess,0,sizeof(promptmess));
+						sprintf(promptmess,"’“¡„¥ÌŒÛ:01");
+						temp = 0x33;
+						DisplayMessage(&temp);
 					}
 					else
 					{
@@ -347,7 +350,6 @@ void TaskChipComm(void *pdata) {
 			if (device_control.cmd.changemoney.exe_st == EXE_RUN_END)
 			{
 				sys_state.ss.st_cmd.se.makechange.exe_st = EXE_RUN_END;
-				sys_state.ss.st_cmd.se.store_trade_data.exe_st = EXE_WRITED;
 				device_control.cmd.changemoney.exe_st = EXE_WAIT;
 				device_control.cmd.print.exe_st = EXE_WRITED;
 				while (ChipDataUpdata(1,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,&device_control.cmd.changemoney) != TRUE)
@@ -358,6 +360,7 @@ void TaskChipComm(void *pdata) {
 				{
 					OSTimeDly(2);
 				}
+				sys_state.ss.st_cmd.se.store_trade_data.exe_st = EXE_WRITED;
 			}
 			else if (device_control.cmd.print.exe_st == EXE_RUN_END)
 			{

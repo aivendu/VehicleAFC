@@ -80,10 +80,10 @@ void InitConfigData (void) {
 	
 }
 
- 
+
 void TaskDataStore(void *pdata) {
 
-	uint8 data_buffer[18];
+	uint8 data_buffer[18],temp;
 	uint16 changenoteamount0,changenoteamount1,changecoinamount;
 	uint16 tradeamount;
 	uint16 realpayamount;
@@ -123,6 +123,12 @@ void TaskDataStore(void *pdata) {
 			memcpy(&data_buffer[2],(uint8 *)&trade_amount,sizeof(_trade_amount_s));
 			I2c0WriteBytes(FM24V10_1_ADDR,data_buffer,2+sizeof(_trade_amount_s));
 			sys_state.ss.st_cmd.se.store_trade_data.exe_st = EXE_WAIT;
+			memset(promptmess,0,sizeof(promptmess));
+			sprintf(promptmess,"实找%d元: 1元 %d个; 5元 %d张; 10元 %d张",
+				(device_control.trade.cr.coin_dis+device_control.trade.cr.cass1_dis*5+device_control.trade.cr.cass2_dis*10),
+				device_control.trade.cr.coin_dis,device_control.trade.cr.cass1_dis,device_control.trade.cr.cass2_dis);
+			temp = 0x33;
+			DisplayMessage(&temp);
 		}
 		else if (sys_state.ss.st_cmd.se.printamount.exe_st == EXE_RUN_END)
 		{
