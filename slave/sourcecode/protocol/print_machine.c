@@ -628,7 +628,7 @@ void PrintReceipt(void)
 	Ent(1);
 	OSTimeDly(10);	
 
-	sprintf(print_buffer,"找  零: %d元",device_control.trade.tm.changemoney);			//	打印总票价
+	sprintf(print_buffer,"找  零: %d元",(device_control.trade.cr.cass1_dis * 5 + device_control.trade.cr.cass2_dis * 10 + device_control.trade.cr.coin_dis));			//	打印总票价
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
 	OSTimeDly(10);	
