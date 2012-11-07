@@ -253,10 +253,19 @@ void TaskChipComm(void *pdata) {
 				if ((sys_state.ss.st_cmd.se.makechange.exe_st == EXE_WRITED)
 					&& ((device_control.cmd.changemoney.exe_st == EXE_WAIT) || (device_control.cmd.changemoney.exe_st == EXE_RUN_END)))
 				{
-					device_control.cmd.changemoney.exe_st = EXE_WRITED;
-					while (ChipDataUpdata(1,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,&device_control.cmd.changemoney) != TRUE) 
+					
+					if(device_control.trade.tm.changemoney > 99)
 					{
-						OSTimeDly(2);
+						device_control.cmd.changemoney.exe_st = EXE_WAIT;
+						DisplayMessage("’“¡„¥ÌŒÛ:01");
+					}
+					else
+					{
+						device_control.cmd.changemoney.exe_st = EXE_WRITED;
+						while (ChipDataUpdata(1,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,&device_control.cmd.changemoney) != TRUE) 
+						{
+							OSTimeDly(2);
+						}
 					}
 				}
 				else if (sys_state.ss.st_cmd.se.makechange.exe_st == EXE_WRITED)
@@ -292,7 +301,7 @@ void TaskChipComm(void *pdata) {
 				{
 					OSSemPost(data_updata_sem);
 				}
-				if ((sys_state.ss.st_cmd.se.printamount.exe_st == EXE_WRITED) && (sys_state.ss.st_major.ssm.st_user == USER_NO_CARD)
+				if ((sys_state.ss.st_cmd.se.printamount.exe_st == EXE_WRITED)/* && (sys_state.ss.st_major.ssm.st_user == USER_NO_CARD)*/
 					&& ((device_control.cmd.print_amount.exe_st == EXE_WAIT) || (device_control.cmd.print_amount.exe_st == EXE_RUN_END)))
 				{
 					sys_state.ss.st_cmd.se.printamount.exe_st = EXE_RUNNING;
@@ -307,10 +316,10 @@ void TaskChipComm(void *pdata) {
 						OSTimeDly(2);
 					}
 				}
-				else if ((sys_state.ss.st_cmd.se.printamount.exe_st == EXE_WRITED) && (sys_state.ss.st_major.ssm.st_user != USER_NO_CARD))
+				/*else if ((sys_state.ss.st_cmd.se.printamount.exe_st == EXE_WRITED) && (sys_state.ss.st_major.ssm.st_user != USER_NO_CARD))
 				{
 					sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WAIT;
-				}
+				}*/
 				else if (sys_state.ss.st_cmd.se.printamount.exe_st == EXE_WRITED)
 				{
 					OSSemPost(data_updata_sem);

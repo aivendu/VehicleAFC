@@ -448,6 +448,30 @@ uint16 Print(void *arg) {
 			err = PAD_NACK;
 		}
 	}
+	else if (rec_com.arg == 0x33)
+	{
+		sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WRITED;
+		RequestUpdata();
+		temp.len = 2+2+1;
+		temp.backage_num = rec_com.package_num;
+		temp.err_no = 0x0000;
+		temp.cmd = rec_com.cmd;
+		temp.arg = rec_com.arg;
+		temp.dat = &err;
+		err = PAD_ACK;
+	}
+	else if (rec_com.arg == 0x34)
+	{
+		sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WRITED;
+		RequestUpdata();
+		temp.len = 2+2+1;
+		temp.backage_num = rec_com.package_num;
+		temp.err_no = 0x0000;
+		temp.cmd = rec_com.cmd;
+		temp.arg = rec_com.arg;
+		temp.dat = &err;
+		err = PAD_ACK;
+	}
 	else {
 		temp.len = 2+2+1;
 		temp.backage_num = rec_com.package_num;
@@ -486,7 +510,6 @@ uint16 ShutDown(void *arg) {
 	_df_device_and_pad_comm temp;
 	err = 0;
 	sys_state.ss.st_cmd.se.shutdown.exe_st = EXE_WRITED;			//	执行关机
-	sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WRITED;
 	RequestUpdata();
 	//	准备回复数据
 	err = PAD_ACK;
@@ -934,6 +957,8 @@ void TaskPADRecHandle(void *pdata) {
 				if (rec_temp == '<') {
 					rec_state = RJ45_LENGTH;
 					bcc = 0;
+					dat_len = 0;
+					rec_len = 0;
 					bcc = CRCByte(bcc,rec_temp);
 					//bcc = CRCByte(0,rec_temp);
 				}				
