@@ -1,0 +1,7 @@
+*.o
+*.tdt
+*.stg
+*.i32
+*.txt
+*/SI3.5/*
+slave/*
