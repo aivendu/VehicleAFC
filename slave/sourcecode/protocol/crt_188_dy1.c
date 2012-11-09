@@ -946,7 +946,7 @@ UART_COMMUNICATION_ERR_HANDLE:
 		}
 
 		if ((card_type >= CARD_TYPE_24C01) && (card_type <= CARD_TYPE_24C64)) {		//	判断是否符合该类型的卡
-			err = Crt188Read24CXX(card_type,0,sizeof(_card_plaintxt_s),df_card);			//	读IC 的数据
+			err = Crt188Read24CXX(card_type,0,sizeof(_card_data_s),&df_card_data);			//	读IC 的数据
 			if (err == SYS_NO_ERR) {
 				card_machine_state = CRT188_HAVE_CARD;
 				device_control.sys_device.ic_machine_state = IC_MACHINE_HAVE_CARD;

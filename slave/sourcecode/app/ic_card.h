@@ -18,10 +18,10 @@ typedef struct {
 	uint8 user_id[3];			//	客户代号
 	uint8 card_id[4];			//	卡号
 	uint8 card_create_time[4];	//	办卡时间，从2000年开始计算的秒数，
-	uint8 unused[4];			//	预留
 } _company_flag_s;
 
 typedef struct {
+	uint8 regist_time[4];		//	打卡时间
 	uint8 user_role;			//	用户角色，用于判别用户的功能权限
 	char staffid[7];			//	工号，支持最多7个字符
 	char driver_name[8];		//	司机名字，支持最多4个字的名字
@@ -30,6 +30,7 @@ typedef struct {
 
 typedef struct {
 	uint8 guid[16];				//	GUID, 路线唯一编号
+	uint8 vehicle_plate[8];		//	车牌号
 	uint16 routenum;			//	路线编号
 } _route_info_s;
 
