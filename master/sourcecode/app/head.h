@@ -10,7 +10,8 @@ typedef enum {
 	TaskPADRecHandlePrio,
 	TaskServerHandlePrio,
 	TaskChipCommPrio,
-	TaskDataStorePrio,
+	TaskTradePrio,
+	TaskDataUploadPrio,
 	
 	PRIOEND
 } _task_prio_e;

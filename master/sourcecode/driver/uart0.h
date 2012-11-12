@@ -44,12 +44,13 @@
 
 typedef enum {
 	UART0_INIT,
-	RJ45
+	GPRS,
 } _uart0_fun;
 
 
 typedef struct {
 	uint8 channal;
+	//uint8 unused[3];
 	uint32 bps;
 } _uart_config_s;
 

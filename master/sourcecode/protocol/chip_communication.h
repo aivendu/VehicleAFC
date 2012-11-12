@@ -2,7 +2,7 @@
 #define _CHIP_COMMUNICATION_H
 
 #include "comm.h"
-#include "eeprom.h"
+#include "virtual_memery.h"
 
 
 typedef struct {
@@ -29,6 +29,7 @@ typedef struct {
 } _line_mess_s;
 
 typedef struct {
+	uint8 regist_time[4];		//	打卡时间
 	uint8 user_role;			//	用户角色，用于判别用户的功能权限
 	char staffid[7];			//	工号，支持最多7个字符
 	char driver_name[8];		//	司机名字，支持最多4个字的名字
@@ -37,6 +38,7 @@ typedef struct {
 
 typedef struct {
 	uint8 guid[16];				//	GUID, 路线唯一编号
+	char vehicle_plate[8];		//	车牌号
 	uint16 routenum;			//	路线编号
 } _route_info_s;
 
@@ -186,7 +188,7 @@ extern _device_control_s device_control;
 
 
 extern void ChipCommInit(void);
-extern void RequestUpdata(void);
+extern void RequestUpload(void);
 extern void TaskChipComm(void *pdata);
 
 

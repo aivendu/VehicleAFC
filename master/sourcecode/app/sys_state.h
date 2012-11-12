@@ -9,7 +9,8 @@ typedef struct {
 	uint32 st_init				:1;
 	uint32 st_allow_trade		:1;
 	uint32 st_device_abort		:1;
-	uint32 unused				:21;
+	uint32 st_sys_time_upload	:2;		//	0--未更新，1--通过gps 更新，2--通过服务器更新
+	uint32 unused				:19;
 } _sys_st_major_s;
 
 typedef union {
@@ -55,7 +56,7 @@ typedef struct {
 	_exe_s config_match;		//	执行配置匹配
 	_exe_s logout;				//	执行注销
 	_exe_s login;
-	_exe_s updata_line_data;
+	_exe_s upload_line_data;
 	_exe_s change_site;
 	_exe_s store_trade_data;
 	_exe_s printamount;
@@ -103,7 +104,12 @@ typedef union {
 
 extern _sys_st_u sys_state;
 
+#define GetChangeMoneyCommand()			(sys_state.ss.st_cmd.se.makechange.exe_st)
+#define SetChangeMoneyCommand(c)		(sys_state.ss.st_cmd.se.makechange.exe_st = c)
+#define GetTimeUploadState()			(sys_state.ss.st_major.ssm.st_sys_time_upload)
+#define SetTimeUploadState(c)			(sys_state.ss.st_major.ssm.st_sys_time_upload = c)
 
+#define GetCommandState()				
 
 
 #endif

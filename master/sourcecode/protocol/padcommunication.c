@@ -19,11 +19,12 @@ uint32 delay_time = 60;			//	调试代码
 
 uint8 station_quantity;
 char promptmess[100]={"欢迎光临! welcome to here!"};
-
+char PAD_version[16];
 
 _df_device_and_pad_comm comm_rec_temp;
 static OS_EVENT *pad_ack_sem;
 static uint8 send_package_num;
+
 
 #define GetPackageNum()				(send_package_num++)
 #define ResetPackageNum()			(send_package_num=0)
@@ -37,7 +38,7 @@ void PadCommInit(void) {
 	if (pad_ack_sem ==  NULL) {
 		while(1);
 	}
-	pad_event_sem = OSSemCreate(0);
+	pad_event_sem = OSSemCreate(1);
 	if (pad_event_sem ==  NULL) {
 		while(1);
 	}
@@ -46,6 +47,21 @@ void PadCommInit(void) {
 /*
 *	请求PAD 通信资源
 */
+void RequestPADCommunication(void)
+{
+	uint8 err;
+	OSSemPend(pad_event_sem,0,&err);
+}
+
+/*
+*	释放PAD 通信资源
+*/
+
+void FreePADCommunication(void)
+{
+	OSSemPost(pad_event_sem);
+}
+
 
 
 /*****************************************************************************************************
@@ -145,15 +161,6 @@ uint8 SendToPadCom(const _df_device_and_pad_comm *dat,uint8 flag) {
 	return 0;			//	发送完成，返回发送成功
 }
 
-uint8 ReadVariable(_pad_com_task var) {
-	return 0;
-}
-
-
-char pad_ver[17];
-char config_ver[17];
-uint8 pad_state[5];
-
 uint8 changesite_flag;
 uint8 old_station;
 uint8 curr_station;
@@ -196,7 +203,7 @@ uint16 GetDeviceState(void *arg) {			//	路线编号以自动生成的GUID 代替
 }
 
 uint16 ExceptionHandle(void *arg) {
-	uint16 err_no = 0x0101;
+	//uint16 err_no = 0x0101;
 	_df_device_and_pad_comm temp;
 	uint8 data_temp=PAD_NACK;
 	temp.len = 2+2+1;
@@ -236,7 +243,7 @@ uint16 ChangeSite(void *arg) {
 
 uint16 RideMess(void *arg) {
 	_df_device_and_pad_comm temp;
-	_ride_mess_s *mess_temp;
+	//_ride_mess_s *mess_temp;
 	uint8 data_temp;
 	uint8 index=0;
 	if (rec_com.old_package_num != rec_com.package_num)
@@ -310,7 +317,7 @@ uint16 RideMess(void *arg) {
 		temp.err_no = 0x0000;		//	没有错误
 		data_temp = PAD_ACK;
 		sys_state.ss.st_cmd.se.speak.exe_st = EXE_WRITED;
-		RequestUpdata();
+		RequestUpload();
 	}
 	temp.cmd = rec_com.cmd;
 	temp.arg = rec_com.arg;
@@ -334,13 +341,13 @@ uint16 MakeChange(void *arg) {
 			device_control.trade.tm.realpay = rec_com.data[8]*256+rec_com.data[9];
 			device_control.trade.tm.changemoney = rec_com.data[12]*256+rec_com.data[13];
 			if (device_control.trade.tm.changemoney == (device_control.trade.tm.realpay - device_control.trade.tm.needpay)) {
-				RequestUpdata();
+				RequestUpload();
 				data_temp[0]= PAD_ACK;
 				temp.err_no = 0x0000;
 			}
 			else {
 				device_control.trade.tm.changemoney = device_control.trade.tm.realpay - device_control.trade.tm.needpay;
-				RequestUpdata();
+				RequestUpload();
 				data_temp[0]= PAD_ACK;
 				temp.err_no = 0x0000;		//	计算错误
 			}
@@ -411,7 +418,7 @@ uint16 Print(void *arg) {
 	if (rec_com.arg == 0x31) {
 		if ((rec_com.old_package_num != rec_com.package_num)) {
 			sys_state.ss.st_cmd.se.print.exe_st = EXE_WRITED;
-			RequestUpdata();
+			RequestUpload();
 			temp.err_no = 0x0000;
 			err = PAD_ACK;
 		}
@@ -451,7 +458,7 @@ uint16 Print(void *arg) {
 	else if (rec_com.arg == 0x33)
 	{
 		sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WRITED;
-		RequestUpdata();
+		RequestUpload();
 		temp.len = 2+2+1;
 		temp.backage_num = rec_com.package_num;
 		temp.err_no = 0x0000;
@@ -463,7 +470,7 @@ uint16 Print(void *arg) {
 	else if (rec_com.arg == 0x34)
 	{
 		sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WRITED;
-		RequestUpdata();
+		RequestUpload();
 		temp.len = 2+2+1;
 		temp.backage_num = rec_com.package_num;
 		temp.err_no = 0x0000;
@@ -510,7 +517,8 @@ uint16 ShutDown(void *arg) {
 	_df_device_and_pad_comm temp;
 	err = 0;
 	sys_state.ss.st_cmd.se.shutdown.exe_st = EXE_WRITED;			//	执行关机
-	RequestUpdata();
+	sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WRITED;
+	RequestUpload();
 	//	准备回复数据
 	err = PAD_ACK;
 	temp.len = 2+2+1;
@@ -571,7 +579,7 @@ uint16 DisplayMessage(void *arg)
 {
 	uint8 err,i=1;
 	_df_device_and_pad_comm temp;
-	uint8 *point_temp;
+	//uint8 *point_temp;
 	err = 0;
 
 	temp.backage_num = GetPackageNum() & (~0x80);
@@ -589,6 +597,7 @@ uint16 DisplayMessage(void *arg)
 	}
 	i=0;
 	while(1) {
+		RequestPADCommunication();
 		RequestUart1(1,0);
 		do {
 			OSSemPend(pad_ack_sem,1,&err);
@@ -596,6 +605,7 @@ uint16 DisplayMessage(void *arg)
 		SendToPadCom(&temp,0);
 		FreeUart1();
 		OSSemPend(pad_ack_sem,delay_time,&err);		//	等待100ms 
+		FreePADCommunication();
 		if (err == OS_NO_ERR) {
 			if ((send_com.package_num == temp.backage_num) && (send_com.err_no == 0x0000)) {
 				if (*(uint8 *)arg == 0x33) {
@@ -625,7 +635,7 @@ uint16 DisplayMessage(void *arg)
 uint16 Online(void *arg) {
 	uint8 err,i=1;
 	_df_device_and_pad_comm temp;
-	uint8 *point_temp;
+	//uint8 *point_temp;
 	err = 0;
 
 	temp.backage_num = GetPackageNum() & (~0x80);
@@ -648,6 +658,7 @@ uint16 Online(void *arg) {
 	}
 	i=0;
 	while(1) {
+		RequestPADCommunication();
 		RequestUart1(1,0);
 		do {
 			OSSemPend(pad_ack_sem,1,&err);
@@ -655,10 +666,12 @@ uint16 Online(void *arg) {
 		SendToPadCom(&temp,0);
 		FreeUart1();
 		OSSemPend(pad_ack_sem,delay_time,&err);		//	等待100ms 
+		FreePADCommunication();
 		if (err == OS_NO_ERR) {
 			if ((send_com.package_num == temp.backage_num) && (send_com.err_no == 0x0000)) {
 				if (*(uint8 *)arg == 0x31) {
-					
+					memcpy(PAD_version,send_com.data,16);
+					PAD_version[15] = 0;
 				}
 				else if (*(uint8 *)arg == 0x32) {
 					memcpy(&sys_state.ss.st_pad,send_com.data,8);
@@ -703,6 +716,7 @@ uint16 Login(void *arg) {
 	}
 	
 	while(1) {
+		RequestPADCommunication();
 		RequestUart1(1,0);
 		do {
 			OSSemPend(pad_ack_sem,1,&err);
@@ -710,6 +724,7 @@ uint16 Login(void *arg) {
 		SendToPadCom(&temp,0);
 		FreeUart1();
 		OSSemPend(pad_ack_sem,PAD_COMM_WAIT_TIME,&err);		//	等待100ms 
+		FreePADCommunication();
 		if (err == OS_NO_ERR) {
 			if ((send_com.package_num == temp.backage_num) && (send_com.err_no == 0x0000)		//	正常返回
 				&& (send_com.data[0] != PAD_NACK)) {
@@ -733,7 +748,7 @@ uint16 Login(void *arg) {
 
 uint16 TimeSync(void *arg) {
 	uint8 err,i=1;
-	uint16 time_temp;
+	//uint16 time_temp;
 	_df_device_and_pad_comm temp;
 	uint8 data_temp[9];
 	err = 0;
@@ -750,6 +765,7 @@ uint16 TimeSync(void *arg) {
 	temp.dat = (uint8 *)&data_temp;
 	temp.len = 2+7; 
 	while(1) {
+		RequestPADCommunication();
 		RequestUart1(1,0);
 		do {
 			OSSemPend(pad_ack_sem,1,&err);
@@ -757,6 +773,7 @@ uint16 TimeSync(void *arg) {
 		SendToPadCom(&temp,0);
 		FreeUart1();
 		OSSemPend(pad_ack_sem,PAD_COMM_WAIT_TIME,&err);		//	等待100ms 
+		FreePADCommunication();
 		if (err == OS_NO_ERR) {
 			if ((send_com.package_num == temp.backage_num) && (send_com.err_no == 0x0000)		//	正常返回
 				&& (send_com.data[0] != PAD_NACK)) {
@@ -802,6 +819,7 @@ uint16 GetStationMess(void *arg) {
 		return PARAMITER_ERR;
 	}
 	while (1) {
+		RequestPADCommunication();
 		RequestUart1(1,0);
 		do {
 			OSSemPend(pad_ack_sem,1,&err);
@@ -810,6 +828,7 @@ uint16 GetStationMess(void *arg) {
 		FreeUart1();
 
 		OSSemPend(pad_ack_sem,PAD_COMM_WAIT_TIME,&err);		//	等待100ms 
+		FreePADCommunication();
 		if (err == OS_NO_ERR) {
 			if (*(uint8 *)arg == 0x31) {
 				if ((send_com.package_num == temp.backage_num) && (send_com.err_no == 0x0000)) {		//	正常返回
@@ -868,7 +887,7 @@ uint16 StationSync(void *arg) {
 	temp.cmd = 0x40;
 	temp.arg = 0x31;
 	
-	if ((curr_station <= 0) || (curr_station > curr_line.line_station_amount))
+	if ((curr_station == 0) || (curr_station > curr_line.line_station_amount))
 	{
 		curr_station = 1;
 	}
@@ -876,6 +895,7 @@ uint16 StationSync(void *arg) {
 	data_temp[1] = run_direction;
 	temp.dat = data_temp; 
 	while(1) {
+		RequestPADCommunication();
 		RequestUart1(1,0);
 		do {
 			OSSemPend(pad_ack_sem,1,&err);
@@ -883,6 +903,7 @@ uint16 StationSync(void *arg) {
 		SendToPadCom(&temp,0);
 		FreeUart1();
 		OSSemPend(pad_ack_sem,PAD_COMM_WAIT_TIME,&err);		//	等待100ms 
+		FreePADCommunication();
 		if (err == OS_NO_ERR) {
 			if ((send_com.package_num == temp.backage_num) && (send_com.err_no == 0x0000)
 				&& (send_com.data[0] != PAD_NACK)) {
@@ -957,8 +978,6 @@ void TaskPADRecHandle(void *pdata) {
 				if (rec_temp == '<') {
 					rec_state = RJ45_LENGTH;
 					bcc = 0;
-					dat_len = 0;
-					rec_len = 0;
 					bcc = CRCByte(bcc,rec_temp);
 					//bcc = CRCByte(0,rec_temp);
 				}				
@@ -1159,8 +1178,8 @@ uint32 pad_comm_tick;
 
 void TaskDeviceCommand(void *pdata) {
 	uint16 err;
-	uint8 pad_communication_num=0;
-	uint8 guid_old[16];
+	//uint8 pad_communication_num=0;
+	//uint8 guid_old[16];
 	uint8 run_state;
 	uint8 arg[2];
 	uint8 station;
@@ -1317,9 +1336,9 @@ void TaskDeviceCommand(void *pdata) {
 					if ((++station) > curr_line.line_station_amount) {
 						run_state = RUNNING;
 						time_delay_num = 26;
-						sys_state.ss.st_cmd.se.updata_line_data.exe_st = EXE_WRITED;
+						sys_state.ss.st_cmd.se.upload_line_data.exe_st = EXE_WRITED;
 						sys_state.ss.st_cmd.se.change_site.exe_st = EXE_WRITED;
-						RequestUpdata();
+						RequestUpload();
 					}
 					else
 					{
@@ -1350,7 +1369,7 @@ void TaskDeviceCommand(void *pdata) {
 				sys_state.ss.st_cmd.se.print.exe_st = EXE_WAIT;
 				sys_state.ss.st_cmd.se.shutdown.exe_st = EXE_WAIT;
 				sys_state.ss.st_cmd.se.speak.exe_st = EXE_WAIT;
-				sys_state.ss.st_cmd.se.updata_line_data.exe_st = EXE_WAIT;
+				sys_state.ss.st_cmd.se.upload_line_data.exe_st = EXE_WAIT;
 				arg[0] = sys_state.ss.st_major.ssm.st_user;
 				err = Login(arg);
 				if (err == SYS_NO_ERR) {

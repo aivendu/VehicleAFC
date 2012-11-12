@@ -79,7 +79,7 @@ void TaskGPRS(void *pdata){
 							}
 							OSSemPost(Uart0_Channel_Sem);
 							SetGprsUsedState(0);
-							if ((GetUserState() == USER_RUNNING) && (GetUpdataState() == 0)) {
+							if ((GetUserState() == USER_RUNNING) && (GetUploadState() == 0)) {
 								break;
 							}
 							//OSTaskSuspend(TaskGPRSPrio);

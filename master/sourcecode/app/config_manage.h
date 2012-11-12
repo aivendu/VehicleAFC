@@ -1,6 +1,7 @@
 #ifndef _CONFIG_MANAGE_H
 #define _CONFIG_MANAGE_H
 
+#include "uart0.h"
 
 #define CONFIG_SAVE_START_ADDR			0
 
@@ -83,6 +84,7 @@ typedef struct
 
 extern _config_s config_ram;
 
+extern void ConfigInit(void);
 
 
 #endif

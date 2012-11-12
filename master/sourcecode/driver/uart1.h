@@ -38,7 +38,7 @@
 
 typedef enum {
 	UART1_INIT,
-	GPRS
+	RJ45,
 } _uart1_fun;
 
 

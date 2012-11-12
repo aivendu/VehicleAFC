@@ -78,6 +78,7 @@
 #include "queue.h"
 #include "head.h"
 #include "comm.h"
+#include "string.h"
 #include "uart0.h"
 #include "uart1.h"
 #include "i2c0.h"
@@ -86,13 +87,18 @@
 #include "test.h"
 #include "device_state.h"
 #include "ic_card.h"
+//#include "command.h"
 #include "sys_err.h"
 #include "sys_state.h"
+#include "data_upload.h"
 #include "padcommunication.h"
 #include "chip_communication.h"
 #include "server_communication.h"
-#include "eeprom.h"
+#include "virtual_memery.h"
 #include "target.h"              //This line may not be deleted 这一句不能删除
+#include "config_manage.h"
+#include "log_data_handle.h"
+#include "trade.h"
 
 
    /* 由于不同情况中断OSIntExit()对堆栈的使用情况不同，必须加上这个宏定义    */

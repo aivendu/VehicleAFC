@@ -7,7 +7,7 @@ uint32	current_trade_index;
 #define	IDLE					0
 #define	CHANGE_MONEY			1
 #define	PRINT					2
-#define	UPDATA					3
+#define	UPLOAD					3
 #define	STORE					4
 
 void InitTradeManageData(void)
@@ -26,7 +26,7 @@ void TaskTrade(void *pdata)
 	InitTradeManageData();
 	while (1)
 	{
-		if (GetTimeUPDataState() != 0)
+		if (GetTimeUploadState() != 0)
 		{
 			if ((YEAR > trade_manage_data_temp.year)
 				|| ((YEAR == trade_manage_data_temp.year)
@@ -71,7 +71,7 @@ void TaskTrade(void *pdata)
 			case PRINT:
 				break;
 
-			case UPDATA:
+			case UPLOAD:
 				break;
 
 			case STORE:

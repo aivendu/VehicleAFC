@@ -76,6 +76,7 @@ uint16 I2c0WriteBytes(uint8 chip_addr, uint8 *wdat, uint16 wnbyte)
     uint8 err;
     unsigned int Rt;
 
+	OSSemPend(I2cSem, 0, &err);
 	I2CONCLR = 0x6C;
 	I2CONSET = 0x40;							/* 使能I2c */
 
@@ -85,21 +86,66 @@ uint16 I2c0WriteBytes(uint8 chip_addr, uint8 *wdat, uint16 wnbyte)
     i2c_wbuf = wdat;                                      /* 存储写的数据的指针 */
     I2CONSET = 0x24;                                    /* 设置为主机，并启动总线 */
     VICIntEnable = 1 << 9;                      /* 使能I2c中断 */
-    Rt = (unsigned int) OSMboxPend(I2cMbox, 0, &err);   /* 等待操作结束 */
-	VICIntEnClr = 1 << 9;					   /* 禁止能I2c中断 */
-    return Rt;
+    OSMboxPend(I2cMbox, 0, &err);   			/* 等待操作结束 */
+	VICIntEnClr = 1 << 9;						/* 禁止能I2c中断 */
+	OSSemPost(I2cSem);
+    return (wnbyte - i2c_wnbyte);
 }
 
 uint16 I2c0WriteMemery(uint8 chip_addr, uint8 *addr, uint8 addr_len, uint8 *wdat, uint16 wnbyte)
 {
-	uint16 err;
-	err = I2c0WriteBytes(chip_addr,addr,addr_len);
-	if (err != I2C_WRITE_END)
-	{
-		return err;
+	uint8	err;
+	uint16	rt;
+	OSSemPend(I2cSem, 0, &err);
+
+	I2CONCLR = 0x6C;
+	I2CONSET = 0x40;							/* 使能I2c */
+
+	VICIntEnClr = 1 << 9;                       /* 禁止能I2c中断 */
+	I2CONCLR = 0x28;
+	I2CONSET = 0x24; 
+	while (1) {
+		if ((I2CONSET & 0x08) != 0x08) {
+			continue;
+		}
+		if (((I2STAT & 0xf8) == 0x08) || ((I2STAT & 0xf8) == 0x10)) {
+			I2DAT = chip_addr & 0xfe;
+			I2CONCLR = 0x28;
+		}
+		else if ((I2STAT &0xf8) == 0x18) {
+#if MEMERY_ADDR_MODE == 0
+			I2DAT = addr[addr_len-1];
+#else
+			I2DAT = addr[0];
+#endif
+			I2CONCLR = 0x28;
+			--addr_len;
+		}
+		else if ((I2STAT &0xf8) == 0x28) {
+			if (--addr_len) {
+#if MEMERY_ADDR_MODE == 0
+				I2DAT = addr[addr_len-1];
+#else
+				I2DAT = addr[0];
+#endif
+
+				I2CONCLR = 0x28;
+			}
+			else {
+			    i2c_wnbyte = wnbyte;                       /* 存储读字节数 */
+			    i2c_wbuf = wdat;                               /* 存储读到的数据 */
+			    VICIntEnable = 1 << 9;                      /* 使能I2c中断 */
+				break;
+			}
+		}
 	}
-	err = I2c0WriteBytes(chip_addr,wdat,wnbyte);
-	return err;
+
+    OSMboxPend(I2cMbox, 0, &err);               /* 等待操作结束 */
+
+    VICIntEnClr = 1 << 9;                       /* 禁止能I2c中断 */
+    OSSemPost(I2cSem);
+	
+    return (wnbyte - i2c_wnbyte);
 }
 
 /*********************************************************************************************************
@@ -126,7 +172,7 @@ uint16 I2c0ReadBytes(uint8 chip_addr,uint8 *rdat,int16 rnbyte)
 {
     uint8 err;
     
-    //OSSemPend(I2cSem, 0, &err);
+    OSSemPend(I2cSem, 0, &err);
 
     I2CONCLR = 0x6C;
     I2CONSET = 0x40;                            /* 使能I2c */
@@ -141,7 +187,7 @@ uint16 I2c0ReadBytes(uint8 chip_addr,uint8 *rdat,int16 rnbyte)
     OSMboxPend(I2cMbox, 0, &err);               /* 等待操作结束 */
 
     VICIntEnClr = 1 << 9;                       /* 禁止能I2c中断 */
-    //OSSemPost(I2cSem);
+    OSSemPost(I2cSem);
     return (rnbyte - i2c_rnbyte);
 }
 
@@ -149,6 +195,8 @@ uint16 I2c0WriteReadBytes(uint8 chip_addr, uint8 *wdat, uint8 wnbyte, uint8 *rda
 	uint8 err;
 	
 	err = 0;
+
+	OSSemPend(I2cSem, 0, &err);
 	I2CONCLR = 0x6C;
 	I2CONSET = 0x40;							/* 使能I2c */
 	
@@ -164,7 +212,7 @@ uint16 I2c0WriteReadBytes(uint8 chip_addr, uint8 *wdat, uint8 wnbyte, uint8 *rda
 	OSMboxPend(I2cMbox, 0, &err);				/* 等待操作结束 */
 	
 	VICIntEnClr = 1 << 9;					   /* 禁止能I2c中断 */
-	//OSSemPost(I2cSem);
+	OSSemPost(I2cSem);
 	return (rnbyte - i2c_rnbyte);
 	
 }

@@ -110,5 +110,15 @@ extern void PadCommInit(void);
 extern void TaskDeviceCommand(void *pdata);
 extern void TaskPADRecHandle(void *pdata);
 extern uint16 DisplayMessage(void *arg);
+extern uint16 Online(void *arg);
+extern uint16 Login(void *arg);
+extern uint16 TimeSync(void *arg);
+extern uint16 GetStationMess(void *arg);
+extern uint16 StationSync(void *arg);
+
+
+
+
+
 
 #endif
