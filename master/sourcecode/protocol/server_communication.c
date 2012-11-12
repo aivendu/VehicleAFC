@@ -19,9 +19,8 @@
 
 
 static OS_EVENT *server_communication_sem,*server_return_sem;
-_server_communication_s gprs_rec_buffer;
+_server_communication_s gprs_rec_buffer,gprs_send_buffer;
 static uint8 server_package;
-
 const char dtuinfo[] = "AT*DtuInfo";
 const char heartbeat[] = "AT#Heartbeat:";
 const char DSC_IP[] = "AT#IP:0,120.195.217.32";
@@ -92,15 +91,7 @@ uint8 GprsSendFrameToServer(_server_communication_s *command)
 	}
 	GprsSendByte(SERVER_COMMUNICATION_HEAD);	//	发送头
 	memset(temp,0,sizeof(temp));
-	//sprintf(temp,"%04c",config_ram.pa.device_addr);	//	去设备地址
-	if (strlen(config_ram.pa.device_addr) >= 4)
-	{
-		memcpy(temp,config_ram.pa.device_addr,4);
-	}
-	else
-	{
-		memcpy(temp,"9999",4);
-	}
+	memcpy(temp,GetDeviceAddr(),4);					//	取设备地址
 	GprsSendString(temp);							//	发送设备地址
 	command->check = CrcString(command->check,temp);	//	校验设备地址
 		
@@ -147,24 +138,23 @@ uint8 GprsSendFrameToServer(_server_communication_s *command)
 uint8 ServerOnLine(void)
 {
 	uint8 err;
-	_server_communication_s server_communication_temp;
-	server_communication_temp.package_no = server_package;
-	memcpy(server_communication_temp.command,"00",2);
-	memcpy(server_communication_temp.argument,"00",2);
-	server_communication_temp.data_lenght = 4;
 	RequestServerCommunication();
-	GprsSendFrameToServer(&server_communication_temp);
+	gprs_send_buffer.package_no = server_package;
+	memcpy(gprs_send_buffer.command,"00",2);
+	memcpy(gprs_send_buffer.argument,"00",2);
+	gprs_send_buffer.data_lenght = 4;
+	GprsSendFrameToServer(&gprs_send_buffer);
 	
 	OSSemPend(server_return_sem,GPRS_MAX_TIME_DELAY*2,&err);
-	FreeServerCommunication();
 	if (err == GPRS_DATA_NO_ERR)
 	{
 		if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
 		{
-			return GPRS_DATA_NO_ERR;
+			err = GPRS_DATA_NO_ERR;
 		}
-		return GPRS_DATA_RETURN_ERR;
+		err = GPRS_DATA_RETURN_ERR;
 	}
+	FreeServerCommunication();
 	return err;
 }
 
@@ -172,11 +162,12 @@ uint8 ServerOnLine(void)
 uint8 ServerUploadTradeData(_trade_data_to_server_s *data)
 {
 	uint8 err;
-	_server_communication_s server_communication_temp;
-	server_communication_temp.package_no = server_package;
-	memcpy(server_communication_temp.command,"TD",2);
-	memcpy(server_communication_temp.argument,"00",2);
-	sprintf(server_communication_temp.data,"%04d%02d%02d%02d%02d%02d%05d%05d%05d%02d%02d%02d%01d%02d",
+	
+	RequestServerCommunication();
+	gprs_send_buffer.package_no = server_package;
+	memcpy(gprs_send_buffer.command,"TD",2);
+	memcpy(gprs_send_buffer.argument,"00",2);
+	sprintf(gprs_send_buffer.data,"%04d%02d%02d%02d%02d%02d%05d%05d%05d%02d%02d%02d%01d%02d",
 		data->year,
 		data->month,
 		data->day,
@@ -193,26 +184,28 @@ uint8 ServerUploadTradeData(_trade_data_to_server_s *data)
 		data->current_station);
 	for (err = 0; ((err < data->destination_num) && (err < 6)); err++)
 	{
-		sprintf(&server_communication_temp.data[38 + (err * 7)],"%02d%03d%02d",
+		sprintf(&gprs_send_buffer.data[38 + (err * 7)],"%02d%03d%02d",
 			data->destination[err].destination_station,
 			data->destination[err].price,
 			data->destination[err].people_num);
 	}
 	
-	server_communication_temp.data_lenght = 4 + strlen(server_communication_temp.data);
-	RequestServerCommunication();
-	GprsSendFrameToServer(&server_communication_temp);
+	gprs_send_buffer.data_lenght = 4 + strlen(gprs_send_buffer.data);
+	GprsSendFrameToServer(&gprs_send_buffer);
 	
 	OSSemPend(server_return_sem,GPRS_MAX_TIME_DELAY*2,&err);
-	FreeServerCommunication();
 	if (err == GPRS_DATA_NO_ERR)
 	{
 		if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
 		{
-			return GPRS_DATA_NO_ERR;
+			err = GPRS_DATA_NO_ERR;
 		}
-		return GPRS_DATA_RETURN_ERR;
+		else
+		{
+			err = GPRS_DATA_RETURN_ERR;
+		}
 	}
+	FreeServerCommunication();
 	return err;
 }
 
@@ -220,24 +213,27 @@ uint8 ServerUploadTradeData(_trade_data_to_server_s *data)
 uint8 ServerTimeSync(void)
 {
 	uint8 err;
-	_server_communication_s server_communication_temp;
-	server_communication_temp.package_no = server_package;
-	memcpy(server_communication_temp.command,"TS",2);
-	memcpy(server_communication_temp.argument,"00",2);
-	server_communication_temp.data_lenght = 4;
+	
 	RequestServerCommunication();
-	GprsSendFrameToServer(&server_communication_temp);
+	gprs_send_buffer.package_no = server_package;
+	memcpy(gprs_send_buffer.command,"TS",2);
+	memcpy(gprs_send_buffer.argument,"00",2);
+	gprs_send_buffer.data_lenght = 4;
+	GprsSendFrameToServer(&gprs_send_buffer);
 	
 	OSSemPend(server_return_sem,GPRS_MAX_TIME_DELAY*2,&err);
-	FreeServerCommunication();
 	if (err == GPRS_DATA_NO_ERR)
 	{
 		if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
 		{
-			return GPRS_DATA_NO_ERR;
+			err = GPRS_DATA_NO_ERR;
 		}
-		return GPRS_DATA_RETURN_ERR;
+		else
+		{
+			err = GPRS_DATA_RETURN_ERR;
+		}
 	}
+	FreeServerCommunication();
 	return err;
 }
 
@@ -245,107 +241,109 @@ uint8 ServerTimeSync(void)
 uint8 ServerCashBoxBalance(uint16 cashbox1, uint16 cashbox2, uint16 cashbox3)
 {
 	uint8 err;
-	_server_communication_s server_communication_temp;
-	server_communication_temp.package_no = server_package;
-	memcpy(server_communication_temp.command,"MB",2);
-	memcpy(server_communication_temp.argument,"00",2);
-	sprintf(server_communication_temp.data, "%05d%05d%05d", cashbox1,cashbox2,cashbox3);
-	server_communication_temp.data_lenght = 4 + 15;
-	GprsSendFrameToServer(&server_communication_temp);
+	
+	RequestServerCommunication();
+	gprs_send_buffer.package_no = server_package;
+	memcpy(gprs_send_buffer.command,"MB",2);
+	memcpy(gprs_send_buffer.argument,"00",2);
+	sprintf(gprs_send_buffer.data, "%05d%05d%05d", cashbox1,cashbox2,cashbox3);
+	gprs_send_buffer.data_lenght = 4 + 15;
+	GprsSendFrameToServer(&gprs_send_buffer);
 	
 	OSSemPend(server_return_sem,GPRS_MAX_TIME_DELAY*2,&err);
 	if (err == GPRS_DATA_NO_ERR)
 	{
 		if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
 		{
-			return GPRS_DATA_NO_ERR;
+			err = GPRS_DATA_NO_ERR;
 		}
-		return GPRS_DATA_RETURN_ERR;
+		err = GPRS_DATA_RETURN_ERR;
 	}
+	FreeServerCommunication();
 	return err;
 }
 
 uint8 ServerGPSData(uint8 flag,uint32 latitude, uint32 longitude, uint32 speed)
 {
 	uint8 err;
-	_server_communication_s server_communication_temp;
-	server_communication_temp.package_no = server_package;
-	memcpy(server_communication_temp.command,"GD",2);
+	
+	RequestServerCommunication();
+	gprs_send_buffer.package_no = server_package;
+	memcpy(gprs_send_buffer.command,"GD",2);
 	if (flag)
 	{
-		memcpy(server_communication_temp.argument,"01",2);
-		sprintf(server_communication_temp.data, "%010d%010d%03d.%02d",longitude,latitude,speed/1000,(speed%1000)/10);
-		server_communication_temp.data_lenght = 4+26;
+		memcpy(gprs_send_buffer.argument,"01",2);
+		sprintf(gprs_send_buffer.data, "%010d%010d%03d.%02d",longitude,latitude,speed/1000,(speed%1000)/10);
+		gprs_send_buffer.data_lenght = 4+26;
 	}
 	else
 	{
-		memcpy(server_communication_temp.argument,"00",2);
-		server_communication_temp.data_lenght = 4;
+		memcpy(gprs_send_buffer.argument,"00",2);
+		gprs_send_buffer.data_lenght = 4;
 	}
-	RequestServerCommunication();
-	GprsSendFrameToServer(&server_communication_temp);
+	GprsSendFrameToServer(&gprs_send_buffer);
 	
 	OSSemPend(server_return_sem,GPRS_MAX_TIME_DELAY*2,&err);
-	FreeServerCommunication();
 	if (err == GPRS_DATA_NO_ERR)
 	{
 		if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
 		{
-			return GPRS_DATA_NO_ERR;
+			err = GPRS_DATA_NO_ERR;
 		}
-		return GPRS_DATA_RETURN_ERR;
+		err = GPRS_DATA_RETURN_ERR;
 	}
+	FreeServerCommunication();
 	return err;
 }
 
 uint8 ServerLogin(char *staffid)
 {
 	uint8 err;
-	_server_communication_s server_communication_temp;
-	server_communication_temp.package_no = server_package;
-	memcpy(server_communication_temp.command,"LI",2);
-	memcpy(server_communication_temp.argument,"00",2);
-	memset(server_communication_temp.data,0,9);
-	sprintf(server_communication_temp.data,"%s",staffid);
-	server_communication_temp.data_lenght = 4+8;
+	
 	RequestServerCommunication();
-	GprsSendFrameToServer(&server_communication_temp);
+	gprs_send_buffer.package_no = server_package;
+	memcpy(gprs_send_buffer.command,"LI",2);
+	memcpy(gprs_send_buffer.argument,"00",2);
+	memset(gprs_send_buffer.data,0,9);
+	sprintf(gprs_send_buffer.data,"%s",staffid);
+	gprs_send_buffer.data_lenght = 4+8;
+	GprsSendFrameToServer(&gprs_send_buffer);
 	
 	OSSemPend(server_return_sem,GPRS_MAX_TIME_DELAY*2,&err);
-	FreeServerCommunication();
 	if (err == GPRS_DATA_NO_ERR)
 	{
 		if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
 		{
-			return GPRS_DATA_NO_ERR;
+			err = GPRS_DATA_NO_ERR;
 		}
-		return GPRS_DATA_RETURN_ERR;
+		err = GPRS_DATA_RETURN_ERR;
 	}
+	FreeServerCommunication();
 	return err;
 }
 
 uint8 ServerLogout(char *staffid)
 {
 	uint8 err;
-	_server_communication_s server_communication_temp;
-	memcpy(server_communication_temp.command,"LO",2);
-	memcpy(server_communication_temp.argument,"00",2);
-	memset(server_communication_temp.data,0,9);
-	sprintf(server_communication_temp.data,"%s",staffid);
-	server_communication_temp.data_lenght = 4+8;
+	
 	RequestServerCommunication();
-	GprsSendFrameToServer(&server_communication_temp);
+	memcpy(gprs_send_buffer.command,"LO",2);
+	memcpy(gprs_send_buffer.argument,"00",2);
+	memset(gprs_send_buffer.data,0,9);
+	sprintf(gprs_send_buffer.data,"%s",staffid);
+	gprs_send_buffer.data_lenght = 4+8;
+	GprsSendFrameToServer(&gprs_send_buffer);
 	
 	OSSemPend(server_return_sem,GPRS_MAX_TIME_DELAY*2,&err);
-	FreeServerCommunication();
 	if (err == GPRS_DATA_NO_ERR)
 	{
 		if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
 		{
-			return GPRS_DATA_NO_ERR;
+			err =  GPRS_DATA_NO_ERR;
 		}
-		return GPRS_DATA_RETURN_ERR;
+		err = GPRS_DATA_RETURN_ERR;
 	}
+	FreeServerCommunication();
 	return err;
 }
 
@@ -354,39 +352,38 @@ uint8 ServerLogout(char *staffid)
 uint8 ReturnOK(char *arg)
 {
 	//uint8 err;
-	_server_communication_s server_communication_temp;
-	memcpy(server_communication_temp.command,"OK",2);
-	memcpy(server_communication_temp.argument,arg,2);
-	server_communication_temp.data_lenght = 4;
-	GprsSendFrameToServer(&server_communication_temp);
+	
+	memcpy(gprs_send_buffer.command,"OK",2);
+	memcpy(gprs_send_buffer.argument,arg,2);
+	gprs_send_buffer.data_lenght = 4;
+	GprsSendFrameToServer(&gprs_send_buffer);
 	return GPRS_DATA_NO_ERR;
 }
 // ER命令
 uint8 ReturnER(char *arg)
 {
 	//uint8 err;
-	_server_communication_s server_communication_temp;
-	memcpy(server_communication_temp.command,"ER",2);
-	memcpy(server_communication_temp.argument,arg,2);
-	server_communication_temp.data_lenght = 4;
-	GprsSendFrameToServer(&server_communication_temp);
+	
+	memcpy(gprs_send_buffer.command,"ER",2);
+	memcpy(gprs_send_buffer.argument,arg,2);
+	gprs_send_buffer.data_lenght = 4;
+	GprsSendFrameToServer(&gprs_send_buffer);
 	return GPRS_DATA_NO_ERR;
 }
 
 uint8 ReturnConfig(char *arg)
 {
-	_server_communication_s server_communication_temp;
-	memcpy(server_communication_temp.command,"RS",2);
-	memcpy(server_communication_temp.argument,arg,2);
-	server_communication_temp.data_lenght = 4;
-	GprsSendFrameToServer(&server_communication_temp);
+	
+	memcpy(gprs_send_buffer.command,"RS",2);
+	memcpy(gprs_send_buffer.argument,arg,2);
+	gprs_send_buffer.data_lenght = 4;
+	GprsSendFrameToServer(&gprs_send_buffer);
 	return GPRS_DATA_NO_ERR;
 }
 
 uint16 ServerMessage(void)
 {
 	uint8 temp[2];
-	_server_communication_s server_communication_temp;
 	memset(promptmess,0,sizeof(promptmess));
 	gprs_rec_buffer.check = 0;
 	strcpy(promptmess,gprs_rec_buffer.data);
@@ -405,14 +402,14 @@ uint16 GetVersion(void *arg)
 uint16 GetUartConfig(void *arg)
 {
 	sprintf(gprs_rec_buffer.data,"%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;",
-		config_ram.uc.uc_rj45.channal,config_ram.uc.uc_rj45.bps,
-		config_ram.uc.uc_gprs.channal,config_ram.uc.uc_gprs.bps,
-		config_ram.uc.uc_gps.channal,config_ram.uc.uc_gps.bps,
-		config_ram.uc.uc_bill.channal,config_ram.uc.uc_bill.bps,
-		config_ram.uc.uc_coin.channal,config_ram.uc.uc_coin.bps,
-		config_ram.uc.uc_print.channal,config_ram.uc.uc_print.bps,
-		config_ram.uc.uc_voice.channal,config_ram.uc.uc_voice.bps,
-		config_ram.uc.uc_icmachine.channal,config_ram.uc.uc_icmachine.bps,
+		GetRj45UartChannal(),GetRj45UartBps(),
+		GetGprsUartChannal(),GetGprsUartBps(),
+		GetGpsUartChannal(),GetGpsUartBps(),
+		GetBillUartChannal(),GetBillUartBps(),
+		GetCoinUartChannal(),GetCoinUartBps(),
+		GetPrintUartChannal(),GetPrintUartBps(),
+		GetVoiceUartChannal(),GetVoiceUartBps(),
+		GetICMachineUartChannal(),GetICMachineUartBps(),
 		0x00,0x00,
 		0x00,0x00
 		);
@@ -421,62 +418,58 @@ uint16 GetUartConfig(void *arg)
 
 uint16 UartConfig(void *arg)
 {
-	config_ram.uc.uc_rj45.channal = ((_uart_config_from_server_s *)gprs_rec_buffer.data)[0].channal_num;
+	SetRj45UartChannal(((_uart_config_from_server_s *)gprs_rec_buffer.data)[0].channal_num - '0');
 	((_uart_config_from_server_s *)gprs_rec_buffer.data)[0].separator = 0x00;
-	config_ram.uc.uc_rj45.bps = atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[0].bps);
+	SetRj45UartBps(atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[0].bps));
 	
-	config_ram.uc.uc_gprs.channal = ((_uart_config_from_server_s *)gprs_rec_buffer.data)[1].channal_num;
+	SetGprsUartChannal(((_uart_config_from_server_s *)gprs_rec_buffer.data)[1].channal_num - '0');
 	((_uart_config_from_server_s *)gprs_rec_buffer.data)[1].separator = 0x00;
-	config_ram.uc.uc_gprs.bps = atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[1].bps);
+	SetGprsUartBps(atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[1].bps));
 	
-	config_ram.uc.uc_gps.channal = ((_uart_config_from_server_s *)gprs_rec_buffer.data)[2].channal_num;
+	SetGpsUartChannal(((_uart_config_from_server_s *)gprs_rec_buffer.data)[2].channal_num - '0');
 	((_uart_config_from_server_s *)gprs_rec_buffer.data)[2].separator = 0x00;
-	config_ram.uc.uc_gps.bps = atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[2].bps);
+	SetGpsUartBps(atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[2].bps));
 	
-	config_ram.uc.uc_bill.channal = ((_uart_config_from_server_s *)gprs_rec_buffer.data)[3].channal_num;
+	SetBillUartChannal(((_uart_config_from_server_s *)gprs_rec_buffer.data)[3].channal_num - '0');
 	((_uart_config_from_server_s *)gprs_rec_buffer.data)[3].separator = 0x00;
-	config_ram.uc.uc_bill.bps = atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[3].bps);
+	SetBillUartBps(atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[3].bps));
 	
-	config_ram.uc.uc_coin.channal = ((_uart_config_from_server_s *)gprs_rec_buffer.data)[4].channal_num;
+	SetCoinUartChannal(((_uart_config_from_server_s *)gprs_rec_buffer.data)[4].channal_num - '0');
 	((_uart_config_from_server_s *)gprs_rec_buffer.data)[4].separator = 0x00;
-	config_ram.uc.uc_coin.bps = atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[4].bps);
+	SetCoinUartBps(atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[4].bps));
 	
-	config_ram.uc.uc_print.channal = ((_uart_config_from_server_s *)gprs_rec_buffer.data)[5].channal_num;
+	SetPrintUartChannal(((_uart_config_from_server_s *)gprs_rec_buffer.data)[5].channal_num - '0');
 	((_uart_config_from_server_s *)gprs_rec_buffer.data)[5].separator = 0x00;
-	config_ram.uc.uc_print.bps = atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[5].bps);
+	SetPrintUartBps(atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[5].bps));
 	
-	config_ram.uc.uc_voice.channal = ((_uart_config_from_server_s *)gprs_rec_buffer.data)[6].channal_num;
+	SetICMachineUartChannal(((_uart_config_from_server_s *)gprs_rec_buffer.data)[7].channal_num - '0');
 	((_uart_config_from_server_s *)gprs_rec_buffer.data)[6].separator = 0x00;
-	config_ram.uc.uc_voice.bps = atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[6].bps);
-	
-	config_ram.uc.uc_voice.channal = ((_uart_config_from_server_s *)gprs_rec_buffer.data)[7].channal_num;
-	((_uart_config_from_server_s *)gprs_rec_buffer.data)[6].separator = 0x00;
-	config_ram.uc.uc_voice.bps = atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[7].bps);
+	SetICMachineUartBps(atoi(((_uart_config_from_server_s *)gprs_rec_buffer.data)[7].bps));
 	return TRUE;
 }
 
 
 uint16 GetFuncConfig(void *arg)
 {
-	sprintf(gprs_rec_buffer.data,"%d%031d",config_ram.fc.login_mod,0x00);
+	sprintf(gprs_rec_buffer.data,"%d%031d",GetLoginMod(),0x00);
 	return 32;
 }
 
 uint16 FuncConfig(void *arg)
 {
-	config_ram.fc.login_mod = gprs_rec_buffer.data[0] - '0';
+	SetLoginMod(gprs_rec_buffer.data[0] - '0');
 	return TRUE;
 }
 
 uint16 GetCashboxConfig(void *arg)
 {
 	sprintf(gprs_rec_buffer.data,"%04d%04d%04d%04d%04d%04d",
-		config_ram.cc.cashbox1_value,
-		config_ram.cc.cashbox2_value,
-		config_ram.cc.cashbox3_value,
-		config_ram.cc.cashbox1_alarm_threshold,
-		config_ram.cc.cashbox2_alarm_threshold,
-		config_ram.cc.cashbox3_alarm_threshold
+		GetCashbox1Value(),
+		GetCashbox2Value(),
+		GetCashbox3Value(),
+		GetCashbox1AlarmThreshold(),
+		GetCashbox2AlarmThreshold(),
+		GetCashbox3AlarmThreshold()
 		);
 	return 24;
 }
@@ -492,55 +485,55 @@ uint16 CashboxConfig(void *arg)
 	{
 		return FALSE;
 	}
-	config_ram.cc.cashbox1_value = (uint8)temp_32;
+	SetCashbox1Value((uint8)temp_32);
 	
 	temp_32 = stoi(10,4,temp->cashbox2_par_value,&err);
 	if (err == FALSE)
 	{
 		return FALSE;
 	}
-	config_ram.cc.cashbox2_value = (uint8)temp_32;
+	SetCashbox2Value((uint8)temp_32);
 	
 	temp_32 = stoi(10,4,temp->cashbox3_par_value,&err);
 	if (err == FALSE)
 	{
 		return FALSE;
 	}
-	config_ram.cc.cashbox3_value = (uint8)temp_32;
+	SetCashbox3Value((uint8)temp_32);
 	
 	temp_32 = stoi(10,4,temp->cashbox1_threshold,&err);
 	if (err == FALSE)
 	{
 		return FALSE;
 	}
-	config_ram.cc.cashbox1_alarm_threshold = (uint8)temp_32;
+	SetCashbox1AlarmThreshold((uint8)temp_32);
 	
 	temp_32 = stoi(10,4,temp->cashbox2_threshold,&err);
 	if (err == FALSE)
 	{
 		return FALSE;
 	}	
-	config_ram.cc.cashbox2_alarm_threshold = (uint8)temp_32;
+	SetCashbox2AlarmThreshold((uint8)temp_32);
 	
 	temp_32 = stoi(10,4,temp->cashbox3_threshold,&err);
 	if (err == FALSE)
 	{
 		return FALSE;
 	}
-	config_ram.cc.cashbox3_alarm_threshold = (uint8)temp_32;
+	SetCashbox3AlarmThreshold((uint8)temp_32);
 	return TRUE;
 }
 
 uint16 GetSysPerformanceConfig(void *arg)
 {
-	sprintf(gprs_rec_buffer.data,"%04d%05d%05d%05d%05d%05d",
+	sprintf(gprs_rec_buffer.data,"%04d%05d%05d%05d%05d",
 		0x00,
-		config_ram.pa.gprs_answer_response_time,
-		config_ram.pa.gps_sampling_time,
-		config_ram.pa.gprs_offline_response_time,
-		config_ram.pa.login_remain_time
+		GetGprsAnswerResponseTime(),
+		GetGpsSamplingTime(),
+		GetGprsOfflineResponseTime(),
+		GetLoginRemainTime()
 		);
-	memcpy(gprs_rec_buffer.data,config_ram.pa.device_addr,4);
+	memcpy(gprs_rec_buffer.data,GetDeviceAddr(),4);
 	return 29;
 }
 
@@ -550,23 +543,26 @@ uint16 SysPerformanceConfig(void *arg)
 	uint8 err;
 	_sys_performance_config_from_server_s *temp;
 	temp = (_sys_performance_config_from_server_s *)gprs_rec_buffer.data;
-	memcpy(config_ram.pa.device_addr,temp->device_addr,4);
-	config_ram.pa.gprs_answer_response_time = (uint16)stoi(10,5,temp->gprs_response_time,&err);
+	if (SetDeviceAddr(temp->device_addr) == FALSE)
+	{
+		return FALSE;
+	}
+	SetGprsAnswerResponseTime((uint16)stoi(10,5,temp->gprs_response_time,&err));
 	if (err == FALSE)
 	{
 		return FALSE;
 	}
-	config_ram.pa.gps_sampling_time = (uint16)stoi(10,5,temp->gps_sampling_time,&err);
+	SetGpsSamplingTime((uint16)stoi(10,5,temp->gps_sampling_time,&err));
 	if (err == FALSE)
 	{
 		return FALSE;
 	}
-	config_ram.pa.gprs_offline_response_time = (uint16)stoi(10,5,temp->gprs_off_line_delay_time,&err);
+	SetGprsOfflineResponseTime((uint16)stoi(10,5,temp->gprs_off_line_delay_time,&err));
 	if (err == FALSE)
 	{
 		return FALSE;
 	}
-	config_ram.pa.login_remain_time = (uint16)stoi(10,5,temp->user_logout_delay_time,&err);
+	SetLoginRemainTime((uint16)stoi(10,5,temp->user_logout_delay_time,&err));
 	if (err == FALSE)
 	{
 		return FALSE;
@@ -577,11 +573,11 @@ uint16 SysPerformanceConfig(void *arg)
 uint16 GetServerCommConfig(void *arg)
 {
 	sprintf(gprs_rec_buffer.data,"%03d%03d%03d%03d%05d",
-		config_ram.pa.server_ip[0],
-		config_ram.pa.server_ip[1],
-		config_ram.pa.server_ip[2],
-		config_ram.pa.server_ip[3],
-		config_ram.pa.server_port
+		GetServerIp(0),
+		GetServerIp(1),
+		GetServerIp(2),
+		GetServerIp(3),
+		GetServerPort()
 		);
 	return 17;
 }
@@ -589,45 +585,50 @@ uint16 GetServerCommConfig(void *arg)
 uint16 ServerCommConfig(void *arg)
 {
 	uint8 err;
+	uint8 ip_temp[4];
+	uint16 port;
 	_server_communication_config_from_server *temp = (_server_communication_config_from_server *)gprs_rec_buffer.data;
-	config_ram.pa.server_ip[0] = (uint8)stoi(10,3,temp->ip[0],&err);
+	ip_temp[0] = (uint8)stoi(10,3,temp->ip[0],&err);
 	if (err == FALSE)
 	{
 		return FALSE;
 	}
-	config_ram.pa.server_ip[1] = (uint8)stoi(10,3,temp->ip[1],&err);
+	ip_temp[1] = (uint8)stoi(10,3,temp->ip[1],&err);
 	if (err == FALSE)
 	{
 		return FALSE;
 	}
-	config_ram.pa.server_ip[2] = (uint8)stoi(10,3,temp->ip[2],&err);
+	ip_temp[2] = (uint8)stoi(10,3,temp->ip[2],&err);
 	if (err == FALSE)
 	{
 		return FALSE;
 	}
-	config_ram.pa.server_ip[3] = (uint8)stoi(10,3,temp->ip[3],&err);
+	ip_temp[3] = (uint8)stoi(10,3,temp->ip[3],&err);
 	if (err == FALSE)
 	{
 		return FALSE;
 	}
-	config_ram.pa.server_port = (uint16)stoi(10,5,temp->port,&err);
+	port = (uint16)stoi(10,5,temp->port,&err);
 	if (err == FALSE)
 	{
 		return FALSE;
 	}
+	SetServerIp(ip_temp[0],ip_temp[1],ip_temp[2],ip_temp[3]);
+	SetServerPort(port);
 	return TRUE;
 }
 
 uint16 GetPrintConfig(void *arg)
 {
-	memcpy(gprs_rec_buffer.data,config_ram.customer,16);
+	memcpy(gprs_rec_buffer.data,GetPrintCustomer(),16);
+	
 	return 16;
 }
 
 
 uint16 PrintConfig(void *arg)
 {
-	memcpy(config_ram.customer,gprs_rec_buffer.data,16);
+	SetPrintCustomer(gprs_rec_buffer.data);
 	return TRUE;
 }
 
@@ -791,6 +792,7 @@ uint8 GprsReceiveFrameFromServer(void)
 {
 	uint8 state = GPRS_HEAD,err;
 	char device_addr[4];
+	char check_temp[4];
 	uint8 data_temp,data_num=0,data_amount=0;
 	uint16 check_sun,timer_num=0;
 	
@@ -836,18 +838,9 @@ uint8 GprsReceiveFrameFromServer(void)
 				}
 				if ((++data_num) >= 4)
 				{
-					if (((strlen(config_ram.pa.device_addr) >= 4) && (memcmp(device_addr,config_ram.pa.device_addr,4) == 0))
-						|| (memcmp(device_addr,"9999",4) == 0))
-					{
-						state = GPRS_PACKAGE;
-						gprs_rec_buffer.package_no = 0;
-						data_num = 0;
-					}
-					else
-					{
-						state = GPRS_HEAD;
-						data_num = 0;
-					}
+					state = GPRS_PACKAGE;
+					gprs_rec_buffer.package_no = 0;
+					data_num = 0;
 				}
 				break;
 				
@@ -942,10 +935,10 @@ uint8 GprsReceiveFrameFromServer(void)
 
 			case GPRS_CHECK:
 				//gprs_rec_buffer.check = gprs_rec_buffer.check * 16 + data_temp - '0';
-				device_addr[data_num] = data_temp;
+				check_temp[data_num] = data_temp;
 				if ((++data_num) >= 4)
 				{
-					gprs_rec_buffer.check = (uint16)stoi(16,4,device_addr,&err);
+					gprs_rec_buffer.check = (uint16)stoi(16,4,check_temp,&err);
 					if (gprs_rec_buffer.check == check_sun)
 					{
 						state = GPRS_END;
@@ -970,7 +963,11 @@ uint8 GprsReceiveFrameFromServer(void)
 				break;
 
 			case GPRS_HANDLE:
-				if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
+				if (memcmp(GetDeviceAddr(),device_addr,4) != 0)
+				{
+					ReturnER("99");
+				}
+				else if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
 				{
 					OSSemPost(server_return_sem);
 				}
@@ -1011,7 +1008,7 @@ void TaskServerHandle(void *pdata) {
 	err=0;
 	OSTimeDly(200);
 
-	ConfigInit();
+	//ConfigInit();
 	RequestUart0(GPRS,0);
 
 	while (1)

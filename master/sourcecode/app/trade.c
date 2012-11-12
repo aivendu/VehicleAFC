@@ -20,10 +20,37 @@ void TaskTrade(void *pdata)
 {
 	uint8 trade_state = IDLE,i;
 	uint32 addr;
+	uint8 temp[20];
 	pdata = pdata;
 
 	OSTimeDly(20);
+#if 0
+	//	≤‚ ‘Ã˙µÁ
+	memcpy(temp,"000102030405",12);
+	temp[0] = 0x00;
+	temp[1] = 0;
+	I2c0WriteBytes(FM24V10_1_0_ADDR,temp,12);
+	WriteExternMemery("0123456789",FM24V10_1_0_VIRTUAL_ADDR+10,10);
+	temp[0] = 00;
+	temp[1] = 20;
+	I2c0WriteMemery(FM24V10_1_0_ADDR,temp,2,"9876543210",10);
+	memset(temp,0,20);
+	temp[0] = 0x00;
+	temp[1] = 0x00;
+	I2c0WriteReadBytes(FM24V10_1_0_ADDR,temp,2,temp,10);
+	memset(temp,0,20);
+	temp[0] = 0;
+	temp[1] = 10;
+	I2c0WriteReadBytes(FM24V10_1_0_ADDR,temp,2,temp,10);
+	memset(temp,0,20);
+	temp[0] = 0;
+	temp[1] = 20;
+	I2c0WriteReadBytes(FM24V10_1_0_ADDR,temp,2,temp,10);
+	ReadExternMemery(&trade_manage_data_temp,FM24V10_1_0_VIRTUAL_ADDR,30);
+#endif
 	InitTradeManageData();
+	InitLog();
+	ConfigInit();
 	while (1)
 	{
 		if (GetTimeUploadState() != 0)

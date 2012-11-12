@@ -29,7 +29,7 @@ unsigned long stoi(unsigned char scale,unsigned char strlen,const char *str,unsi
 	}
 	else  {
 		*err = FALSE;
-		return 0;	//	参数不正确，不可以转换
+		return 0xffffffff;	//	参数不正确，不可以转换
 	}
 	
 	while ((*str) && (temp_8<strlen)) {
@@ -50,7 +50,7 @@ unsigned long stoi(unsigned char scale,unsigned char strlen,const char *str,unsi
 		}
 		else {
 			*err = FALSE;
-			return 0;
+			return 0xffffffff;
 		}
 		str ++;
 		temp_8 ++;

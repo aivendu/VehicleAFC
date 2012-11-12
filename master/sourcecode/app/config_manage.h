@@ -3,17 +3,25 @@
 
 #include "uart0.h"
 
-#define CONFIG_SAVE_START_ADDR			0
+#define CONFIG_SAVE_START_ADDR			256
 
-
+//	可设置的地址范围，超出范围固定为9999
+#define MAX_DEVICE_ADDR					9998
+#define MIN_DEVICE_ADDR					1000
 
 //	定义和控制系统功能
 typedef struct
 {
-	uint8	config_flag				:1;
-	uint32 login_mod				:2;
-	uint32 unused					:29;
+	uint8	config_state			:2;		//	配置状态
+	uint32	login_mod				:2;		//	登录模式
+	uint32	unused					:28;
 } _function_config_s;
+
+typedef union
+{
+	uint32 fc_b[1];							//	限定只能占用4 byte
+	_function_config_s fc;
+} _function_config_u;
 
 
 //	定义和控制系统参数
@@ -28,6 +36,11 @@ typedef struct
 	uint8	server_ip[4];				//	服务器IP 地址
 } _parameter_s;
 
+typedef union
+{
+	uint8 pa_b[18];						//	限定只能占用18 byte
+	_parameter_s pa;
+} _parameter_u;
 
 
 //	钱箱设置
@@ -41,6 +54,13 @@ typedef struct
 	uint8	cashbox3_alarm_threshold;	//	纸币钱箱二报警阈值
 	uint8	unused[2];
 }_cashbox_config_s;
+
+typedef union
+{
+	uint8 cc_b[8];						//	限定只能占用8 byte
+	_cashbox_config_s cc;
+} _cashbox_config_u;
+
 
 //	串口配置
 typedef struct {
@@ -56,26 +76,100 @@ typedef struct {
 	_uart_config_s unused2;
 } _uart_manage_s;
 
-
-/*
-//	定义系统需要常改到参数
-typedef struct
+typedef union
 {
-	uint16	cashbox1_amount;	//	硬币钱箱总额
-	uint16	cashbox2_amount;	//	纸币钱箱一总额
-	uint16	cashbox3_amount;	//	纸币钱箱二总额
-} _cashbox_amount;
-*/
+	_uart_manage_s um;
+	uint8 um_b[80];						//	限定只能占用80 byte
+} _uart_manage_u;
 
+
+//	配置项
 typedef struct
 {
 	char config_version[8];			//	配置版本号
-	char customer[16];				//	客户名称，提供打印
-	_function_config_s fc;
-	_cashbox_config_s  cc;
-	_uart_manage_s uc;
-	_parameter_s pa;
+	char print_customer[16];		//	客户名称，提供打印
+	_function_config_u fc;			//	功能配置
+	_cashbox_config_u  cc;			//	
+	_uart_manage_u um;
+	_parameter_u pa;
 } _config_s;
+
+extern char * GetDeviceAddr(void);
+extern uint8 SetDeviceAddr(char *arg);
+#define GetGprsAnswerResponseTime()		(config_ram.pa.pa.gprs_answer_response_time)
+#define SetGprsAnswerResponseTime(c)	(config_ram.pa.pa.gprs_answer_response_time = c)
+#define GetGpsSamplingTime()			(config_ram.pa.pa.gps_sampling_time)
+#define SetGpsSamplingTime(c)			(config_ram.pa.pa.gps_sampling_time = c)
+#define GetGprsOfflineResponseTime()	(config_ram.pa.pa.gprs_offline_response_time)
+#define SetGprsOfflineResponseTime(c)	(config_ram.pa.pa.gprs_offline_response_time = c)
+#define GetLoginRemainTime()			(config_ram.pa.pa.login_remain_time)
+#define SetLoginRemainTime(c)			(config_ram.pa.pa.login_remain_time = c)
+#define GetServerPort()					(config_ram.pa.pa.server_port)
+#define SetServerPort(c)				(config_ram.pa.pa.server_port = c)
+#define GetServerIp(c)					(config_ram.pa.pa.server_ip[c])
+#define SetServerIp(a,b,c,d)			{config_ram.pa.pa.server_ip[0] = a;\
+										 config_ram.pa.pa.server_ip[1] = b;\
+										 config_ram.pa.pa.server_ip[2] = c;\
+										 config_ram.pa.pa.server_ip[3] = d;}
+
+
+#define GetPrintCustomer()				(config_ram.print_customer)
+#define SetPrintCustomer(c)				{memset(config_ram.print_customer,0,sizeof(config_ram.print_customer));\
+										 strncpy(config_ram.print_customer,c,sizeof(config_ram.print_customer));}
+
+#define GetConfigVersion()				(config_ram.config_version)
+
+#define GetConfigState()				(config_ram.fc.fc.config_state)
+#define SetConfigState(c)				(config_ram.fc.fc.config_state = c)
+#define GetLoginMod()					(config_ram.fc.fc.login_mod)
+#define SetLoginMod(c)					(config_ram.fc.fc.login_mod = c)
+
+#define GetCashbox1Value()				(config_ram.cc.cc.cashbox1_value)
+#define SetCashbox1Value(c)				(config_ram.cc.cc.cashbox1_value = c)
+#define GetCashbox2Value()				(config_ram.cc.cc.cashbox2_value)
+#define SetCashbox2Value(c)				(config_ram.cc.cc.cashbox2_value = c)
+#define GetCashbox3Value()				(config_ram.cc.cc.cashbox3_value)
+#define SetCashbox3Value(c)				(config_ram.cc.cc.cashbox3_value = c)
+#define GetCashbox1AlarmThreshold()		(config_ram.cc.cc.cashbox1_alarm_threshold)
+#define SetCashbox1AlarmThreshold(c)	(config_ram.cc.cc.cashbox1_alarm_threshold = c)	
+#define GetCashbox2AlarmThreshold()		(config_ram.cc.cc.cashbox2_alarm_threshold)
+#define SetCashbox2AlarmThreshold(c)	(config_ram.cc.cc.cashbox2_alarm_threshold = c)
+#define GetCashbox3AlarmThreshold()		(config_ram.cc.cc.cashbox3_alarm_threshold)
+#define SetCashbox3AlarmThreshold(c)	(config_ram.cc.cc.cashbox3_alarm_threshold = c)
+
+#define GetRj45UartChannal()			(config_ram.um.um.uc_rj45.channal)
+#define SetRj45UartChannal(c)			(config_ram.um.um.uc_rj45.channal = c)
+#define GetRj45UartBps()				(config_ram.um.um.uc_rj45.bps)
+#define SetRj45UartBps(c)				(config_ram.um.um.uc_rj45.bps = c)
+#define GetGprsUartChannal()			(config_ram.um.um.uc_gprs.channal)
+#define SetGprsUartChannal(c)			(config_ram.um.um.uc_gprs.channal = c)
+#define GetGprsUartBps()				(config_ram.um.um.uc_gprs.bps)
+#define SetGprsUartBps(c)				(config_ram.um.um.uc_gprs.bps = c)
+#define GetGpsUartChannal()				(config_ram.um.um.uc_gps.channal)
+#define SetGpsUartChannal(c)			(config_ram.um.um.uc_gps.channal = c)
+#define GetGpsUartBps()					(config_ram.um.um.uc_gps.bps)
+#define SetGpsUartBps(c)				(config_ram.um.um.uc_gps.bps = c)
+#define GetBillUartChannal()			(config_ram.um.um.uc_bill.channal)
+#define SetBillUartChannal(c)			(config_ram.um.um.uc_bill.channal = c)
+#define GetBillUartBps()				(config_ram.um.um.uc_bill.bps)
+#define SetBillUartBps(c)				(config_ram.um.um.uc_bill.bps = c)
+#define GetCoinUartChannal()			(config_ram.um.um.uc_coin.channal)
+#define SetCoinUartChannal(c)			(config_ram.um.um.uc_coin.channal = c)
+#define GetCoinUartBps()				(config_ram.um.um.uc_coin.bps)
+#define SetCoinUartBps(c)				(config_ram.um.um.uc_coin.bps = c)
+#define GetPrintUartChannal()			(config_ram.um.um.uc_print.channal)
+#define SetPrintUartChannal(c)			(config_ram.um.um.uc_print.channal = c)
+#define GetPrintUartBps()				(config_ram.um.um.uc_print.bps)
+#define SetPrintUartBps(c)				(config_ram.um.um.uc_print.bps = c)
+#define GetVoiceUartChannal()			(config_ram.um.um.uc_voice.channal)
+#define SetVoiceUartChannal(c)			(config_ram.um.um.uc_voice.channal = c)
+#define GetVoiceUartBps()				(config_ram.um.um.uc_voice.bps)
+#define SetVoiceUartBps(c)				(config_ram.um.um.uc_voice.bps = c)
+#define GetICMachineUartChannal()		(config_ram.um.um.uc_icmachine.channal)
+#define SetICMachineUartChannal(c)		(config_ram.um.um.uc_icmachine.channal = c)
+#define GetICMachineUartBps()			(config_ram.um.um.uc_icmachine.bps)
+#define SetICMachineUartBps(c)			(config_ram.um.um.uc_icmachine.bps = c)
+
 
 
 

@@ -17,6 +17,11 @@ typedef struct
 	uint32	last_log;			//	上一条日志地址
 } _log_s;
 
+
+extern uint32	log_index;			//	最后一个log 的管理块地址
+extern _log_s	log_manage;
+
+
 extern void InitLog(void);
 extern void StoreLog(uint16 type, void *data, uint16 data_len);
 extern void *ReadLog(uint8 flag,uint16 data_lenght);

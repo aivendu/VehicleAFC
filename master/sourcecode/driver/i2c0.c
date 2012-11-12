@@ -92,9 +92,9 @@ uint16 I2c0WriteBytes(uint8 chip_addr, uint8 *wdat, uint16 wnbyte)
     return (wnbyte - i2c_wnbyte);
 }
 
-uint16 I2c0WriteMemery(uint8 chip_addr, uint8 *addr, uint8 addr_len, uint8 *wdat, uint16 wnbyte)
+uint16 I2c0WriteMemery(uint8 chip_addr, uint8 *addr, uint8 addr_len, void *wdat, uint16 wnbyte)
 {
-	uint8	err;
+	uint8	err,len_temp = 0;
 	uint16	rt;
 	OSSemPend(I2cSem, 0, &err);
 
@@ -112,28 +112,29 @@ uint16 I2c0WriteMemery(uint8 chip_addr, uint8 *addr, uint8 addr_len, uint8 *wdat
 			I2DAT = chip_addr & 0xfe;
 			I2CONCLR = 0x28;
 		}
-		else if ((I2STAT &0xf8) == 0x18) {
-#if MEMERY_ADDR_MODE == 0
+		else if ((I2STAT & 0xf8) == 0x18) {
+#if MEMERY_ADDR_MODE == 1
 			I2DAT = addr[addr_len-1];
 #else
 			I2DAT = addr[0];
 #endif
 			I2CONCLR = 0x28;
-			--addr_len;
+			addr_len--;
 		}
-		else if ((I2STAT &0xf8) == 0x28) {
-			if (--addr_len) {
-#if MEMERY_ADDR_MODE == 0
-				I2DAT = addr[addr_len-1];
+		else if ((I2STAT & 0xf8) == 0x28) {
+			if (addr_len--) {
+#if MEMERY_ADDR_MODE == 1
+				I2DAT = addr[addr_len];
 #else
-				I2DAT = addr[0];
+				I2DAT = addr[++len_temp];
 #endif
 
 				I2CONCLR = 0x28;
 			}
 			else {
+				i2c_mode = 4;
 			    i2c_wnbyte = wnbyte;                       /* 存储读字节数 */
-			    i2c_wbuf = wdat;                               /* 存储读到的数据 */
+			    i2c_wbuf = (uint8 *)wdat;                               /* 存储读到的数据 */
 			    VICIntEnable = 1 << 9;                      /* 使能I2c中断 */
 				break;
 			}
@@ -191,7 +192,7 @@ uint16 I2c0ReadBytes(uint8 chip_addr,uint8 *rdat,int16 rnbyte)
     return (rnbyte - i2c_rnbyte);
 }
 
-uint16 I2c0WriteReadBytes(uint8 chip_addr, uint8 *wdat, uint8 wnbyte, uint8 *rdat, uint16 rnbyte){
+uint16 I2c0WriteReadBytes(uint8 chip_addr, uint8 *wdat, uint8 wnbyte, void *rdat, uint16 rnbyte){
 	uint8 err;
 	
 	err = 0;

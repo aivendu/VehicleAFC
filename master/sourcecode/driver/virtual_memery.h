@@ -44,6 +44,7 @@ typedef	unsigned char IO_ADDR_T;				//	外部存储器地址类型定义
 typedef struct
 {
 	IO_ADDR_T io_addr;
+	uint8  memery_addr_len;
 	uint32 memery_size;
 	uint32 memery_start_addr;
 	uint32 virtual_start_addr;

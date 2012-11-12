@@ -86,7 +86,7 @@
 #include "io_driver.h"
 #include "test.h"
 #include "device_state.h"
-#include "ic_card.h"
+//#include "ic_card.h"
 //#include "command.h"
 #include "sys_err.h"
 #include "sys_state.h"

@@ -74,6 +74,8 @@ int main (void)
 	//OSTaskSuspend(TaskDeviceCommandPrio);
 	//OSTaskSuspend(TaskChipCommPrio);
 	//OSTaskSuspend(TaskServerHandlePrio);
+	//OSTaskSuspend(TaskTradePrio);
+	//OSTaskSuspend(TaskDataUploadPrio);
 
 	
     OSStart();	
