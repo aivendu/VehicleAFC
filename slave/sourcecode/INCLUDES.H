@@ -84,7 +84,7 @@
 #include "spi0.h"
 #include "eeprom.h"
 #include "io_driver.h"
-//#include "test.h"
+#include "test.h"
 #include "ic_card.h"
 #include "device_state.h"
 #include "sys_state.h"

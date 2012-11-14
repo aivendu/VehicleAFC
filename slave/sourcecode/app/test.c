@@ -1,4 +1,4 @@
-#include "config.h"
+#include "includes.h"
 
 const sintable[] = {
 	0x80,0x83,0x86,0x89,0x8c,0x8f,0x92,0x95,0x98,0x9c,0x9f,0xa2,0xa5,0xa8,0xab,0xae,
@@ -19,65 +19,218 @@ const sintable[] = {
 	0x4e,0x51,0x54,0x57,0x5a,0x5d,0x60,0x63,0x66,0x69,0x6c,0x6f,0x73,0x76,0x79,0x7c
 };
 
-void OutSine(void) {
-	uint16 i;
-	for (i=0;i<256;i++) {
-		DacOut(sintable[i]);
-		//delay10us(10);
-	}
-}
-
-void OutSquareWave(void) {
-	Write595Bit(OS_STATE,1);	
-	OSTimeDly(1);
-	Write595Bit(OS_STATE,0);	
-	OSTimeDly(1);
-	#if 0
-	IO1SET |= (1<<16);
-	OSTimeDly(1);
-	IO1CLR |= (1<<16);
-	OSTimeDly(1);
-	#endif
-}
-
-void testsyn6228(char *text) {
-	uint8 ecc=0,i;
-	uint8 headofFrame[]={0xfd,0x00,0x00,0x01,0x01};
-	headofFrame[2] = strlen(text)+3;
-	ecc = 0;
-	for(i=0;i<5;i++)		//	发送头
-	{
-	  ecc=ecc^(headofFrame[i]);
-	  UART0Putch(headofFrame[i]);
-	}
-	 
-	 
-	for(i=0;i<(headofFrame[2]-3);i++)			//	发送语音文字
-	{
-	 ecc=ecc^(text[i]);
-	 UART0Putch(text[i]);
-	}
-	
-	UART0Putch(ecc);		//	发送校验
-}
 
 
+
+
+
+uint8 testitem;
 void TaskTest(void *pdata) {
 
-	uint8 run_flag=1;
-	char text[]="欢迎使用语音天下ANY6288";
-	
+	uint8 run_flag=1,i;
+	char textdata[]="欢迎使用语音天下ANY6288";
+	char rec_data[100];
+	uint32 test_result = 0;;
 	pdata = pdata;
 	
+	testitem = 1;
 	while (1) {
-		//OutSine();
-		//OutSquareWave();
 		while (run_flag) {
-			RequestUart0(SYN6288_CHNNEL);
-			testsyn6228(text);
+switch (testitem)
+{
+	case 1:
+			RequestUart0(PRINTER_UART0,0);
+			memset(rec_data,0,sizeof(rec_data));
+			Uart0SendString(textdata,1);
+			for (i = 0; i < sizeof(rec_data); i++)
+			{
+				if (Uart0RecByte((uint8 *)&rec_data[i],1,OS_TICKS_PER_SEC/20) == FALSE)
+				{
+					break;
+				}
+				
+			}
+			if (strncmp(textdata,rec_data,sizeof(textdata)) == 0)
+			{
+				test_result |= (1<<1);
+			}
+			FreeUart0();
+			testitem++;
+	break;
+	case 2:
+			RequestUart0(COINMACHINE_UART0,0);
+			memset(rec_data,0,sizeof(rec_data));
+			Uart0SendString(textdata,1);
+			for (i = 0; i < sizeof(rec_data); i++)
+			{
+				if (Uart0RecByte((uint8 *)&rec_data[i],1,OS_TICKS_PER_SEC/20) == FALSE)
+				{
+					break;
+				}
+				
+			}
+			if (strncmp(textdata,rec_data,sizeof(textdata)) == 0)
+			{
+				test_result |= (1<<2);
+			}
+			FreeUart0();
+			testitem++;
+	break;
+	case 3:
+			RequestUart0(NOTE_MACHINE_UART0,0);
+			memset(rec_data,0,sizeof(rec_data));
+			Uart0SendString(textdata,1);
+			for (i = 0; i < sizeof(rec_data); i++)
+			{
+				if (Uart0RecByte((uint8 *)&rec_data[i],1,OS_TICKS_PER_SEC/20) == FALSE)
+				{
+					break;
+				}
+				
+			}
+			if (strncmp(textdata,rec_data,sizeof(textdata)) == 0)
+			{
+				test_result |= (1<<3);
+			}
+			FreeUart0();
+			testitem++;
+	break;
+	case 4:
+			RequestUart0(UART0_INIT,0);
+			memset(rec_data,0,sizeof(rec_data));
+			Uart0SendString(textdata,1);
+			for (i = 0; i < sizeof(rec_data); i++)
+			{
+				if (Uart0RecByte((uint8 *)&rec_data[i],1,OS_TICKS_PER_SEC/20) == FALSE)
+				{
+					break;
+				}
+				
+			}
+			if (strncmp(textdata,rec_data,sizeof(textdata)) == 0)
+			{
+				test_result |= (1<<4);
+			}
+			FreeUart0();
+			testitem++;
+	break;
+	case 5:
+			RequestUart1(SPEAKER_UART1,0);
+			memset(rec_data,0,sizeof(rec_data));
+			Uart1SendString(textdata,1);
+			for (i = 0; i < sizeof(rec_data); i++)
+			{
+				if (Uart1RecByte((uint8 *)&rec_data[i],1,OS_TICKS_PER_SEC/20) == FALSE)
+				{
+					break;
+				}
+				
+			}
+			if (strncmp(textdata,rec_data,sizeof(textdata)) == 0)
+			{
+				test_result |= (1<<5);
+			}
+			FreeUart1();
+			testitem++;
+	break;
+	case 6:	
+			RequestUart1(IC_MACHINE_UART1,0);
+			memset(rec_data,0,sizeof(rec_data));
+			Uart1SendString(textdata,1);
+			for (i = 0; i < sizeof(rec_data); i++)
+			{
+				if (Uart1RecByte((uint8 *)&rec_data[i],1,OS_TICKS_PER_SEC/20) == FALSE)
+				{
+					break;
+				}
+				
+			}
+			if (strncmp(textdata,rec_data,sizeof(textdata)) == 0)
+			{
+				test_result |= (1<<0);
+			}
+			FreeUart1();
+			testitem++;
+	break;
+	case 7:
+			RequestUart1(GPS_UART1,6);
+			memset(rec_data,0,sizeof(rec_data));
+			Uart1SendString(textdata,1);
+			for (i = 0; i < sizeof(rec_data); i++)
+			{
+				if (Uart1RecByte((uint8 *)&rec_data[i],1,OS_TICKS_PER_SEC/20) == FALSE)
+				{
+					break;
+				}
+				
+			}
+			if (strncmp(textdata,rec_data,sizeof(textdata)) == 0)
+			{
+				test_result |= (1<<7);
+			}
+			FreeUart1();
+			testitem++;
+	break;
+	case 8:
+			RequestUart1(UART1_INIT,0);
+			memset(rec_data,0,sizeof(rec_data));
+			Uart1SendString(textdata,1);
+			for (i = 0; i < sizeof(rec_data); i++)
+			{
+				if (Uart1RecByte((uint8 *)&rec_data[i],1,OS_TICKS_PER_SEC/20) == FALSE)
+				{
+					break;
+				}
+				
+			}
+			if (strncmp(textdata,rec_data,sizeof(textdata)) == 0)
+			{
+				test_result |= (1<<8);
+			}
+			FreeUart1();
+			testitem = 1;
+
+	case 9:
+		//	IO 口测试
+		IO0CLR |= POWER_CONTROL_GPRS;			
+		IO0CLR |= POWER_CONTROL_RESERVED;		
+		IO0CLR |= POWER_CONTROL_PRINT_MACHINE;
+		IO0CLR |= POWER_CONTROL_IC_MACHINE;	
+		IO0CLR |= POWER_CONTROL_COIN_MACHINE;	
+		IO0CLR |= POWER_CONTROL_GPS;			
+		IO0CLR |= POWER_CONTROL_NOTE_MACHINE;	
+		IO0CLR |= SYS_STATE_LEN;
+		IO0SET |= POWER_CONTROL_GPRS;			
+		IO0SET |= POWER_CONTROL_RESERVED;		
+		IO0SET |= POWER_CONTROL_PRINT_MACHINE;
+		IO0SET |= POWER_CONTROL_IC_MACHINE;	
+		IO0SET |= POWER_CONTROL_COIN_MACHINE;	
+		IO0SET |= POWER_CONTROL_GPS;			
+		IO0SET |= POWER_CONTROL_NOTE_MACHINE;	
+		IO0SET |= SYS_STATE_LEN;
+		break;
+
+	case 10:
+		RequestUart1(PRINTER_UART0,0);
+		Uart1SendByte(0x55,0);
+		FreeUart1();
+		break;
+
+	case 11:
+		RequestUart0(PRINTER_UART0,0);
+		Uart0SendByte(0x55,0);
+		FreeUart0();
+		break;
+		
+	default:
+		break;
+	}
+			
+			//RequestUart0(SYN6288_CHNNEL);
+			//testsyn6228(text);
 			//run_flag = 0;
-			OSSemPost(Uart0_Channel_Sem);
-			OSTimeDly(OS_TICKS_PER_SEC*5);
+			//OSSemPost(Uart0_Channel_Sem);
+			//OSTimeDly(OS_TICKS_PER_SEC*5);
 		}
 		OSTimeDly(20);
 	}

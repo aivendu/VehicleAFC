@@ -58,9 +58,9 @@ OS_STK	TaskChipCommStk[TaskChipCommSize];
 int main (void)
 {
     OSInit();	
-    
     TargetInit();
-    //OSTaskCreate (TaskTest, (void *)0, &TaskTestStk[TaskTestSize - 1], TaskTestPrio);
+	
+    OSTaskCreate (TaskTest, (void *)0, &TaskTestStk[TaskTestSize - 1], TaskTestPrio);
 	OSTaskCreate(TaskICCard, (void *)0, &TaskCrt188Stk[TaskCrt188Size - 1], TaskCrt188Prio);
 	OSTaskCreate(TaskNoteMachine, (void *)0, &TaskNoteMachineStk[TaskNoteMachineSize - 1], TaskNoteMachinePrio);
     OSTaskCreate (TaskPTRExe, (void *)0, &TaskPTRExeStk[TaskPTRExeSize - 1], TaskPTRExePrio);
@@ -72,7 +72,7 @@ int main (void)
 	
 
 
-	//OSTaskSuspend(TaskTestPrio);
+	OSTaskSuspend(TaskTestPrio);
 	//OSTaskSuspend(TaskCrt188Prio);
 	//OSTaskSuspend(TaskNoteMachinePrio);
 	//OSTaskSuspend(TaskPTRExePrio);
