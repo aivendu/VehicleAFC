@@ -119,6 +119,7 @@ extern uint8 ServerCashBoxBalance(uint16 cashbox1, uint16 cashbox2, uint16 cashb
 extern uint8 ServerGPSData(uint8 flag,uint32 latitude, uint32 longitude, uint32 speed);
 extern uint8 ServerLogin(char *staffid);
 extern uint8 ServerLogout(char *staffid);
+extern uint8 GetNextPackage(void);
 
 
 

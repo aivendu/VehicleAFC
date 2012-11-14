@@ -13,44 +13,92 @@ uint32	current_trade_index;
 void InitTradeManageData(void)
 {
 	ReadExternMemery(&current_trade_index,TRADE_DATA_START_ADDR,4);
-	ReadExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
+	if (current_trade_index == TRADE_DATA_START_ADDR)		//	如果还没有存入过交易数据
+	{
+		memset(&trade_manage_data_temp,0,sizeof(_trade_manage_data_s));		//	不需要读取交易数据
+	}
+	else
+	{
+		//	读取最后一天的总帐数据
+		ReadExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
+	}
 }
 
+uint8 TradeAmountDataSave(_trade_manage_data_s *data)
+{
+	trade_manage_data_temp.realpay_amount += trade_data_temp.realpay;
+	trade_manage_data_temp.needpay_amount += trade_data_temp.needpay;
+	trade_manage_data_temp.coin_dis_amount += trade_data_temp.change_cashbox_1;
+	trade_manage_data_temp.note_1_dis_amount += trade_data_temp.change_cashbox_2;
+	trade_manage_data_temp.note_2_dis_amount += trade_data_temp.change_cashbox_3;
+	trade_manage_data_temp.trade_num++;
+	trade_manage_data_temp.people_amount += trade_data_temp.people_amount;
+	trade_manage_data_temp.in += sizeof(_trade_data_to_server_s);
+	WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
+	return 1;
+}
+
+uint8 TradeAmountDataRead(_trade_manage_data_s *data)
+{
+	return 1;
+}
+
+uint8 TradeDataSave(_trade_manage_data_s *data)
+{
+	return 1;
+	
+}
+
+uint8 TradeDataRead(_trade_manage_data_s *data)
+{
+	return 1;
+}
+
+#define DATA_LENGHT_TEST		11
+char const testdata[6] = "71236";
 void TaskTrade(void *pdata)
 {
 	uint8 trade_state = IDLE,i;
-	uint32 addr;
-	uint8 temp[20];
-	pdata = pdata;
-
-	OSTimeDly(20);
+	
 #if 0
+	uint32 addr;
+	uint8 temp[3][DATA_LENGHT_TEST+3];
+	OSTimeDly(20);
+
 	//	测试铁电
-	memcpy(temp,"000102030405",12);
-	temp[0] = 0x00;
-	temp[1] = 0;
-	I2c0WriteBytes(FM24V10_1_0_ADDR,temp,12);
-	WriteExternMemery("0123456789",FM24V10_1_0_VIRTUAL_ADDR+10,10);
-	temp[0] = 00;
-	temp[1] = 20;
-	I2c0WriteMemery(FM24V10_1_0_ADDR,temp,2,"9876543210",10);
-	memset(temp,0,20);
-	temp[0] = 0x00;
-	temp[1] = 0x00;
-	I2c0WriteReadBytes(FM24V10_1_0_ADDR,temp,2,temp,10);
-	memset(temp,0,20);
-	temp[0] = 0;
-	temp[1] = 10;
-	I2c0WriteReadBytes(FM24V10_1_0_ADDR,temp,2,temp,10);
-	memset(temp,0,20);
-	temp[0] = 0;
-	temp[1] = 20;
-	I2c0WriteReadBytes(FM24V10_1_0_ADDR,temp,2,temp,10);
-	ReadExternMemery(&trade_manage_data_temp,FM24V10_1_0_VIRTUAL_ADDR,30);
+	for (addr = 0; addr < 0xffff; addr += DATA_LENGHT_TEST)
+	{
+	
+	sprintf((char *)temp[0],"00%05s%06d",testdata,addr);
+	temp[0][0] = (addr >> 8) & 0xff;
+	temp[0][1] = addr & 0xff;
+	I2c0WriteBytes(FM24V10_1_0_ADDR,temp[0],DATA_LENGHT_TEST+2);
+	
+	sprintf((char *)temp[1],"%05s%06d",testdata,addr);
+	WriteExternMemery(temp[1],FM24V10_2_0_VIRTUAL_ADDR+addr,DATA_LENGHT_TEST);
+	
+	sprintf((char *)temp[2],"%05s%06d",testdata,addr);
+	I2c0WriteMemery(FM24V10_3_0_ADDR,&addr,2,temp[2],DATA_LENGHT_TEST);
+	
+	memset(temp[0],0,13);
+	I2c0ReadMemery(FM24V10_1_0_ADDR,&addr,2,temp[0],DATA_LENGHT_TEST);
+	
+	memset(temp[1],0,13);
+	ReadExternMemery(temp[1],FM24V10_2_0_VIRTUAL_ADDR+addr,DATA_LENGHT_TEST);
+	
+	memset(temp[2],0,13);
+	temp[2][0] = (addr >> 8) & 0xff;
+	temp[2][1] = addr & 0xff;
+	I2c0WriteReadBytes(FM24V10_3_0_ADDR,temp[2],2,temp[2],DATA_LENGHT_TEST);
+	
+	}
 #endif
+
+	pdata = pdata;
+	
+	ConfigInit();
 	InitTradeManageData();
 	InitLog();
-	ConfigInit();
 	while (1)
 	{
 		if (GetTimeUploadState() != 0)
@@ -73,10 +121,40 @@ void TaskTrade(void *pdata)
 				trade_manage_data_temp.note_1_dis_amount = 0;
 				trade_manage_data_temp.note_2_dis_amount = 0;
 				trade_manage_data_temp.trade_num = 0;
-				current_trade_index = trade_manage_data_temp.in;
+				if (current_trade_index == TRADE_DATA_START_ADDR)		//	是否有交易数据存储
+				{
+					//	交易数据接着current_trade_index 存储
+					current_trade_index = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
+					//	交易日志存储接着trade_manage_data_temp 存储
+					trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
+				}
+				else
+				{
+					if ((trade_manage_data_temp.in + sizeof(_trade_manage_data_s)) 		//	下一天的交易是否会超出存储区域
+						>= (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
+					{
+						//	超出了，接着current_trade_index 开始存储
+						current_trade_index = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
+						trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
+					}
+					else
+					{
+						//	修改当前日期的交易数据索引地址
+						current_trade_index = trade_manage_data_temp.in;
+						trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
+						if ((trade_manage_data_temp.in + sizeof(_trade_data_to_server_s)) 	//	下一笔交易是否会超出存储区域
+								>= (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
+						{
+							//	超出了，接着current_trade_index 开始存储
+							trade_manage_data_temp.in = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
+						}
+					}
+					
+				}
 				trade_manage_data_temp.out = trade_manage_data_temp.in;
+				//	存储数据
 				WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
-				WriteExternMemery(&current_trade_index, TRADE_DATA_START_ADDR,4);
+				WriteExternMemery(&current_trade_index, TRADE_DATA_START_ADDR,sizeof(current_trade_index));
 			}
 		}
 		switch (trade_state)
@@ -84,6 +162,7 @@ void TaskTrade(void *pdata)
 			case IDLE:
 				if (sys_state.ss.st_cmd.se.store_trade_data.exe_st == EXE_WRITED)
 				{
+					sys_state.ss.st_cmd.se.store_trade_data.exe_st = EXE_RUNNING;
 					trade_state = STORE;
 				}
 				else
@@ -102,7 +181,6 @@ void TaskTrade(void *pdata)
 				break;
 
 			case STORE:
-				addr = sizeof(_trade_data_to_server_s);
 				trade_data_temp.year = device_control.trade.tm.year+2000;
 				trade_data_temp.month = device_control.trade.tm.month;
 				trade_data_temp.day = device_control.trade.tm.day;
@@ -134,7 +212,14 @@ void TaskTrade(void *pdata)
 				trade_manage_data_temp.trade_num++;
 				trade_manage_data_temp.people_amount += trade_data_temp.people_amount;
 				trade_manage_data_temp.in += sizeof(_trade_data_to_server_s);
+				if ((trade_manage_data_temp.in + sizeof(_trade_data_to_server_s)) 
+						>= (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
+				{
+					trade_manage_data_temp.in = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
+				}
 				WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
+				sys_state.ss.st_cmd.se.store_trade_data.exe_st = EXE_WAIT;
+				trade_state = IDLE;
 
 				//	
 				break;
@@ -142,10 +227,6 @@ void TaskTrade(void *pdata)
 			default:
 				trade_state = IDLE;
 				break;
-		}
-		if (GetChangeMoneyCommand() == EXE_WAIT)
-		{
-			
 		}
 	}
 }

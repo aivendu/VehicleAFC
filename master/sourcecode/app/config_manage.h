@@ -5,15 +5,16 @@
 
 #define CONFIG_SAVE_START_ADDR			256
 
-//	可设置的地址范围，超出范围固定为9999
-#define MAX_DEVICE_ADDR					9998
-#define MIN_DEVICE_ADDR					1000
+//	可设置的地址范围，超出范围固定为FFFF
+#define MAX_DEVICE_ADDR					0xFFFF
+#define MIN_DEVICE_ADDR					0x1000
 
 //	定义和控制系统功能
 typedef struct
 {
-	uint8	config_state			:2;		//	配置状态
+	uint32	config_state			:2;		//	配置状态
 	uint32	login_mod				:2;		//	登录模式
+	uint32	trade_upload_end		:1;		//	交易数据上传完成
 	uint32	unused					:28;
 } _function_config_s;
 
@@ -27,7 +28,7 @@ typedef union
 //	定义和控制系统参数
 typedef struct
 {
-	char	device_addr[4];		//	设备地址, ASCII 字符, 0000-9999
+	char	device_addr[4];		//	设备地址, ASCII 字符, 0000-FFFF
 	uint16	gprs_answer_response_time;	//	GPRS 最迟响应时间
 	uint16	gps_sampling_time;			//	GPS 采样时间
 	uint16	gprs_offline_response_time;	//	GPRS 脱机响应时间
@@ -86,8 +87,8 @@ typedef union
 //	配置项
 typedef struct
 {
-	char config_version[8];			//	配置版本号
-	char print_customer[16];		//	客户名称，提供打印
+	char config_version[9];			//	配置版本号
+	char print_customer[19];		//	客户名称，提供打印
 	_function_config_u fc;			//	功能配置
 	_cashbox_config_u  cc;			//	
 	_uart_manage_u um;

@@ -35,10 +35,11 @@ const char DNS_EN[] = "AT^DNS_EN:0,0";
 #define GetServerPackage()			server_package
 #define ClearServerPackage()		(server_package = 0)
 
-void SetNextPackage(void)
+uint8 GetNextPackage(void)
 {
 	if ((++server_package) > 99) 
 		server_package = 0;
+	return server_package;
 }
 
 
@@ -96,7 +97,7 @@ uint8 GprsSendFrameToServer(_server_communication_s *command)
 	command->check = CrcString(command->check,temp);	//	校验设备地址
 		
 	memset(temp,0,sizeof(temp));
-	sprintf(temp,"%02d",GetServerPackage());
+	sprintf(temp,"%02d",command->package_no);
 	GprsSendString(temp);							//	发送包号
 	command->check = CrcString(command->check,temp);	//	校验
 
@@ -152,7 +153,10 @@ uint8 ServerOnLine(void)
 		{
 			err = GPRS_DATA_NO_ERR;
 		}
-		err = GPRS_DATA_RETURN_ERR;
+		else
+		{
+			err = GPRS_DATA_RETURN_ERR;
+		}
 	}
 	FreeServerCommunication();
 	return err;
@@ -257,7 +261,10 @@ uint8 ServerCashBoxBalance(uint16 cashbox1, uint16 cashbox2, uint16 cashbox3)
 		{
 			err = GPRS_DATA_NO_ERR;
 		}
-		err = GPRS_DATA_RETURN_ERR;
+		else
+		{
+			err = GPRS_DATA_RETURN_ERR;
+		}
 	}
 	FreeServerCommunication();
 	return err;
@@ -290,7 +297,10 @@ uint8 ServerGPSData(uint8 flag,uint32 latitude, uint32 longitude, uint32 speed)
 		{
 			err = GPRS_DATA_NO_ERR;
 		}
-		err = GPRS_DATA_RETURN_ERR;
+		else
+		{
+			err = GPRS_DATA_RETURN_ERR;
+		}
 	}
 	FreeServerCommunication();
 	return err;
@@ -316,7 +326,10 @@ uint8 ServerLogin(char *staffid)
 		{
 			err = GPRS_DATA_NO_ERR;
 		}
-		err = GPRS_DATA_RETURN_ERR;
+		else
+		{
+			err = GPRS_DATA_RETURN_ERR;
+		}
 	}
 	FreeServerCommunication();
 	return err;
@@ -327,6 +340,7 @@ uint8 ServerLogout(char *staffid)
 	uint8 err;
 	
 	RequestServerCommunication();
+	gprs_send_buffer.package_no = server_package;
 	memcpy(gprs_send_buffer.command,"LO",2);
 	memcpy(gprs_send_buffer.argument,"00",2);
 	memset(gprs_send_buffer.data,0,9);
@@ -341,67 +355,26 @@ uint8 ServerLogout(char *staffid)
 		{
 			err =  GPRS_DATA_NO_ERR;
 		}
-		err = GPRS_DATA_RETURN_ERR;
+		else
+		{
+			err = GPRS_DATA_RETURN_ERR;
+		}
 	}
 	FreeServerCommunication();
 	return err;
 }
 
 
-// OK命令
-uint8 ReturnOK(char *arg)
-{
-	//uint8 err;
-	
-	memcpy(gprs_send_buffer.command,"OK",2);
-	memcpy(gprs_send_buffer.argument,arg,2);
-	gprs_send_buffer.data_lenght = 4;
-	GprsSendFrameToServer(&gprs_send_buffer);
-	return GPRS_DATA_NO_ERR;
-}
-// ER命令
-uint8 ReturnER(char *arg)
-{
-	//uint8 err;
-	
-	memcpy(gprs_send_buffer.command,"ER",2);
-	memcpy(gprs_send_buffer.argument,arg,2);
-	gprs_send_buffer.data_lenght = 4;
-	GprsSendFrameToServer(&gprs_send_buffer);
-	return GPRS_DATA_NO_ERR;
-}
-
-uint8 ReturnConfig(char *arg)
-{
-	
-	memcpy(gprs_send_buffer.command,"RS",2);
-	memcpy(gprs_send_buffer.argument,arg,2);
-	gprs_send_buffer.data_lenght = 4;
-	GprsSendFrameToServer(&gprs_send_buffer);
-	return GPRS_DATA_NO_ERR;
-}
-
-uint16 ServerMessage(void)
-{
-	uint8 temp[2];
-	memset(promptmess,0,sizeof(promptmess));
-	gprs_rec_buffer.check = 0;
-	strcpy(promptmess,gprs_rec_buffer.data);
-	temp[0] = 0x33;
-	DisplayMessage(temp);
-	ReturnOK("00");
-	return TRUE;
-}
 
 uint16 GetVersion(void *arg)
 {
-	sprintf(gprs_rec_buffer.data,"%s;%s;0",VERSION,PAD_version);
-	return strlen(gprs_rec_buffer.data);
+	sprintf(arg,"%s;%s;0",VERSION,PAD_version);
+	return strlen(arg);
 }
 
 uint16 GetUartConfig(void *arg)
 {
-	sprintf(gprs_rec_buffer.data,"%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;",
+	sprintf(arg,"%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;%d%06d;",
 		GetRj45UartChannal(),GetRj45UartBps(),
 		GetGprsUartChannal(),GetGprsUartBps(),
 		GetGpsUartChannal(),GetGpsUartBps(),
@@ -451,7 +424,7 @@ uint16 UartConfig(void *arg)
 
 uint16 GetFuncConfig(void *arg)
 {
-	sprintf(gprs_rec_buffer.data,"%d%031d",GetLoginMod(),0x00);
+	sprintf(arg,"%d%031d",GetLoginMod(),0x00);
 	return 32;
 }
 
@@ -463,7 +436,7 @@ uint16 FuncConfig(void *arg)
 
 uint16 GetCashboxConfig(void *arg)
 {
-	sprintf(gprs_rec_buffer.data,"%04d%04d%04d%04d%04d%04d",
+	sprintf(arg,"%04d%04d%04d%04d%04d%04d",
 		GetCashbox1Value(),
 		GetCashbox2Value(),
 		GetCashbox3Value(),
@@ -526,15 +499,15 @@ uint16 CashboxConfig(void *arg)
 
 uint16 GetSysPerformanceConfig(void *arg)
 {
-	sprintf(gprs_rec_buffer.data,"%04d%05d%05d%05d%05d",
+	sprintf(arg,"%04d%05d%05d%05d%05d",
 		0x00,
 		GetGprsAnswerResponseTime(),
 		GetGpsSamplingTime(),
 		GetGprsOfflineResponseTime(),
 		GetLoginRemainTime()
 		);
-	memcpy(gprs_rec_buffer.data,GetDeviceAddr(),4);
-	return 29;
+	memcpy(arg,GetDeviceAddr(),4);
+	return 24;
 }
 
 
@@ -572,7 +545,7 @@ uint16 SysPerformanceConfig(void *arg)
 
 uint16 GetServerCommConfig(void *arg)
 {
-	sprintf(gprs_rec_buffer.data,"%03d%03d%03d%03d%05d",
+	sprintf(arg,"%03d%03d%03d%03d%05d",
 		GetServerIp(0),
 		GetServerIp(1),
 		GetServerIp(2),
@@ -620,7 +593,7 @@ uint16 ServerCommConfig(void *arg)
 
 uint16 GetPrintConfig(void *arg)
 {
-	memcpy(gprs_rec_buffer.data,GetPrintCustomer(),16);
+	memcpy(arg,GetPrintCustomer(),16);
 	
 	return 16;
 }
@@ -668,14 +641,14 @@ uint8 ServerDownloadConfigData(void)
 	}
 }
 
-uint8 ServerGetConfigData(void)
+uint8 ServerGetConfigData(void *arg)
 {
 	uint8 i = 0;
 	while (1)
 	{
 		if (memcmp(gprs_rec_buffer.argument,config_corresponding_table[i].command,2) == 0)
 		{
-			return config_corresponding_table[i].funcget(NULL);
+			return config_corresponding_table[i].funcget(arg);
 			
 		}
 		if (memcmp(config_corresponding_table[++i].command,"FF",2) == 0)
@@ -684,6 +657,47 @@ uint8 ServerGetConfigData(void)
 		}
 	}
 }
+
+
+// OK命令
+uint8 ReturnOK(char *arg,uint8 package_no)
+{
+	//uint8 err;
+	
+	_server_communication_s server_communication_temp;
+	memcpy(server_communication_temp.command,"OK",2);
+	memcpy(server_communication_temp.argument,arg,2);
+	server_communication_temp.data_lenght = 4;
+	server_communication_temp.package_no = package_no;
+	GprsSendFrameToServer(&server_communication_temp);
+	return GPRS_DATA_NO_ERR;
+}
+// ER命令
+uint8 ReturnER(char *arg,uint8 package_no)
+{
+	//uint8 err;
+	
+	_server_communication_s server_communication_temp;
+	memcpy(server_communication_temp.command,"ER",2);
+	memcpy(server_communication_temp.argument,arg,2);
+	server_communication_temp.data_lenght = 4;
+	server_communication_temp.package_no = package_no;
+	GprsSendFrameToServer(&server_communication_temp);
+	return GPRS_DATA_NO_ERR;
+}
+
+uint8 ReturnConfig(char *arg,uint8 package_no)
+{
+	_server_communication_s server_communication_temp;
+	memcpy(server_communication_temp.command,"RS",2);
+	memcpy(server_communication_temp.argument,arg,2);
+	server_communication_temp.data_lenght = ServerGetConfigData(server_communication_temp.data) + 4;
+	server_communication_temp.package_no = package_no;
+	GprsSendFrameToServer(&server_communication_temp);
+	return GPRS_DATA_NO_ERR;
+}
+
+
 
 //	用于启动GDTU
 void StartGdtu(void)
@@ -796,7 +810,6 @@ uint8 GprsReceiveFrameFromServer(void)
 	uint8 data_temp,data_num=0,data_amount=0;
 	uint16 check_sun,timer_num=0;
 	
-	_server_communication_s server_communication_temp;
 	while (1)
 	{
 		if (GprsReceiveByte(&data_temp) == FALSE)
@@ -962,40 +975,45 @@ uint8 GprsReceiveFrameFromServer(void)
 				}
 				break;
 
-			case GPRS_HANDLE:
-				if (memcmp(GetDeviceAddr(),device_addr,4) != 0)
-				{
-					ReturnER("99");
-				}
-				else if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
-				{
-					OSSemPost(server_return_sem);
-				}
-				else if (memcmp(gprs_rec_buffer.command,"ER",2) == 0)
-				{
-					OSSemPost(server_return_sem);
-				}
-				else if (memcmp(gprs_rec_buffer.command,"MS",2) == 0)
-				{
-					ReturnOK("00");
-					DisplayMessage(gprs_rec_buffer.data);
-				}
-				else if (memcmp(gprs_rec_buffer.command,"WS",2) == 0)
-				{
-					ServerDownloadConfigData();
-					ReturnOK(gprs_rec_buffer.argument);
-				}
-				else if (memcmp(gprs_rec_buffer.command,"RS",2) == 0)
-				{
-					memcpy(server_communication_temp.command,"RS",2);
-					memcpy(server_communication_temp.argument,gprs_rec_buffer.argument,2);
-					check_sun = ServerGetConfigData();
-					server_communication_temp.data_lenght = 4 + check_sun;
-					memcpy(server_communication_temp.data,gprs_rec_buffer.data,check_sun);
-					GprsSendFrameToServer(&server_communication_temp);
-				}
+			default:
 				state = GPRS_HEAD;
 				break;
+		}
+		if (state == GPRS_HANDLE)
+		{
+			if (memcmp(GetDeviceAddr(),device_addr,4) != 0)
+			{
+				ReturnER("99",gprs_rec_buffer.package_no);
+			}
+			else if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
+			{
+				OSSemPost(server_return_sem);
+			}
+			else if (memcmp(gprs_rec_buffer.command,"ER",2) == 0)
+			{
+				OSSemPost(server_return_sem);
+			}
+			else if (memcmp(gprs_rec_buffer.command,"MS",2) == 0)
+			{
+				if (DisplayMessage(gprs_rec_buffer.data) == SYS_NO_ERR) 
+				{
+					ReturnOK("00",gprs_rec_buffer.package_no);
+				}
+				else
+				{
+					ReturnER("00",gprs_rec_buffer.package_no);
+				}
+			}
+			else if (memcmp(gprs_rec_buffer.command,"WS",2) == 0)
+			{
+				ServerDownloadConfigData();
+				ReturnOK(gprs_rec_buffer.argument,gprs_rec_buffer.package_no);
+			}
+			else if (memcmp(gprs_rec_buffer.command,"RS",2) == 0)
+			{
+				ReturnConfig(gprs_rec_buffer.argument,gprs_rec_buffer.package_no);
+			}
+			state = GPRS_HEAD;
 		}
 	}
 }

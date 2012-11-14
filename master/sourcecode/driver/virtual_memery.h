@@ -51,17 +51,20 @@ typedef struct
 } _Memery_chip_manage_s;
 
 
-
 typedef struct
 {
-	uint8 data[31];
-	uint8 crc;
-} _MemeryData_s;
+	uint8 failure			:1;			//	0 -- 存储器正常，1 -- 存储器已损坏
+	uint8 memeryused		:1;			//	0 -- 存储器可以使用，1 -- 存储器已被使用
+	uint8 prohibitread		:1;			//	0 -- 存储器可以读，1 -- 存储器不能被读
+	uint8 prohibitwrite		:1;			//	0 -- 存储器可以写，1 -- 存储器不能被写
+	uint8 unused			:4;
+} _mem_state_s;
+
 
 typedef struct {
-	uint8 data[14];
-	uint8 flag;
+	uint8 state;
 	uint8 crc;
+	uint8 data[14];
 } _mem_eeprom_s;
 
 typedef union {

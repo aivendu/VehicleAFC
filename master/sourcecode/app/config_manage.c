@@ -24,7 +24,7 @@ const _config_s config_init_from_rom =
 		8,9600,		//	未使用
 		9,9600,		//	未使用
 	},
-	{'9','9','9','9',5,0,3,0,30,0,10,0,0x1d,0x57,120,195,217,32},
+	{'F','F','F','F',5,0,3,0,30,0,10,0,0x1d,0x57,120,195,217,32},
 };
 
 void ConfigInit(void)
@@ -35,19 +35,16 @@ void ConfigInit(void)
 	if ((GetConfigState() == 0) 
 		|| (memcmp(GetConfigVersion(),config_init_from_rom.config_version,strlen(config_init_from_rom.config_version) != 0)))
 	{
-		config_ram = config_init_from_rom;
-		WriteExternMemery(&config_ram,CONFIG_SAVE_START_ADDR,sizeof(_config_s));		//	重新初始化
 		if (GetConfigState() == 0)
 		{
-			current_trade_index = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
-			memcpy(&trade_manage_data_temp,0,sizeof(_trade_manage_data_s));
-			log_index = LOG_START_ADDR + sizeof(log_index);
-			memcpy(&log_manage,0,sizeof(log_manage));
-			WriteExternMemery(&current_trade_index,TRADE_DATA_START_ADDR,4);
-			WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
-			WriteExternMemery(&log_index,LOG_START_ADDR,4);
-			WriteExternMemery(&log_manage,log_index,sizeof(_log_s));
+			current_trade_index = TRADE_DATA_START_ADDR;
+			log_index.log_start = LOG_START_ADDR;
+			log_index.log_end = LOG_START_ADDR;
+			WriteExternMemery(&current_trade_index,TRADE_DATA_START_ADDR,sizeof(current_trade_index));
+			WriteExternMemery(&log_index,LOG_START_ADDR,sizeof(_log_manage_s));
 		}
+		config_ram = config_init_from_rom;
+		WriteExternMemery(&config_ram,CONFIG_SAVE_START_ADDR,sizeof(_config_s));		//	重新初始化
 	}
 #endif
 }
@@ -56,7 +53,7 @@ char * GetDeviceAddr(void)
 {
 	uint8 err;
 	uint32 temp_32;
-	temp_32 = stoi(10,4,config_ram.pa.pa.device_addr,&err);		//	计算地址
+	temp_32 = stoi(16,4,config_ram.pa.pa.device_addr,&err);		//	计算地址
 	if ((temp_32 <= MAX_DEVICE_ADDR) && (temp_32 >= MIN_DEVICE_ADDR))		//	地址是否符合规定
 	{
 		return config_ram.pa.pa.device_addr;
@@ -64,7 +61,7 @@ char * GetDeviceAddr(void)
 	}
 	else
 	{
-		return "9999";
+		return "FFFF";
 	}
 }
 
@@ -72,7 +69,7 @@ uint8 SetDeviceAddr(char *arg)
 {
 	uint8 err;
 	uint32 temp_32;
-	temp_32 = stoi(10,4,arg,&err);		//	计算地址
+	temp_32 = stoi(16,4,arg,&err);		//	计算地址
 	if ((temp_32 <= MAX_DEVICE_ADDR) && (temp_32 >= MIN_DEVICE_ADDR))		//	地址是否符合规定
 	{
 		memcpy(config_ram.pa.pa.device_addr,arg,4);

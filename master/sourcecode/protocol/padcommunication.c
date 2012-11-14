@@ -1361,6 +1361,8 @@ void TaskDeviceCommand(void *pdata) {
 
 			case LOGIN:
 				//changesite_flag = 0;
+				GetNextPackage();
+				ServerLogin(device_control.user.uinfo.staffid);
 				sys_state.ss.st_cmd.se.change_site.exe_st = EXE_WAIT;
 				sys_state.ss.st_cmd.se.config_match.exe_st = EXE_WAIT;
 				sys_state.ss.st_cmd.se.login.exe_st = EXE_WAIT;

@@ -29,6 +29,7 @@ extern uint32 delay10us(uint32 m);
 extern uint32 delayus(uint32 m);
 extern unsigned int CRCByte(unsigned int crc_data, unsigned char b);
 extern uint32 TimeSec(uint16 yearnow,uint8 monthnow, uint8 daynow, uint8 hournow, uint8 minnow ,uint8 secnow);
+extern unsigned long stoi(unsigned char scale,unsigned char strlen,const char *str,unsigned char * const err);
 
 
 #endif

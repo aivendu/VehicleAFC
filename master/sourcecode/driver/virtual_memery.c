@@ -46,14 +46,14 @@ uint16 ReadExternMemery(void *data, uint32 addr, uint32 len)
 		{
 			//	数据不是存储在单一存储器里
 			len_temp = memery_chip[i].memery_size - addr_temp;
-			I2c0WriteReadBytes(memery_chip[i].io_addr,(uint8 *)&addr,memery_chip[i].memery_addr_len,data,len_temp);
+			I2c0ReadMemery(memery_chip[i].io_addr,(uint8 *)&addr,memery_chip[i].memery_addr_len,data,len_temp);
 			i++;
 		}
 		else
 		{
 			//	数据可以在当前存储器里全部存储
 			len_temp = len;
-			I2c0WriteReadBytes(memery_chip[i].io_addr,(uint8 *)&addr_temp,memery_chip[i].memery_addr_len,data,len_temp);
+			I2c0ReadMemery(memery_chip[i].io_addr,(uint8 *)&addr_temp,memery_chip[i].memery_addr_len,data,len_temp);
 			return 0;
 		}
 		data = (void *)((uint32)data + len_temp);
@@ -102,6 +102,7 @@ uint16 WriteExternMemery(void *data, uint32 addr, uint32 len)
 		i++;
 	}
 }
+
 
 void InitConfigData (void) {
 	return;

@@ -186,8 +186,9 @@ uint8 TradeHandle(uint8 state)
 }
 
 //uint8 data_spi[10000];
-uint8 test_command[] = {'<',0x00,0x01,0x00,0x01,0x05,0x00,0x05};
-uint32 time_delay;
+//uint8 test_command[] = {'<',0x00,0x01,0x00,0x01,0x05,0x00,0x05};
+//uint32 time_delay;
+char user_staffid_old[8];
 void TaskChipComm(void *pdata) {
 
 	uint8 err=0,i;
@@ -324,6 +325,7 @@ void TaskChipComm(void *pdata) {
 					{
 						OSTimeDly(2);
 					}
+					
 				}
 				/*else if ((sys_state.ss.st_cmd.se.printamount.exe_st == EXE_WRITED) && (sys_state.ss.st_major.ssm.st_user != USER_NO_CARD))
 				{
@@ -382,6 +384,31 @@ void TaskChipComm(void *pdata) {
 				{
 					OSTimeDly(2);
 				}
+				trade_data_temp.year = device_control.trade.tm.year+2000;
+				trade_data_temp.month= device_control.trade.tm.month;
+				trade_data_temp.day = device_control.trade.tm.day;
+				trade_data_temp.hour = device_control.trade.tm.hour;
+				trade_data_temp.minute= device_control.trade.tm.min;
+				trade_data_temp.second= device_control.trade.tm.sec;
+				trade_data_temp.current_station= device_control.trade.rm[0].trade_start_st;
+				trade_data_temp.serial_number= device_control.trade.tm.serail_num;
+				trade_data_temp.needpay= device_control.trade.tm.needpay;
+				trade_data_temp.realpay= device_control.trade.tm.realpay;
+				trade_data_temp.change_cashbox_1= device_control.trade.cr.coin_dis;
+				trade_data_temp.change_cashbox_2= device_control.trade.cr.cass1_dis;
+				trade_data_temp.change_cashbox_3= device_control.trade.cr.cass2_dis;
+				trade_data_temp.destination_num= device_control.trade.tm.des_num;
+				trade_data_temp.people_amount=0;
+				for (i=0;i<trade_data_temp.destination_num;i++)
+				{
+					trade_data_temp.destination[i].start_station= device_control.trade.rm[i].trade_start_st;
+					trade_data_temp.destination[i].destination_station= device_control.trade.rm[i].trade_end_st;
+					trade_data_temp.destination[i].price= device_control.trade.rm[i].price;
+					trade_data_temp.destination[i].people_num= device_control.trade.rm[i].number_of_people;
+					trade_data_temp.people_amount += device_control.trade.rm[i].number_of_people;
+				}
+				GetNextPackage();
+				ServerUploadTradeData(&trade_data_temp);
 			}
 			if (device_control.cmd.print_amount.exe_st == EXE_RUN_END)
 			{
@@ -444,6 +471,8 @@ void TaskChipComm(void *pdata) {
 			if (sys_state.ss.st_major.ssm.st_user != USER_HAVE_CARD_NO_LOGIN)
 			{
 				if (strncmp(device_control.user.rinfo.vehicle_plate,"ËÕA00099",8) == 0) {
+					memset(user_staffid_old,0,8);
+					memcpy(user_staffid_old,device_control.user.uinfo.staffid,7);
 					sys_state.ss.st_major.ssm.st_user = USER_VALIDATED;
 				}
 				else
@@ -454,7 +483,12 @@ void TaskChipComm(void *pdata) {
 		}
 		else if (sys_state.ss.st_other.sso.st_ic_machine == IC_MACHINE_NO_CARD)
 		{
-			sys_state.ss.st_major.ssm.st_user = USER_NO_CARD;
+			if (sys_state.ss.st_major.ssm.st_user != USER_NO_CARD)
+			{
+				GetNextPackage();
+				ServerLogout(user_staffid_old);
+				sys_state.ss.st_major.ssm.st_user = USER_NO_CARD;
+			}
 		}
 		
 	}
