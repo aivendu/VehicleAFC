@@ -211,8 +211,8 @@ Section Cross References
     test.o(.text) refers to uart0.o(.text) for RequestUart0
     test.o(.text) refers to rt_memclr_w.o(.text) for __rt_memclr_w
     test.o(.text) refers to strncmp.o(.text) for strncmp
-    test.o(.text) refers to uart1.o(.text) for RequestUart1
     test.o(.text) refers to Os_time.o(.text) for OSTimeDly
+    test.o(.text) refers to uart1.o(.text) for RequestUart1
     test.o(.text) refers to test.o(.constdata) for .constdata$1
     test.o(.text) refers to test.o(.bss) for .bss$2
     __main.o(!!!) refers to kernel.o(.text) for __rt_entry
@@ -356,62 +356,62 @@ Image Symbol Table
     $a     0x0000995c   ROM_EXEC
     $d     0x00009c4c   ROM_EXEC
     $a     0x00009c54   ROM_EXEC
-    $d     0x0000a1ac   ROM_EXEC
-    $a     0x0000a1b8   ROM_EXEC
-    $d     0x0000a228   ROM_EXEC
-    $f     0x0000a228   ROM_EXEC
-    $f     0x0000a22c   ROM_EXEC
-    $a     0x0000a230   ROM_EXEC
-    $d     0x0000a31c   ROM_EXEC
-    $a     0x0000a32c   ROM_EXEC
-    $d     0x0000a638   ROM_EXEC
-    $a     0x0000a63c   ROM_EXEC
-    $d     0x0000a6b4   ROM_EXEC
-    $a     0x0000a6b8   ROM_EXEC
-    $p     0x0000a7bc   ROM_EXEC
-    $p     0x0000aa40   ROM_EXEC
-    $p     0x0000aa5c   ROM_EXEC
-    $p     0x0000aa88   ROM_EXEC
-    $p     0x0000abb0   ROM_EXEC
-    $p     0x0000abe8   ROM_EXEC
-    $p     0x0000ac24   ROM_EXEC
-    $p     0x0000af1c   ROM_EXEC
-    $d     0x0000af38   ROM_EXEC
-    $a     0x0000af84   ROM_EXEC
-    $p     0x0000b2ac   ROM_EXEC
-    $p     0x0000b2d8   ROM_EXEC
-    $p     0x0000b32c   ROM_EXEC
-    $p     0x0000b3a4   ROM_EXEC
-    $p     0x0000b3d4   ROM_EXEC
-    $p     0x0000b3fc   ROM_EXEC
-    $p     0x0000b430   ROM_EXEC
-    $p     0x0000b460   ROM_EXEC
-    $p     0x0000b498   ROM_EXEC
-    $a     0x0000b4b4   ROM_EXEC
-    $d     0x0000b610   ROM_EXEC
-    $f     0x0000b610   ROM_EXEC
-    $a     0x0000b614   ROM_EXEC
-    $d     0x0000b68c   ROM_EXEC
-    $a     0x0000b694   ROM_EXEC
-    $d     0x0000b78c   ROM_EXEC
-    $a     0x0000b790   ROM_EXEC
-    $d     0x0000b798   ROM_EXEC
-    $a     0x0000b79c   ROM_EXEC
-    $d     0x0000b938   ROM_EXEC
-    $a     0x0000b93c   ROM_EXEC
-    $d     0x0000bd68   ROM_EXEC
-    $f     0x0000bd7c   ROM_EXEC
-    $a     0x0000bd80   ROM_EXEC
-    $d     0x0000bdb8   ROM_EXEC
-    $a     0x0000bdbc   ROM_EXEC
-    $d     0x0000be70   ROM_EXEC
-    $f     0x0000be70   ROM_EXEC
-    $f     0x0000be74   ROM_EXEC
-    $a     0x0000be90   ROM_EXEC
-    $d     0x0000bea8   ROM_EXEC
-    $f     0x0000c150   ROM_EXEC
-    $f     0x0000c160   ROM_EXEC
-    $d     0x0000c164   ROM_EXEC
+    $d     0x0000a1c4   ROM_EXEC
+    $a     0x0000a1d0   ROM_EXEC
+    $d     0x0000a240   ROM_EXEC
+    $f     0x0000a240   ROM_EXEC
+    $f     0x0000a244   ROM_EXEC
+    $a     0x0000a248   ROM_EXEC
+    $d     0x0000a334   ROM_EXEC
+    $a     0x0000a344   ROM_EXEC
+    $d     0x0000a650   ROM_EXEC
+    $a     0x0000a654   ROM_EXEC
+    $d     0x0000a6cc   ROM_EXEC
+    $a     0x0000a6d0   ROM_EXEC
+    $p     0x0000a7d4   ROM_EXEC
+    $p     0x0000aa58   ROM_EXEC
+    $p     0x0000aa74   ROM_EXEC
+    $p     0x0000aaa0   ROM_EXEC
+    $p     0x0000abc8   ROM_EXEC
+    $p     0x0000ac00   ROM_EXEC
+    $p     0x0000ac3c   ROM_EXEC
+    $p     0x0000af34   ROM_EXEC
+    $d     0x0000af50   ROM_EXEC
+    $a     0x0000af9c   ROM_EXEC
+    $p     0x0000b2c4   ROM_EXEC
+    $p     0x0000b2f0   ROM_EXEC
+    $p     0x0000b344   ROM_EXEC
+    $p     0x0000b3bc   ROM_EXEC
+    $p     0x0000b3ec   ROM_EXEC
+    $p     0x0000b414   ROM_EXEC
+    $p     0x0000b448   ROM_EXEC
+    $p     0x0000b478   ROM_EXEC
+    $p     0x0000b4b0   ROM_EXEC
+    $a     0x0000b4cc   ROM_EXEC
+    $d     0x0000b628   ROM_EXEC
+    $f     0x0000b628   ROM_EXEC
+    $a     0x0000b62c   ROM_EXEC
+    $d     0x0000b6a4   ROM_EXEC
+    $a     0x0000b6ac   ROM_EXEC
+    $d     0x0000b7a4   ROM_EXEC
+    $a     0x0000b7a8   ROM_EXEC
+    $d     0x0000b7b0   ROM_EXEC
+    $a     0x0000b7b4   ROM_EXEC
+    $d     0x0000b950   ROM_EXEC
+    $a     0x0000b954   ROM_EXEC
+    $d     0x0000bd80   ROM_EXEC
+    $f     0x0000bd94   ROM_EXEC
+    $a     0x0000bd98   ROM_EXEC
+    $d     0x0000bdd0   ROM_EXEC
+    $a     0x0000bdd4   ROM_EXEC
+    $d     0x0000be88   ROM_EXEC
+    $f     0x0000be88   ROM_EXEC
+    $f     0x0000be8c   ROM_EXEC
+    $a     0x0000bea8   ROM_EXEC
+    $d     0x0000bec0   ROM_EXEC
+    $f     0x0000c168   ROM_EXEC
+    $f     0x0000c178   ROM_EXEC
+    $d     0x0000c17c   ROM_EXEC
     $d     0x40000000   IRAM
     $d     0x40003388   HEAP
 
@@ -424,7 +424,7 @@ Image Symbol Table
     SWIStacks                                0x40003308   Data         128  Os_cpu_a.o(SWIStacks)
     <Anonymous Symbol>                       0x00000000   Data         216  Os_cpu_a.o(.debug_line)
     <Anonymous Symbol>                       0x00000000   Data          16  Os_cpu_a.o(.debug_abbrev)
-    subr                                     0x0000bd80   ARM Code     272  Os_cpu_a.o(subr)
+    subr                                     0x0000bd98   ARM Code     272  Os_cpu_a.o(subr)
     USR32Mode                                0x00000010   Number         0  Os_cpu_a.o ABSOLUTE
     FIQ32Mode                                0x00000011   Number         0  Os_cpu_a.o ABSOLUTE
     IRQ32Mode                                0x00000012   Number         0  Os_cpu_a.o ABSOLUTE
@@ -433,8 +433,8 @@ Image Symbol Table
     SVC_STACK_LEGTH                          0x00000020   Number         0  Os_cpu_a.o ABSOLUTE
     T_bit                                    0x00000020   Number         0  Os_cpu_a.o ABSOLUTE
     NoInt                                    0x00000080   Number         0  Os_cpu_a.o ABSOLUTE
-    StackSvc                                 0x0000bdb8   Data           4  Os_cpu_a.o(subr)
-    OSIntCtxSw_1                             0x0000be28   ARM Code       0  Os_cpu_a.o(subr)
+    StackSvc                                 0x0000bdd0   Data           4  Os_cpu_a.o(subr)
+    OSIntCtxSw_1                             0x0000be40   ARM Code       0  Os_cpu_a.o(subr)
     SvcStackSpace                            0x40003308   Data         128  Os_cpu_a.o(SWIStacks)
     D:\dqj_work\5.VehicleAFC\AQ\01 开发库\4 设计\2 嵌入式软件\branches\AQ01\slave\sourcecode\ARM\Os_cpu_c.c 0x00000000   Number         0  Os_cpu_c.o ABSOLUTE
     .text                                    0x00000160   ARM Code       0  Os_cpu_c.o(.text)
@@ -612,7 +612,7 @@ Image Symbol Table
     <Anonymous Symbol>                       0x000003fc   Data          16  IRQ.o(.debug_abbrev)
     <Anonymous Symbol>                       0x000012e4   Data         176  IRQ.o(.debug_line)
     <Anonymous Symbol>                       0x00004170   Data         176  IRQ.o(.debug_info)
-    IRQ                                      0x0000b9e8   ARM Code     920  IRQ.o(IRQ)
+    IRQ                                      0x0000ba00   ARM Code     920  IRQ.o(IRQ)
     USR32Mode                                0x00000010   Number         0  IRQ.o ABSOLUTE
     FIQ32Mode                                0x00000011   Number         0  IRQ.o ABSOLUTE
     IRQ32Mode                                0x00000012   Number         0  IRQ.o ABSOLUTE
@@ -666,7 +666,7 @@ Image Symbol Table
     .bss                                     0x40000d2c   Data           0  Os_core.o(.bss)
     .text                                    0x00000598   ARM Code       0  Os_core.o(.text)
     .bss                                     0x40000cf0   Data           0  Os_core.o(.bss)
-    .constdata                               0x0000bea8   Data           0  Os_core.o(.constdata)
+    .constdata                               0x0000bec0   Data           0  Os_core.o(.constdata)
     .bss                                     0x40000d9c   Data           0  Os_core.o(.bss)
     .bss                                     0x40000d34   Data           0  Os_core.o(.bss)
     C$debug_abbrev0                          0x00000010   Data           0  Os_cpu_c.o(.debug_abbrev)
@@ -753,7 +753,7 @@ Image Symbol Table
     C$debug_info27                           0x00003658   Data           0  target.o(.debug_info)
     C$debug_info33                           0x000042d4   Data           0  Os_core.o(.debug_info)
     C$debug_info231                          0x00004de8   Data           0  Os_core.o(.debug_info)
-    .constdata$1                             0x0000bea8   Data           0  Os_core.o(.constdata)
+    .constdata$1                             0x0000bec0   Data           0  Os_core.o(.constdata)
     .bss$2                                   0x4000003c   Data           0  Os_core.o(.bss)
     .bss$7                                   0x40000cf0   Data           0  Os_core.o(.bss)
     .bss$12                                  0x40000d2c   Data           0  Os_core.o(.bss)
@@ -1580,7 +1580,7 @@ Image Symbol Table
     C$debug_info231                          0x00009100   Data           0  queue.o(.debug_info)
     D:\dqj_work\5.VehicleAFC\AQ\01 开发库\4 设计\2 嵌入式软件\branches\AQ01\slave\sourcecode\app\comm.c 0x00000000   Number         0  comm.o ABSOLUTE
     .text                                    0x00003918   ARM Code       0  comm.o(.text)
-    .constdata                               0x0000bfb0   Data           0  comm.o(.constdata)
+    .constdata                               0x0000bfc8   Data           0  comm.o(.constdata)
     C$debug_abbrev0                          0x00000010   Data           0  Os_cpu_c.o(.debug_abbrev)
     C$debug_pubnames16                       0x000000f4   Data           0  Os_cpu_c.o(.debug_pubnames)
     C$debug_macinfo17                        0x00000194   Data           0  Os_cpu_c.o(.debug_macinfo)
@@ -1663,11 +1663,11 @@ Image Symbol Table
     C$debug_macinfo5                         0x00003e84   Data           0  comm.o(.debug_macinfo)
     C$debug_info3                            0x000096cc   Data           0  comm.o(.debug_info)
     C$debug_info231                          0x000097a4   Data           0  comm.o(.debug_info)
-    .constdata$1                             0x0000bfb0   Data           0  comm.o(.constdata)
+    .constdata$1                             0x0000bfc8   Data           0  comm.o(.constdata)
     D:\dqj_work\5.VehicleAFC\AQ\01 开发库\4 设计\2 嵌入式软件\branches\AQ01\slave\sourcecode\driver\uart0.c 0x00000000   Number         0  uart0.o ABSOLUTE
     .text                                    0x00003d18   ARM Code       0  uart0.o(.text)
     .bss                                     0x400027cc   Data           0  uart0.o(.bss)
-    .constdata                               0x0000bfbc   Data           0  uart0.o(.constdata)
+    .constdata                               0x0000bfd4   Data           0  uart0.o(.constdata)
     C$debug_abbrev0                          0x00000010   Data           0  Os_cpu_c.o(.debug_abbrev)
     C$debug_pubnames16                       0x000000f4   Data           0  Os_cpu_c.o(.debug_pubnames)
     C$debug_macinfo17                        0x00000194   Data           0  Os_cpu_c.o(.debug_macinfo)
@@ -1751,8 +1751,8 @@ Image Symbol Table
     C$debug_macinfo5                         0x00004004   Data           0  uart0.o(.debug_macinfo)
     C$debug_info3                            0x00009c80   Data           0  uart0.o(.debug_info)
     C$debug_info231                          0x00009df4   Data           0  uart0.o(.debug_info)
-    .constdata$1                             0x0000bfbc   Data           0  uart0.o(.constdata)
-    uart0_config                             0x0000bfbc   Data          32  uart0.o(.constdata)
+    .constdata$1                             0x0000bfd4   Data           0  uart0.o(.constdata)
+    uart0_config                             0x0000bfd4   Data          32  uart0.o(.constdata)
     .bss$2                                   0x400027cc   Data           0  uart0.o(.bss)
     uart0_channel_ic_flag                    0x400027cc   Data           1  uart0.o(.bss)
     Uart0Sem                                 0x400027d0   Data           4  uart0.o(.bss)
@@ -1761,7 +1761,7 @@ Image Symbol Table
     UART0RecBuf                              0x40002858   Data         128  uart0.o(.bss)
     D:\dqj_work\5.VehicleAFC\AQ\01 开发库\4 设计\2 嵌入式软件\branches\AQ01\slave\sourcecode\driver\uart1.c 0x00000000   Number         0  uart1.o ABSOLUTE
     .bss                                     0x400028d8   Data           0  uart1.o(.bss)
-    .constdata                               0x0000bfdc   Data           0  uart1.o(.constdata)
+    .constdata                               0x0000bff4   Data           0  uart1.o(.constdata)
     .text                                    0x000042fc   ARM Code       0  uart1.o(.text)
     C$debug_abbrev0                          0x00000010   Data           0  Os_cpu_c.o(.debug_abbrev)
     C$debug_pubnames16                       0x000000f4   Data           0  Os_cpu_c.o(.debug_pubnames)
@@ -1846,8 +1846,8 @@ Image Symbol Table
     Uart1ChangeCh                            0x00004474   ARM Code     256  uart1.o(.text)
     C$debug_info3                            0x0000a870   Data           0  uart1.o(.debug_info)
     C$debug_info231                          0x0000a9f8   Data           0  uart1.o(.debug_info)
-    .constdata$1                             0x0000bfdc   Data           0  uart1.o(.constdata)
-    uart1_config                             0x0000bfdc   Data          32  uart1.o(.constdata)
+    .constdata$1                             0x0000bff4   Data           0  uart1.o(.constdata)
+    uart1_config                             0x0000bff4   Data          32  uart1.o(.constdata)
     .bss$2                                   0x400028d8   Data           0  uart1.o(.bss)
     uart1_channel_ic_flag                    0x400028d8   Data           1  uart1.o(.bss)
     Uart1_Channel_Sem                        0x400028e0   Data           4  uart1.o(.bss)
@@ -2534,7 +2534,7 @@ Image Symbol Table
     .bss$2                                   0x40002eb8   Data           0  eeprom.o(.bss)
     D:\dqj_work\5.VehicleAFC\AQ\01 开发库\4 设计\2 嵌入式软件\branches\AQ01\slave\sourcecode\protocol\coin_machine.c 0x00000000   Number         0  coin_machine.o ABSOLUTE
     .bss                                     0x40002f1c   Data           0  coin_machine.o(.bss)
-    .constdata                               0x0000bffc   Data           0  coin_machine.o(.constdata)
+    .constdata                               0x0000c014   Data           0  coin_machine.o(.constdata)
     .text                                    0x00006118   ARM Code       0  coin_machine.o(.text)
     .data                                    0x40000004   Data           0  coin_machine.o(.data)
     C$debug_abbrev0                          0x00000010   Data           0  Os_cpu_c.o(.debug_abbrev)
@@ -2618,7 +2618,7 @@ Image Symbol Table
     C$debug_line2                            0x000047cc   Data           0  coin_machine.o(.debug_line)
     C$debug_line230                          0x000048cc   Data           0  coin_machine.o(.debug_line)
     C$debug_loc234                           0x0000587c   Data           0  coin_machine.o(.debug_loc)
-    .constdata$1                             0x0000bffc   Data           0  coin_machine.o(.constdata)
+    .constdata$1                             0x0000c014   Data           0  coin_machine.o(.constdata)
     C$debug_info3                            0x0000f518   Data           0  coin_machine.o(.debug_info)
     C$debug_info231                          0x0000f818   Data           0  coin_machine.o(.debug_info)
     C$debug_info183                          0x00010e54   Data           0  coin_machine.o(.debug_info)
@@ -2807,7 +2807,7 @@ Image Symbol Table
     D:\dqj_work\5.VehicleAFC\AQ\01 开发库\4 设计\2 嵌入式软件\branches\AQ01\slave\sourcecode\protocol\gps.c 0x00000000   Number         0  gps.o ABSOLUTE
     .bss                                     0x4000309e   Data           0  gps.o(.bss)
     .bss                                     0x4000309c   Data           0  gps.o(.bss)
-    .constdata                               0x0000c074   Data           0  gps.o(.constdata)
+    .constdata                               0x0000c08c   Data           0  gps.o(.constdata)
     .text                                    0x000092ec   ARM Code       0  gps.o(.text)
     .bss                                     0x4000304c   Data           0  gps.o(.bss)
     .bss                                     0x4000309d   Data           0  gps.o(.bss)
@@ -2891,7 +2891,7 @@ Image Symbol Table
     C$debug_line2                            0x0000598c   Data           0  gps.o(.debug_line)
     C$debug_line230                          0x00005a84   Data           0  gps.o(.debug_line)
     C$debug_loc234                           0x00007948   Data           0  gps.o(.debug_loc)
-    .constdata$1                             0x0000c074   Data           0  gps.o(.constdata)
+    .constdata$1                             0x0000c08c   Data           0  gps.o(.constdata)
     C$debug_info195                          0x00015ffc   Data           0  gps.o(.debug_info)
     C$debug_info213                          0x0001623c   Data           0  gps.o(.debug_info)
     C$debug_info3                            0x00016a48   Data           0  gps.o(.debug_info)
@@ -2978,7 +2978,7 @@ Image Symbol Table
     C$debug_info213                          0x00017cb4   Data           0  trade.o(.debug_info)
     D:\dqj_work\5.VehicleAFC\AQ\01 开发库\4 设计\2 嵌入式软件\branches\AQ01\slave\sourcecode\protocol\syn6288.c 0x00000000   Number         0  syn6288.o ABSOLUTE
     .text                                    0x0000995c   ARM Code       0  syn6288.o(.text)
-    .constdata                               0x0000c164   Data           0  syn6288.o(.constdata)
+    .constdata                               0x0000c17c   Data           0  syn6288.o(.constdata)
     C$debug_abbrev0                          0x00000010   Data           0  Os_cpu_c.o(.debug_abbrev)
     C$debug_pubnames16                       0x000000f4   Data           0  Os_cpu_c.o(.debug_pubnames)
     C$debug_macinfo17                        0x00000194   Data           0  Os_cpu_c.o(.debug_macinfo)
@@ -3056,12 +3056,12 @@ Image Symbol Table
     C$debug_pubnames232                      0x00003e98   Data           0  syn6288.o(.debug_pubnames)
     C$debug_line230                          0x00005d18   Data           0  syn6288.o(.debug_line)
     C$debug_loc234                           0x00007ea4   Data           0  syn6288.o(.debug_loc)
-    .constdata$1                             0x0000c164   Data           0  syn6288.o(.constdata)
+    .constdata$1                             0x0000c17c   Data           0  syn6288.o(.constdata)
     C$debug_info231                          0x000184c0   Data           0  syn6288.o(.debug_info)
     D:\dqj_work\5.VehicleAFC\AQ\01 开发库\4 设计\2 嵌入式软件\branches\AQ01\slave\sourcecode\app\test.c 0x00000000   Number         0  test.o ABSOLUTE
     .bss                                     0x400030a3   Data           0  test.o(.bss)
     .text                                    0x00009c54   ARM Code       0  test.o(.text)
-    .constdata                               0x0000c172   Data           0  test.o(.constdata)
+    .constdata                               0x0000c18a   Data           0  test.o(.constdata)
     C$debug_abbrev0                          0x00000010   Data           0  Os_cpu_c.o(.debug_abbrev)
     C$debug_pubnames16                       0x000000f4   Data           0  Os_cpu_c.o(.debug_pubnames)
     C$debug_macinfo17                        0x00000194   Data           0  Os_cpu_c.o(.debug_macinfo)
@@ -3142,7 +3142,7 @@ Image Symbol Table
     C$debug_line2                            0x00005edc   Data           0  test.o(.debug_line)
     C$debug_line230                          0x00005fd0   Data           0  test.o(.debug_line)
     C$debug_loc234                           0x000081e0   Data           0  test.o(.debug_loc)
-    .constdata$1                             0x0000c172   Data           0  test.o(.constdata)
+    .constdata$1                             0x0000c18a   Data           0  test.o(.constdata)
     C$debug_info3                            0x00018b38   Data           0  test.o(.debug_info)
     C$debug_info231                          0x00018c20   Data           0  test.o(.debug_info)
     .bss$2                                   0x400030a3   Data           0  test.o(.bss)
@@ -3155,127 +3155,127 @@ Image Symbol Table
     _zero_loop                               0x00000140   ARM Code       0  __main.o(!!!)
     _region_table                            0x00000150   Data           0  __main.o(!!!)
     ../../armsys.c                           0x00000000   Number         0  _no_redirect.o ABSOLUTE
-    .text                                    0x0000a1b8   ARM Code       0  _no_redirect.o(.text)
+    .text                                    0x0000a1d0   ARM Code       0  _no_redirect.o(.text)
     C$debug_frame18                          0x000020dc   Data           0  _no_redirect.o(.debug_frame)
     ../../printf.c                           0x00000000   Number         0  _sprintf.o ABSOLUTE
-    .text                                    0x0000a1c0   ARM Code       0  _sprintf.o(.text)
+    .text                                    0x0000a1d8   ARM Code       0  _sprintf.o(.text)
     C$debug_frame18                          0x00002128   Data           0  _sprintf.o(.debug_frame)
     ../../stdlib.c                           0x00000000   Number         0  rand.o ABSOLUTE
     .bss                                     0x400030a4   Data           0  rand.o(.bss)
-    .text                                    0x0000a230   ARM Code       0  rand.o(.text)
+    .text                                    0x0000a248   ARM Code       0  rand.o(.text)
     C$debug_frame11                          0x00002184   Data           0  rand.o(.debug_frame)
     .bss$2                                   0x400030a4   Data           0  rand.o(.bss)
     _random_j                                0x400030a4   Data           4  rand.o(.bss)
     _random_k                                0x400030a8   Data           4  rand.o(.bss)
     _random_number_seed                      0x400030ac   Data         220  rand.o(.bss)
     ../../memcpset.s                         0x00000000   Number         0  rt_memclr.o ABSOLUTE
-    .text                                    0x0000a32c   ARM Code      68  rt_memclr.o(.text)
     <Anonymous Symbol>                       0x00002204   Data          68  rt_memclr.o(.debug_frame)
-    _Bytes                                   0x0000a35c   ARM Code       0  rt_memclr.o(.text)
+    .text                                    0x0000a344   ARM Code      68  rt_memclr.o(.text)
+    _Bytes                                   0x0000a374   ARM Code       0  rt_memclr.o(.text)
     ../../memcpset.s                         0x00000000   Number         0  rt_memclr_w.o ABSOLUTE
-    .text                                    0x0000a370   ARM Code      88  rt_memclr_w.o(.text)
+    .text                                    0x0000a388   ARM Code      88  rt_memclr_w.o(.text)
     <Anonymous Symbol>                       0x00002248   Data          84  rt_memclr_w.o(.debug_frame)
-    _loop                                    0x0000a388   ARM Code       0  rt_memclr_w.o(.text)
+    _loop                                    0x0000a3a0   ARM Code       0  rt_memclr_w.o(.text)
     ../../memcpset.s                         0x00000000   Number         0  rt_memcpy.o ABSOLUTE
-    .text                                    0x0000a3c8   ARM Code     180  rt_memcpy.o(.text)
+    .text                                    0x0000a3e0   ARM Code     180  rt_memcpy.o(.text)
     <Anonymous Symbol>                       0x0000229c   Data          60  rt_memcpy.o(.debug_frame)
-    _memcpy_dest_aligned                     0x0000a3fc   ARM Code       0  rt_memcpy.o(.text)
-    _memcpy_src1_loop                        0x0000a41c   ARM Code       0  rt_memcpy.o(.text)
-    _memcpy_src2_loop                        0x0000a43c   ARM Code       0  rt_memcpy.o(.text)
-    _memcpy_src3_loop                        0x0000a45c   ARM Code       0  rt_memcpy.o(.text)
+    _memcpy_dest_aligned                     0x0000a414   ARM Code       0  rt_memcpy.o(.text)
+    _memcpy_src1_loop                        0x0000a434   ARM Code       0  rt_memcpy.o(.text)
+    _memcpy_src2_loop                        0x0000a454   ARM Code       0  rt_memcpy.o(.text)
+    _memcpy_src3_loop                        0x0000a474   ARM Code       0  rt_memcpy.o(.text)
     ../../memcpset.s                         0x00000000   Number         0  rt_memcpy_w.o ABSOLUTE
     <Anonymous Symbol>                       0x000022d8   Data          84  rt_memcpy_w.o(.debug_frame)
-    .text                                    0x0000a47c   ARM Code     108  rt_memcpy_w.o(.text)
-    _memcpy_aligned_loop                     0x0000a488   ARM Code       0  rt_memcpy_w.o(.text)
-    _memcpy_small                            0x0000a4a0   ARM Code       0  rt_memcpy_w.o(.text)
+    .text                                    0x0000a494   ARM Code     108  rt_memcpy_w.o(.text)
+    _memcpy_aligned_loop                     0x0000a4a0   ARM Code       0  rt_memcpy_w.o(.text)
+    _memcpy_small                            0x0000a4b8   ARM Code       0  rt_memcpy_w.o(.text)
     ../../division.s                         0x00000000   Number         0  rt_udiv.o ABSOLUTE
-    .text                                    0x0000a4e8   ARM Code     192  rt_udiv.o(.text)
+    .text                                    0x0000a500   ARM Code     192  rt_udiv.o(.text)
     <Anonymous Symbol>                       0x0000232c   Data          68  rt_udiv.o(.debug_frame)
     ../../division.s                         0x00000000   Number         0  rtudiv10.o ABSOLUTE
-    .text                                    0x0000a5a8   ARM Code      44  rtudiv10.o(.text)
     <Anonymous Symbol>                       0x00002370   Data          68  rtudiv10.o(.debug_frame)
+    .text                                    0x0000a5c0   ARM Code      44  rtudiv10.o(.text)
     ../../string.c                           0x00000000   Number         0  strlen.o ABSOLUTE
-    .text                                    0x0000a5d4   ARM Code       0  strlen.o(.text)
+    .text                                    0x0000a5ec   ARM Code       0  strlen.o(.text)
     C$debug_frame12                          0x000023b4   Data           0  strlen.o(.debug_frame)
     ../../string.c                           0x00000000   Number         0  strncmp.o ABSOLUTE
-    .text                                    0x0000a63c   ARM Code       0  strncmp.o(.text)
+    .text                                    0x0000a654   ARM Code       0  strncmp.o(.text)
     C$debug_frame12                          0x000023f0   Data           0  strncmp.o(.debug_frame)
     ../../scanf.c                            0x00000000   Number         0  strtol.o ABSOLUTE
-    .text                                    0x0000a6b8   ARM Code       0  strtol.o(.text)
+    .text                                    0x0000a6d0   ARM Code       0  strtol.o(.text)
     C$debug_frame22                          0x0000243c   Data           0  strtol.o(.debug_frame)
     ../../angel/sys.s                        0x00000000   Number         0  use_no_semi.o ABSOLUTE
     <Anonymous Symbol>                       0x000024a4   Data          68  use_no_semi.o(.debug_frame)
-    .text                                    0x0000a778   ARM Code       4  use_no_semi.o(.text)
+    .text                                    0x0000a790   ARM Code       4  use_no_semi.o(.text)
     ../../printf.c                           0x00000000   Number         0  __vfpntf.o ABSOLUTE
-    .text                                    0x0000a77c   ARM Code       0  __vfpntf.o(.text)
+    .text                                    0x0000a794   ARM Code       0  __vfpntf.o(.text)
     C$debug_frame18                          0x000024e8   Data           0  __vfpntf.o(.debug_frame)
-    _printf_display                          0x0000af84   ARM Code    1328  __vfpntf.o(.text)
+    _printf_display                          0x0000af9c   ARM Code    1328  __vfpntf.o(.text)
     ../../printf.c                           0x00000000   Number         0  _sputc.o ABSOLUTE
-    .text                                    0x0000b4b4   ARM Code       0  _sputc.o(.text)
+    .text                                    0x0000b4cc   ARM Code       0  _sputc.o(.text)
     C$debug_frame18                          0x00002598   Data           0  _sputc.o(.debug_frame)
     ../../scanf.c                            0x00000000   Number         0  _strtoul.o ABSOLUTE
-    .text                                    0x0000b4d0   ARM Code       0  _strtoul.o(.text)
+    .text                                    0x0000b4e8   ARM Code       0  _strtoul.o(.text)
     C$debug_frame22                          0x000025e4   Data           0  _strtoul.o(.debug_frame)
     ../../angel/kernel.s                     0x00000000   Number         0  kernel.o ABSOLUTE
     <Anonymous Symbol>                       0x00002664   Data          88  kernel.o(.debug_frame)
-    .text                                    0x0000b5d8   ARM Code      40  kernel.o(.text)
-    __rt_abort1                              0x0000b5fc   ARM Code       0  kernel.o(.text)
+    .text                                    0x0000b5f0   ARM Code      40  kernel.o(.text)
+    __rt_abort1                              0x0000b614   ARM Code       0  kernel.o(.text)
     ../../angel/rt.s                         0x00000000   Number         0  rt_ctype_table.o ABSOLUTE
-    .text                                    0x0000b600   ARM Code      20  rt_ctype_table.o(.text)
+    .text                                    0x0000b618   ARM Code      20  rt_ctype_table.o(.text)
     <Anonymous Symbol>                       0x000026bc   Data          76  rt_ctype_table.o(.debug_frame)
     ../../angel/rt.s                         0x00000000   Number         0  rt_errno_addr.o ABSOLUTE
-    .text                                    0x0000b614   ARM Code      12  rt_errno_addr.o(.text)
+    .text                                    0x0000b62c   ARM Code      12  rt_errno_addr.o(.text)
     <Anonymous Symbol>                       0x00002708   Data          76  rt_errno_addr.o(.debug_frame)
     ../../scanf.c                            0x00000000   Number         0  _chval.o ABSOLUTE
-    .text                                    0x0000b620   ARM Code       0  _chval.o(.text)
+    .text                                    0x0000b638   ARM Code       0  _chval.o(.text)
     C$debug_frame22                          0x00002754   Data           0  _chval.o(.debug_frame)
     ../../stdlib.c                           0x00000000   Number         0  exit.o ABSOLUTE
-    .text                                    0x0000b640   ARM Code       0  exit.o(.text)
+    .text                                    0x0000b658   ARM Code       0  exit.o(.text)
     C$debug_frame12                          0x00002790   Data           0  exit.o(.debug_frame)
     ../../locale.c                           0x00000000   Number         0  lc_ctype_c.o ABSOLUTE
-    .text                                    0x0000b658   ARM Code       0  lc_ctype_c.o(.text)
-    .constdata                               0x0000c18c   Data           0  lc_ctype_c.o(.constdata)
+    .text                                    0x0000b670   ARM Code       0  lc_ctype_c.o(.text)
+    .constdata                               0x0000c1a4   Data           0  lc_ctype_c.o(.constdata)
     C$debug_frame19                          0x000027dc   Data           0  lc_ctype_c.o(.debug_frame)
-    .constdata$1                             0x0000c18c   Data           0  lc_ctype_c.o(.constdata)
-    __lcctype_c_index                        0x0000c18c   Data           4  lc_ctype_c.o(.constdata)
-    __lcctype_c_lname                        0x0000c190   Data           4  lc_ctype_c.o(.constdata)
-    __lcctype_c_pname                        0x0000c194   Data           4  lc_ctype_c.o(.constdata)
-    __lcctype_c_start                        0x0000c198   Data           1  lc_ctype_c.o(.constdata)
+    .constdata$1                             0x0000c1a4   Data           0  lc_ctype_c.o(.constdata)
+    __lcctype_c_index                        0x0000c1a4   Data           4  lc_ctype_c.o(.constdata)
+    __lcctype_c_lname                        0x0000c1a8   Data           4  lc_ctype_c.o(.constdata)
+    __lcctype_c_pname                        0x0000c1ac   Data           4  lc_ctype_c.o(.constdata)
+    __lcctype_c_start                        0x0000c1b0   Data           1  lc_ctype_c.o(.constdata)
     ../../armsys.c                           0x00000000   Number         0  lib_init.o ABSOLUTE
-    .text                                    0x0000b694   ARM Code       0  lib_init.o(.text)
+    .text                                    0x0000b6ac   ARM Code       0  lib_init.o(.text)
     C$debug_frame18                          0x00002828   Data           0  lib_init.o(.debug_frame)
     ../../angel/sys.s                        0x00000000   Number         0  libspace.o ABSOLUTE
     <Anonymous Symbol>                       0x000028a4   Data          68  libspace.o(.debug_frame)
     .bss                                     0x40003188   Data          96  libspace.o(.bss)
-    .text                                    0x0000b790   ARM Code      12  libspace.o(.text)
+    .text                                    0x0000b7a8   ARM Code      12  libspace.o(.text)
     __libspace_start                         0x40003188   Data          96  libspace.o(.bss)
     ../../longlong.s                         0x00000000   Number         0  lludiv10.o ABSOLUTE
-    .text                                    0x0000b79c   ARM Code     152  lludiv10.o(.text)
+    .text                                    0x0000b7b4   ARM Code     152  lludiv10.o(.text)
     <Anonymous Symbol>                       0x000028e8   Data          88  lludiv10.o(.debug_frame)
     ../../stkheap1.s                         0x00000000   Number         0  stkheap1.o ABSOLUTE
     <Anonymous Symbol>                       0x00002940   Data         128  stkheap1.o(.debug_frame)
-    .text                                    0x0000b834   ARM Code     252  stkheap1.o(.text)
-    _heap_overflow                           0x0000b920   ARM Code       0  stkheap1.o(.text)
+    .text                                    0x0000b84c   ARM Code     252  stkheap1.o(.text)
+    _heap_overflow                           0x0000b938   ARM Code       0  stkheap1.o(.text)
     ../../printf2.s                          0x00000000   Number         0  printf2.o ABSOLUTE
     <Anonymous Symbol>                       0x000029c0   Data          60  printf2.o(.debug_frame)
-    x$fpl$printf2                            0x0000bea4   ARM Code       4  printf2.o(x$fpl$printf2)
+    x$fpl$printf2                            0x0000bebc   ARM Code       4  printf2.o(x$fpl$printf2)
     ../../printf.c                           0x00000000   Number         0  nofpdisp.o ABSOLUTE
-    .text                                    0x0000b930   ARM Code       0  nofpdisp.o(.text)
+    .text                                    0x0000b948   ARM Code       0  nofpdisp.o(.text)
     C$debug_frame18                          0x000029fc   Data           0  nofpdisp.o(.debug_frame)
     ../../memcpset.s                         0x00000000   Number         0  strcmp.o ABSOLUTE
-    .text                                    0x0000b938   Data         160  strcmp.o(.text)
+    .text                                    0x0000b950   Data         160  strcmp.o(.text)
     <Anonymous Symbol>                       0x00002a38   Data          84  strcmp.o(.debug_frame)
-    _ones_word                               0x0000b938   Data           4  strcmp.o(.text)
-    _strcmp_loop                             0x0000b950   ARM Code       0  strcmp.o(.text)
-    _strcmp_return                           0x0000b9a0   ARM Code       0  strcmp.o(.text)
-    _strcmp_byteloop                         0x0000b9a8   ARM Code       0  strcmp.o(.text)
-    _strcmp_byteend                          0x0000b9d0   ARM Code       0  strcmp.o(.text)
+    _ones_word                               0x0000b950   Data           4  strcmp.o(.text)
+    _strcmp_loop                             0x0000b968   ARM Code       0  strcmp.o(.text)
+    _strcmp_return                           0x0000b9b8   ARM Code       0  strcmp.o(.text)
+    _strcmp_byteloop                         0x0000b9c0   ARM Code       0  strcmp.o(.text)
+    _strcmp_byteend                          0x0000b9e8   ARM Code       0  strcmp.o(.text)
     ../../fpinit.s                           0x00000000   Number         0  fpinit.o ABSOLUTE
-    x$fpl$fpinit                             0x0000be90   ARM Code      20  fpinit.o(x$fpl$fpinit)
+    x$fpl$fpinit                             0x0000bea8   ARM Code      20  fpinit.o(x$fpl$fpinit)
     <Anonymous Symbol>                       0x00002a8c   Data          76  fpinit.o(.debug_frame)
     ../../angel/rt.s                         0x00000000   Number         0  rt_fp_status_addr.o ABSOLUTE
     <Anonymous Symbol>                       0x00002ad8   Data          76  rt_fp_status_addr.o(.debug_frame)
-    .text                                    0x0000b9d8   ARM Code      16  rt_fp_status_addr.o(.text)
+    .text                                    0x0000b9f0   ARM Code      16  rt_fp_status_addr.o(.text)
 
     Global Symbols
 
@@ -3537,103 +3537,103 @@ Image Symbol Table
     Syn6288Recover                           0x00009ba4   ARM Code      56  syn6288.o(.text)
     Syn6288ReadState                         0x00009bdc   ARM Code      56  syn6288.o(.text)
     Syn6288PowerDown                         0x00009c14   ARM Code      56  syn6288.o(.text)
-    TaskTest                                 0x00009c54   ARM Code    1368  test.o(.text)
-    _main_redirection                        0x0000a1b8   ARM Code       4  _no_redirect.o(.text)
-    _main                                    0x0000a1bc   ARM Code       4  _no_redirect.o(.text)
-    _sprintf                                 0x0000a1c0   ARM Code     104  _sprintf.o(.text)
-    srand                                    0x0000a230   ARM Code      68  rand.o(.text)
-    _rand_init                               0x0000a274   ARM Code      72  rand.o(.text)
-    rand                                     0x0000a2bc   ARM Code      96  rand.o(.text)
-    __rt_memclr                              0x0000a32c   ARM Code      68  rt_memclr.o(.text)
-    _memset                                  0x0000a330   ARM Code       0  rt_memclr.o(.text)
-    __rt_memclr_w                            0x0000a370   ARM Code      88  rt_memclr_w.o(.text)
-    _memset_w                                0x0000a374   ARM Code       0  rt_memclr_w.o(.text)
-    __rt_memcpy                              0x0000a3c8   ARM Code     180  rt_memcpy.o(.text)
-    __rt_memcpy_w                            0x0000a47c   ARM Code     108  rt_memcpy_w.o(.text)
-    _memcpy_lastbytes                        0x0000a4c8   ARM Code       0  rt_memcpy_w.o(.text)
-    __rt_udiv                                0x0000a4e8   ARM Code     192  rt_udiv.o(.text)
-    __rt_udiv10                              0x0000a5a8   ARM Code      44  rtudiv10.o(.text)
-    strlen                                   0x0000a5d4   ARM Code     100  strlen.o(.text)
-    strncmp                                  0x0000a63c   ARM Code     120  strncmp.o(.text)
-    strtol                                   0x0000a6b8   ARM Code     192  strtol.o(.text)
-    __32__use_no_semihosting_swi             0x0000a778   ARM Code       0  use_no_semi.o(.text)
-    __semihosting_swi_guard                  0x0000a778   ARM Code       0  use_no_semi.o(.text)
-    __use_no_semihosting_swi                 0x0000a778   ARM Code       4  use_no_semi.o(.text)
-    __vfprintf                               0x0000a77c   ARM Code    2056  __vfpntf.o(.text)
-    _sputc                                   0x0000b4b4   ARM Code      20  _sputc.o(.text)
-    _serror                                  0x0000b4c8   ARM Code       8  _sputc.o(.text)
-    _strtoul                                 0x0000b4d0   ARM Code     264  _strtoul.o(.text)
-    __rt_entry                               0x0000b5d8   ARM Code       0  kernel.o(.text)
-    __32__rt_exit                            0x0000b5e8   ARM Code       0  kernel.o(.text)
-    __rt_exit                                0x0000b5e8   ARM Code      16  kernel.o(.text)
-    __32__rt_abort                           0x0000b5f8   ARM Code       0  kernel.o(.text)
-    __rt_abort                               0x0000b5f8   ARM Code       8  kernel.o(.text)
-    __rt_ctype_table                         0x0000b600   ARM Code      20  rt_ctype_table.o(.text)
-    __rt_errno_addr                          0x0000b614   ARM Code      12  rt_errno_addr.o(.text)
-    _chval                                   0x0000b620   ARM Code      32  _chval.o(.text)
-    exit                                     0x0000b640   ARM Code      24  exit.o(.text)
-    _get_lc_ctype                            0x0000b658   ARM Code      60  lc_ctype_c.o(.text)
-    __rt_lib_init                            0x0000b694   ARM Code     228  lib_init.o(.text)
-    __rt_lib_shutdown                        0x0000b778   ARM Code      20  lib_init.o(.text)
-    __user_libspace                          0x0000b790   ARM Code       8  libspace.o(.text)
-    _ll_udiv10                               0x0000b79c   ARM Code     152  lludiv10.o(.text)
-    __rt_stackheap_init                      0x0000b834   ARM Code     144  stkheap1.o(.text)
-    __rt_heap_extend                         0x0000b8c4   ARM Code     108  stkheap1.o(.text)
-    _no_fp_display                           0x0000b930   ARM Code       8  nofpdisp.o(.text)
-    strcmp                                   0x0000b93c   ARM Code     156  strcmp.o(.text)
-    __rt_fp_status_addr                      0x0000b9d8   ARM Code      16  rt_fp_status_addr.o(.text)
-    IRQ_Handler                              0x0000b9e8   ARM Code       0  IRQ.o(IRQ)
-    Uart0_Handler                            0x0000ba68   ARM Code       0  IRQ.o(IRQ)
-    Uart1_Handler                            0x0000bae8   ARM Code       0  IRQ.o(IRQ)
-    Spi0_Handler                             0x0000bb68   ARM Code       0  IRQ.o(IRQ)
-    I2c0_Handler                             0x0000bbe8   ARM Code       0  IRQ.o(IRQ)
-    Timer0_Handler                           0x0000bc68   ARM Code       0  IRQ.o(IRQ)
-    Io2_Handler                              0x0000bce8   ARM Code       0  IRQ.o(IRQ)
-    SoftwareInterrupt                        0x0000bd80   ARM Code       0  Os_cpu_a.o(subr)
-    OSIntCtxSw                               0x0000bdbc   ARM Code       0  Os_cpu_a.o(subr)
-    __OSStartHighRdy                         0x0000be50   ARM Code       0  Os_cpu_a.o(subr)
-    _fp_init                                 0x0000be90   ARM Code      20  fpinit.o(x$fpl$fpinit)
-    __fplib_config_pureend_doubles           0x0000bea0   ARM Code       0  fpinit.o(x$fpl$fpinit)
-    _fp_display_gate                         0x0000bea4   ARM Code       4  printf2.o(x$fpl$printf2)
-    OSMapTbl                                 0x0000bea8   Data           8  Os_core.o(.constdata)
-    OSUnMapTbl                               0x0000beb0   Data         256  Os_core.o(.constdata)
-    DayOfMon                                 0x0000bfb0   Data          12  comm.o(.constdata)
-    sr5PollStr                               0x0000bffc   Data           5  coin_machine.o(.constdata)
-    sr5Selfcheck                             0x0000c001   Data           5  coin_machine.o(.constdata)
-    recCoinPoll                              0x0000c006   Data           5  coin_machine.o(.constdata)
-    readCoinState                            0x0000c00b   Data           5  coin_machine.o(.constdata)
-    hopperPoll                               0x0000c010   Data           5  coin_machine.o(.constdata)
-    hopperRequestStatus                      0x0000c015   Data           5  coin_machine.o(.constdata)
-    hopperRequestKey                         0x0000c01a   Data           5  coin_machine.o(.constdata)
-    hopperDispenseAccount                    0x0000c01f   Data           5  coin_machine.o(.constdata)
-    hopperEmergencyStop                      0x0000c024   Data           5  coin_machine.o(.constdata)
-    hopperReset                              0x0000c029   Data           5  coin_machine.o(.constdata)
-    hopperTest                               0x0000c02e   Data           5  coin_machine.o(.constdata)
-    hopperQuerySensor                        0x0000c033   Data           5  coin_machine.o(.constdata)
-    hopperPoll_bak                           0x0000c038   Data           5  coin_machine.o(.constdata)
-    hopperRequestStatus_bak                  0x0000c03d   Data           5  coin_machine.o(.constdata)
-    hopperRequestKey_bak                     0x0000c042   Data           5  coin_machine.o(.constdata)
-    hopperDispenseAccount_bak                0x0000c047   Data           5  coin_machine.o(.constdata)
-    hopperEmergencyStop_bak                  0x0000c04c   Data           5  coin_machine.o(.constdata)
-    hopperReset_bak                          0x0000c051   Data           5  coin_machine.o(.constdata)
-    hopperTest_bak                           0x0000c056   Data           5  coin_machine.o(.constdata)
-    hopperQuerySensor_bak                    0x0000c05b   Data           5  coin_machine.o(.constdata)
-    hopperEnable                             0x0000c060   Data           6  coin_machine.o(.constdata)
-    hopperEnable_bak                         0x0000c066   Data           6  coin_machine.o(.constdata)
-    colseCoinRec                             0x0000c06c   Data           7  coin_machine.o(.constdata)
-    gsa_argu                                 0x0000c074   Data           8  gps.o(.constdata)
-    gsv_argu                                 0x0000c07c   Data           8  gps.o(.constdata)
-    gga_argu                                 0x0000c084   Data          48  gps.o(.constdata)
-    gll_argu                                 0x0000c0b4   Data          48  gps.o(.constdata)
-    rmc_argu                                 0x0000c0e4   Data          56  gps.o(.constdata)
-    vtg_argu                                 0x0000c11c   Data          16  gps.o(.constdata)
-    zda_argu                                 0x0000c12c   Data          24  gps.o(.constdata)
-    gpsaddr                                  0x0000c144   Data          32  gps.o(.constdata)
-    __ctype                                  0x0000c199   Data         256  lc_ctype_c.o(.constdata)
-    Region$$Table$$Base                      0x0000c29c   Data           0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x0000c2cc   Data           0  anon$$obj.o(Region$$Table)
-    ZISection$$Table$$Base                   0x0000c2cc   Data           0  anon$$obj.o(ZISection$$Table)
-    ZISection$$Table$$Limit                  0x0000c2dc   Data           0  anon$$obj.o(ZISection$$Table)
+    TaskTest                                 0x00009c54   ARM Code    1392  test.o(.text)
+    _main_redirection                        0x0000a1d0   ARM Code       4  _no_redirect.o(.text)
+    _main                                    0x0000a1d4   ARM Code       4  _no_redirect.o(.text)
+    _sprintf                                 0x0000a1d8   ARM Code     104  _sprintf.o(.text)
+    srand                                    0x0000a248   ARM Code      68  rand.o(.text)
+    _rand_init                               0x0000a28c   ARM Code      72  rand.o(.text)
+    rand                                     0x0000a2d4   ARM Code      96  rand.o(.text)
+    __rt_memclr                              0x0000a344   ARM Code      68  rt_memclr.o(.text)
+    _memset                                  0x0000a348   ARM Code       0  rt_memclr.o(.text)
+    __rt_memclr_w                            0x0000a388   ARM Code      88  rt_memclr_w.o(.text)
+    _memset_w                                0x0000a38c   ARM Code       0  rt_memclr_w.o(.text)
+    __rt_memcpy                              0x0000a3e0   ARM Code     180  rt_memcpy.o(.text)
+    __rt_memcpy_w                            0x0000a494   ARM Code     108  rt_memcpy_w.o(.text)
+    _memcpy_lastbytes                        0x0000a4e0   ARM Code       0  rt_memcpy_w.o(.text)
+    __rt_udiv                                0x0000a500   ARM Code     192  rt_udiv.o(.text)
+    __rt_udiv10                              0x0000a5c0   ARM Code      44  rtudiv10.o(.text)
+    strlen                                   0x0000a5ec   ARM Code     100  strlen.o(.text)
+    strncmp                                  0x0000a654   ARM Code     120  strncmp.o(.text)
+    strtol                                   0x0000a6d0   ARM Code     192  strtol.o(.text)
+    __32__use_no_semihosting_swi             0x0000a790   ARM Code       0  use_no_semi.o(.text)
+    __semihosting_swi_guard                  0x0000a790   ARM Code       0  use_no_semi.o(.text)
+    __use_no_semihosting_swi                 0x0000a790   ARM Code       4  use_no_semi.o(.text)
+    __vfprintf                               0x0000a794   ARM Code    2056  __vfpntf.o(.text)
+    _sputc                                   0x0000b4cc   ARM Code      20  _sputc.o(.text)
+    _serror                                  0x0000b4e0   ARM Code       8  _sputc.o(.text)
+    _strtoul                                 0x0000b4e8   ARM Code     264  _strtoul.o(.text)
+    __rt_entry                               0x0000b5f0   ARM Code       0  kernel.o(.text)
+    __32__rt_exit                            0x0000b600   ARM Code       0  kernel.o(.text)
+    __rt_exit                                0x0000b600   ARM Code      16  kernel.o(.text)
+    __32__rt_abort                           0x0000b610   ARM Code       0  kernel.o(.text)
+    __rt_abort                               0x0000b610   ARM Code       8  kernel.o(.text)
+    __rt_ctype_table                         0x0000b618   ARM Code      20  rt_ctype_table.o(.text)
+    __rt_errno_addr                          0x0000b62c   ARM Code      12  rt_errno_addr.o(.text)
+    _chval                                   0x0000b638   ARM Code      32  _chval.o(.text)
+    exit                                     0x0000b658   ARM Code      24  exit.o(.text)
+    _get_lc_ctype                            0x0000b670   ARM Code      60  lc_ctype_c.o(.text)
+    __rt_lib_init                            0x0000b6ac   ARM Code     228  lib_init.o(.text)
+    __rt_lib_shutdown                        0x0000b790   ARM Code      20  lib_init.o(.text)
+    __user_libspace                          0x0000b7a8   ARM Code       8  libspace.o(.text)
+    _ll_udiv10                               0x0000b7b4   ARM Code     152  lludiv10.o(.text)
+    __rt_stackheap_init                      0x0000b84c   ARM Code     144  stkheap1.o(.text)
+    __rt_heap_extend                         0x0000b8dc   ARM Code     108  stkheap1.o(.text)
+    _no_fp_display                           0x0000b948   ARM Code       8  nofpdisp.o(.text)
+    strcmp                                   0x0000b954   ARM Code     156  strcmp.o(.text)
+    __rt_fp_status_addr                      0x0000b9f0   ARM Code      16  rt_fp_status_addr.o(.text)
+    IRQ_Handler                              0x0000ba00   ARM Code       0  IRQ.o(IRQ)
+    Uart0_Handler                            0x0000ba80   ARM Code       0  IRQ.o(IRQ)
+    Uart1_Handler                            0x0000bb00   ARM Code       0  IRQ.o(IRQ)
+    Spi0_Handler                             0x0000bb80   ARM Code       0  IRQ.o(IRQ)
+    I2c0_Handler                             0x0000bc00   ARM Code       0  IRQ.o(IRQ)
+    Timer0_Handler                           0x0000bc80   ARM Code       0  IRQ.o(IRQ)
+    Io2_Handler                              0x0000bd00   ARM Code       0  IRQ.o(IRQ)
+    SoftwareInterrupt                        0x0000bd98   ARM Code       0  Os_cpu_a.o(subr)
+    OSIntCtxSw                               0x0000bdd4   ARM Code       0  Os_cpu_a.o(subr)
+    __OSStartHighRdy                         0x0000be68   ARM Code       0  Os_cpu_a.o(subr)
+    _fp_init                                 0x0000bea8   ARM Code      20  fpinit.o(x$fpl$fpinit)
+    __fplib_config_pureend_doubles           0x0000beb8   ARM Code       0  fpinit.o(x$fpl$fpinit)
+    _fp_display_gate                         0x0000bebc   ARM Code       4  printf2.o(x$fpl$printf2)
+    OSMapTbl                                 0x0000bec0   Data           8  Os_core.o(.constdata)
+    OSUnMapTbl                               0x0000bec8   Data         256  Os_core.o(.constdata)
+    DayOfMon                                 0x0000bfc8   Data          12  comm.o(.constdata)
+    sr5PollStr                               0x0000c014   Data           5  coin_machine.o(.constdata)
+    sr5Selfcheck                             0x0000c019   Data           5  coin_machine.o(.constdata)
+    recCoinPoll                              0x0000c01e   Data           5  coin_machine.o(.constdata)
+    readCoinState                            0x0000c023   Data           5  coin_machine.o(.constdata)
+    hopperPoll                               0x0000c028   Data           5  coin_machine.o(.constdata)
+    hopperRequestStatus                      0x0000c02d   Data           5  coin_machine.o(.constdata)
+    hopperRequestKey                         0x0000c032   Data           5  coin_machine.o(.constdata)
+    hopperDispenseAccount                    0x0000c037   Data           5  coin_machine.o(.constdata)
+    hopperEmergencyStop                      0x0000c03c   Data           5  coin_machine.o(.constdata)
+    hopperReset                              0x0000c041   Data           5  coin_machine.o(.constdata)
+    hopperTest                               0x0000c046   Data           5  coin_machine.o(.constdata)
+    hopperQuerySensor                        0x0000c04b   Data           5  coin_machine.o(.constdata)
+    hopperPoll_bak                           0x0000c050   Data           5  coin_machine.o(.constdata)
+    hopperRequestStatus_bak                  0x0000c055   Data           5  coin_machine.o(.constdata)
+    hopperRequestKey_bak                     0x0000c05a   Data           5  coin_machine.o(.constdata)
+    hopperDispenseAccount_bak                0x0000c05f   Data           5  coin_machine.o(.constdata)
+    hopperEmergencyStop_bak                  0x0000c064   Data           5  coin_machine.o(.constdata)
+    hopperReset_bak                          0x0000c069   Data           5  coin_machine.o(.constdata)
+    hopperTest_bak                           0x0000c06e   Data           5  coin_machine.o(.constdata)
+    hopperQuerySensor_bak                    0x0000c073   Data           5  coin_machine.o(.constdata)
+    hopperEnable                             0x0000c078   Data           6  coin_machine.o(.constdata)
+    hopperEnable_bak                         0x0000c07e   Data           6  coin_machine.o(.constdata)
+    colseCoinRec                             0x0000c084   Data           7  coin_machine.o(.constdata)
+    gsa_argu                                 0x0000c08c   Data           8  gps.o(.constdata)
+    gsv_argu                                 0x0000c094   Data           8  gps.o(.constdata)
+    gga_argu                                 0x0000c09c   Data          48  gps.o(.constdata)
+    gll_argu                                 0x0000c0cc   Data          48  gps.o(.constdata)
+    rmc_argu                                 0x0000c0fc   Data          56  gps.o(.constdata)
+    vtg_argu                                 0x0000c134   Data          16  gps.o(.constdata)
+    zda_argu                                 0x0000c144   Data          24  gps.o(.constdata)
+    gpsaddr                                  0x0000c15c   Data          32  gps.o(.constdata)
+    __ctype                                  0x0000c1b1   Data         256  lc_ctype_c.o(.constdata)
+    Region$$Table$$Base                      0x0000c2b4   Data           0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x0000c2e4   Data           0  anon$$obj.o(Region$$Table)
+    ZISection$$Table$$Base                   0x0000c2e4   Data           0  anon$$obj.o(ZISection$$Table)
+    ZISection$$Table$$Limit                  0x0000c2f4   Data           0  anon$$obj.o(ZISection$$Table)
     df_card                                  0x40000000   Data           4  ic_card.o(.data)
     modifyCoinstyle                          0x40000004   Data           7  coin_machine.o(.data)
     modifyPath                               0x4000000b   Data           7  coin_machine.o(.data)
@@ -3738,9 +3738,9 @@ Memory Map of the image
 
   Image Entry point : 0x00000000
 
-  Load Region ROM_LOAD (Base: 0x00000000, Size: 0x0000c314, Max: 0xffffffff, ABSOLUTE)
+  Load Region ROM_LOAD (Base: 0x00000000, Size: 0x0000c32c, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ROM_EXEC (Base: 0x00000000, Size: 0x0000c2dc, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ROM_EXEC (Base: 0x00000000, Size: 0x0000c2f4, Max: 0xffffffff, ABSOLUTE)
 
     Base Addr    Size         Type   Attr  Idx  E Section Name        Object
 
@@ -3771,53 +3771,53 @@ Memory Map of the image
     0x00008604   0x00000ce8   Code   RO   490     .text               note_machine.o
     0x000092ec   0x00000670   Code   RO   506     .text               gps.o
     0x0000995c   0x000002f8   Code   RO   539     .text               syn6288.o
-    0x00009c54   0x00000564   Code   RO   549     .text               test.o
-    0x0000a1b8   0x00000008   Code   RO   564     .text               _no_redirect.o(c_a__un.l)
-    0x0000a1c0   0x00000070   Code   RO   566     .text               _sprintf.o(c_a__un.l)
-    0x0000a230   0x000000fc   Code   RO   568     .text               rand.o(c_a__un.l)
-    0x0000a32c   0x00000044   Code   RO   571     .text               rt_memclr.o(c_a__un.l)
-    0x0000a370   0x00000058   Code   RO   573     .text               rt_memclr_w.o(c_a__un.l)
-    0x0000a3c8   0x000000b4   Code   RO   575     .text               rt_memcpy.o(c_a__un.l)
-    0x0000a47c   0x0000006c   Code   RO   577     .text               rt_memcpy_w.o(c_a__un.l)
-    0x0000a4e8   0x000000c0   Code   RO   579     .text               rt_udiv.o(c_a__un.l)
-    0x0000a5a8   0x0000002c   Code   RO   581     .text               rtudiv10.o(c_a__un.l)
-    0x0000a5d4   0x00000068   Code   RO   583     .text               strlen.o(c_a__un.l)
-    0x0000a63c   0x0000007c   Code   RO   585     .text               strncmp.o(c_a__un.l)
-    0x0000a6b8   0x000000c0   Code   RO   587     .text               strtol.o(c_a__un.l)
-    0x0000a778   0x00000004   Code   RO   589     .text               use_no_semi.o(c_a__un.l)
-    0x0000a77c   0x00000d38   Code   RO   591     .text               __vfpntf.o(c_a__un.l)
-    0x0000b4b4   0x0000001c   Code   RO   593     .text               _sputc.o(c_a__un.l)
-    0x0000b4d0   0x00000108   Code   RO   595     .text               _strtoul.o(c_a__un.l)
-    0x0000b5d8   0x00000028   Code   RO   597     .text               kernel.o(c_a__un.l)
-    0x0000b600   0x00000014   Code   RO   599     .text               rt_ctype_table.o(c_a__un.l)
-    0x0000b614   0x0000000c   Code   RO   601     .text               rt_errno_addr.o(c_a__un.l)
-    0x0000b620   0x00000020   Code   RO   603     .text               _chval.o(c_a__un.l)
-    0x0000b640   0x00000018   Code   RO   605     .text               exit.o(c_a__un.l)
-    0x0000b658   0x0000003c   Code   RO   607     .text               lc_ctype_c.o(c_a__un.l)
-    0x0000b694   0x000000fc   Code   RO   610     .text               lib_init.o(c_a__un.l)
-    0x0000b790   0x0000000c   Code   RO   612     .text               libspace.o(c_a__un.l)
-    0x0000b79c   0x00000098   Code   RO   615     .text               lludiv10.o(c_a__un.l)
-    0x0000b834   0x000000fc   Code   RO   617     .text               stkheap1.o(c_a__un.l)
-    0x0000b930   0x00000008   Code   RO   621     .text               nofpdisp.o(c_a__un.l)
-    0x0000b938   0x000000a0   Code   RO   623     .text               strcmp.o(c_a__un.l)
-    0x0000b9d8   0x00000010   Code   RO   627     .text               rt_fp_status_addr.o(c_a__un.l)
-    0x0000b9e8   0x00000398   Code   RO   173     IRQ                 IRQ.o
-    0x0000bd80   0x00000110   Code   RO     1     subr                Os_cpu_a.o
-    0x0000be90   0x00000014   Code   RO   625     x$fpl$fpinit        fpinit.o(f_a_p.l)
-    0x0000bea4   0x00000004   Code   RO   619     x$fpl$printf2       printf2.o(f_a_p.l)
-    0x0000bea8   0x00000108   Data   RO   185     .constdata          Os_core.o
-    0x0000bfb0   0x0000000c   Data   RO   305     .constdata          comm.o
-    0x0000bfbc   0x00000020   Data   RO   316     .constdata          uart0.o
-    0x0000bfdc   0x00000020   Data   RO   328     .constdata          uart1.o
-    0x0000bffc   0x00000077   Data   RO   462     .constdata          coin_machine.o
-    0x0000c073   0x00000001   PAD
-    0x0000c074   0x000000f0   Data   RO   507     .constdata          gps.o
-    0x0000c164   0x0000000e   Data   RO   540     .constdata          syn6288.o
-    0x0000c172   0x00000018   Data   RO   550     .constdata          test.o
-    0x0000c18a   0x00000002   PAD
-    0x0000c18c   0x00000110   Data   RO   608     .constdata          lc_ctype_c.o(c_a__un.l)
-    0x0000c29c   0x00000030   Data   RO   629     Region$$Table       anon$$obj.o
-    0x0000c2cc   0x00000010   Data   RO   630     ZISection$$Table    anon$$obj.o
+    0x00009c54   0x0000057c   Code   RO   549     .text               test.o
+    0x0000a1d0   0x00000008   Code   RO   564     .text               _no_redirect.o(c_a__un.l)
+    0x0000a1d8   0x00000070   Code   RO   566     .text               _sprintf.o(c_a__un.l)
+    0x0000a248   0x000000fc   Code   RO   568     .text               rand.o(c_a__un.l)
+    0x0000a344   0x00000044   Code   RO   571     .text               rt_memclr.o(c_a__un.l)
+    0x0000a388   0x00000058   Code   RO   573     .text               rt_memclr_w.o(c_a__un.l)
+    0x0000a3e0   0x000000b4   Code   RO   575     .text               rt_memcpy.o(c_a__un.l)
+    0x0000a494   0x0000006c   Code   RO   577     .text               rt_memcpy_w.o(c_a__un.l)
+    0x0000a500   0x000000c0   Code   RO   579     .text               rt_udiv.o(c_a__un.l)
+    0x0000a5c0   0x0000002c   Code   RO   581     .text               rtudiv10.o(c_a__un.l)
+    0x0000a5ec   0x00000068   Code   RO   583     .text               strlen.o(c_a__un.l)
+    0x0000a654   0x0000007c   Code   RO   585     .text               strncmp.o(c_a__un.l)
+    0x0000a6d0   0x000000c0   Code   RO   587     .text               strtol.o(c_a__un.l)
+    0x0000a790   0x00000004   Code   RO   589     .text               use_no_semi.o(c_a__un.l)
+    0x0000a794   0x00000d38   Code   RO   591     .text               __vfpntf.o(c_a__un.l)
+    0x0000b4cc   0x0000001c   Code   RO   593     .text               _sputc.o(c_a__un.l)
+    0x0000b4e8   0x00000108   Code   RO   595     .text               _strtoul.o(c_a__un.l)
+    0x0000b5f0   0x00000028   Code   RO   597     .text               kernel.o(c_a__un.l)
+    0x0000b618   0x00000014   Code   RO   599     .text               rt_ctype_table.o(c_a__un.l)
+    0x0000b62c   0x0000000c   Code   RO   601     .text               rt_errno_addr.o(c_a__un.l)
+    0x0000b638   0x00000020   Code   RO   603     .text               _chval.o(c_a__un.l)
+    0x0000b658   0x00000018   Code   RO   605     .text               exit.o(c_a__un.l)
+    0x0000b670   0x0000003c   Code   RO   607     .text               lc_ctype_c.o(c_a__un.l)
+    0x0000b6ac   0x000000fc   Code   RO   610     .text               lib_init.o(c_a__un.l)
+    0x0000b7a8   0x0000000c   Code   RO   612     .text               libspace.o(c_a__un.l)
+    0x0000b7b4   0x00000098   Code   RO   615     .text               lludiv10.o(c_a__un.l)
+    0x0000b84c   0x000000fc   Code   RO   617     .text               stkheap1.o(c_a__un.l)
+    0x0000b948   0x00000008   Code   RO   621     .text               nofpdisp.o(c_a__un.l)
+    0x0000b950   0x000000a0   Code   RO   623     .text               strcmp.o(c_a__un.l)
+    0x0000b9f0   0x00000010   Code   RO   627     .text               rt_fp_status_addr.o(c_a__un.l)
+    0x0000ba00   0x00000398   Code   RO   173     IRQ                 IRQ.o
+    0x0000bd98   0x00000110   Code   RO     1     subr                Os_cpu_a.o
+    0x0000bea8   0x00000014   Code   RO   625     x$fpl$fpinit        fpinit.o(f_a_p.l)
+    0x0000bebc   0x00000004   Code   RO   619     x$fpl$printf2       printf2.o(f_a_p.l)
+    0x0000bec0   0x00000108   Data   RO   185     .constdata          Os_core.o
+    0x0000bfc8   0x0000000c   Data   RO   305     .constdata          comm.o
+    0x0000bfd4   0x00000020   Data   RO   316     .constdata          uart0.o
+    0x0000bff4   0x00000020   Data   RO   328     .constdata          uart1.o
+    0x0000c014   0x00000077   Data   RO   462     .constdata          coin_machine.o
+    0x0000c08b   0x00000001   PAD
+    0x0000c08c   0x000000f0   Data   RO   507     .constdata          gps.o
+    0x0000c17c   0x0000000e   Data   RO   540     .constdata          syn6288.o
+    0x0000c18a   0x00000018   Data   RO   550     .constdata          test.o
+    0x0000c1a2   0x00000002   PAD
+    0x0000c1a4   0x00000110   Data   RO   608     .constdata          lc_ctype_c.o(c_a__un.l)
+    0x0000c2b4   0x00000030   Data   RO   629     Region$$Table       anon$$obj.o
+    0x0000c2e4   0x00000010   Data   RO   630     ZISection$$Table    anon$$obj.o
 
 
     Execution Region IRAM (Base: 0x40000000, Size: 0x00003388, Max: 0xffffffff, ABSOLUTE)
@@ -4028,7 +4028,7 @@ Memory Map of the image
     0x00017cb4   0x0000080c   Dbug   RW   537     .debug_info         trade.o
     0x000184c0   0x00000678   Dbug   RW   545     .debug_info         syn6288.o
     0x00018b38   0x000000e8   Dbug   RW   554     .debug_info         test.o
-    0x00018c20   0x00000890   Dbug   RW   558     .debug_info         test.o
+    0x00018c20   0x000008b4   Dbug   RW   558     .debug_info         test.o
     0x00000000   0x000000d8   Dbug   RW     4     .debug_line         Os_cpu_a.o
     0x000000d8   0x000000f8   Dbug   RW     8     .debug_line         Os_cpu_c.o
     0x000001d0   0x00000194   Dbug   RW    11     .debug_line         Os_cpu_c.o
@@ -4097,7 +4097,7 @@ Memory Map of the image
     0x00005a84   0x00000294   Dbug   RW   516     .debug_line         gps.o
     0x00005d18   0x000001c4   Dbug   RW   544     .debug_line         syn6288.o
     0x00005edc   0x000000f4   Dbug   RW   553     .debug_line         test.o
-    0x00005fd0   0x000001e8   Dbug   RW   557     .debug_line         test.o
+    0x00005fd0   0x000001f0   Dbug   RW   557     .debug_line         test.o
     0x00000000   0x000002b4   Dbug   RW    14     .debug_loc          Os_cpu_c.o
     0x000002b4   0x00000324   Dbug   RW   152     .debug_loc          target.o
     0x000005d8   0x0000065c   Dbug   RW   199     .debug_loc          Os_core.o
@@ -4123,7 +4123,7 @@ Memory Map of the image
     0x00006db0   0x00000b98   Dbug   RW   502     .debug_loc          note_machine.o
     0x00007948   0x0000055c   Dbug   RW   519     .debug_loc          gps.o
     0x00007ea4   0x0000033c   Dbug   RW   547     .debug_loc          syn6288.o
-    0x000081e0   0x000002c8   Dbug   RW   560     .debug_loc          test.o
+    0x000081e0   0x000002dc   Dbug   RW   560     .debug_loc          test.o
     0x00000000   0x00000194   Dbug   RW    10     .debug_macinfo      Os_cpu_c.o
     0x00000194   0x000000a0   Dbug   RW    20     .debug_macinfo      Os_cpu_c.o
     0x00000234   0x000000cc   Dbug   RW    24     .debug_macinfo      Os_cpu_c.o
@@ -4246,7 +4246,7 @@ Image component sizes
 
        692          0          0          0       3240   Os_mem.o
          0          0          0          0       3580   trade.o
-      1380         24          0          1       4408   test.o
+      1404         24          0          1       4472   test.o
       5608        119         42         48      13348   coin_machine.o
        996          0          0          0       3888   Os_sem.o
        548          0          0          0       2116   Os_time.o
@@ -4280,7 +4280,7 @@ Image component sizes
          0          0          0        100       1044   eeprom.o
 
     ------------------------------------------------------------------------
-     42424        801         54      12809     209988   Object Totals
+     42448        801         54      12809     210052   Object Totals
 
     ------------------------------------------------------------------------
 
@@ -4339,13 +4339,13 @@ Image component sizes
 
       Code    RO Data    RW Data    ZI Data      Debug   
 
-     48808       1073         54      13133     212680   Grand Totals
+     48832       1073         54      13133     212744   Grand Totals
 
 ================================================================================
 
-    Total RO  Size(Code + RO Data)                49881 (  48.71kB)
+    Total RO  Size(Code + RO Data)                49905 (  48.74kB)
     Total RW  Size(RW Data + ZI Data)             13187 (  12.88kB)
-    Total ROM Size(Code + RO Data + RW Data)      49935 (  48.76kB)
+    Total ROM Size(Code + RO Data + RW Data)      49959 (  48.79kB)
 
 ================================================================================
 

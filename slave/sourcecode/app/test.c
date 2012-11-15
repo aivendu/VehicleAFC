@@ -60,7 +60,10 @@ switch (testitem)
 	case 2:
 			RequestUart0(COINMACHINE_UART0,0);
 			memset(rec_data,0,sizeof(rec_data));
-			Uart0SendString(textdata,1);
+			//Uart0SendString(textdata,1);
+			Uart0SendByte(0x00,0);
+			OSTimeDly(2);
+			Uart0SendByte(0xff,0);
 			for (i = 0; i < sizeof(rec_data); i++)
 			{
 				if (Uart0RecByte((uint8 *)&rec_data[i],1,OS_TICKS_PER_SEC/20) == FALSE)
@@ -189,6 +192,7 @@ switch (testitem)
 			}
 			FreeUart1();
 			testitem = 1;
+			break;
 
 	case 9:
 		//	IO ¿Ú²âÊÔ
