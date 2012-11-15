@@ -14,7 +14,7 @@ typedef struct
 {
 	uint32	config_state			:2;		//	配置状态
 	uint32	login_mod				:2;		//	登录模式
-	uint32	trade_upload_end		:1;		//	交易数据上传完成
+	uint32	trade_upload_state		:1;		//	交易数据上传完成
 	uint32	unused					:28;
 } _function_config_s;
 
@@ -124,6 +124,8 @@ extern uint8 SetDeviceAddr(char *arg);
 #define SetConfigState(c)				(config_ram.fc.fc.config_state = c)
 #define GetLoginMod()					(config_ram.fc.fc.login_mod)
 #define SetLoginMod(c)					(config_ram.fc.fc.login_mod = c)
+#define GetTradeUploadState()			(config_ram.fc.fc.trade_upload_state)
+#define SetTradeUploadState(c)			(config_ram.fc.fc.trade_upload_state = c)
 
 #define GetCashbox1Value()				(config_ram.cc.cc.cashbox1_value)
 #define SetCashbox1Value(c)				(config_ram.cc.cc.cashbox1_value = c)

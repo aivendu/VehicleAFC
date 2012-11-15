@@ -517,7 +517,6 @@ uint16 ShutDown(void *arg) {
 	_df_device_and_pad_comm temp;
 	err = 0;
 	sys_state.ss.st_cmd.se.shutdown.exe_st = EXE_WRITED;			//	执行关机
-	sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WRITED;
 	RequestUpload();
 	//	准备回复数据
 	err = PAD_ACK;

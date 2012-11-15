@@ -423,6 +423,12 @@ void TaskChipComm(void *pdata) {
 		//	更新时间、用户信息、gps信息
 		if (ChipDataUpload(0,0x00,CONTROL_TIME_INDEX_ADDR,CONTROL_TIME_LENGHT+CONTROL_USER_LENGHT+CONTROL_GPS_LENGHT,&device_control.time) == TRUE)
 		{
+			YEAR = device_control.time.year;
+			MONTH = device_control.time.month;
+			DOM = device_control.time.day;
+			HOUR = device_control.time.hour;
+			MIN = device_control.time.min;
+			SEC = device_control.time.sec;
 			for (i = 0; i < curr_line.line_station_amount; i++)
 			{
 				if (device_control.gps.gps_state != GPS_MODE_NORMAL)
