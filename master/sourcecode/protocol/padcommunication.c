@@ -1226,6 +1226,11 @@ void TaskDeviceCommand(void *pdata) {
 					break;
 				}
 				while (device_control.time.year < 2012) OSTimeDly(20);
+				if ((device_control.sys_device.gps_mode_state != GPS_MODE_NORMAL)
+					&& (sys_state.ss.st_major.ssm.st_sys_time_upload == 0))
+				{
+					sys_state.ss.st_major.ssm.st_sys_time_upload = 3;
+				}
 				err = TimeSync(NULL);	//	同步时间
 				if (err == SYS_NO_ERR)
 				{

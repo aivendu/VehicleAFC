@@ -12,9 +12,11 @@ uint32	current_trade_index;
 
 void InitTradeManageData(void)
 {
-	ReadExternMemery(&current_trade_index,TRADE_DATA_START_ADDR,4);
-	if (current_trade_index == TRADE_DATA_START_ADDR)		//	如果还没有存入过交易数据
+	ReadExternMemery(&current_trade_index,TRADE_DATA_START_ADDR,4);	
+	//	如果还没有存入过交易数据或者数据错误
+	if ((current_trade_index <= TRADE_DATA_START_ADDR) || (current_trade_index >= (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE)))
 	{
+		current_trade_index = TRADE_DATA_START_ADDR;
 		memset(&trade_manage_data_temp,0,sizeof(_trade_manage_data_s));		//	不需要读取交易数据
 	}
 	else

@@ -9,7 +9,7 @@ typedef struct {
 	uint32 st_init				:1;
 	uint32 st_allow_trade		:1;
 	uint32 st_device_abort		:1;
-	uint32 st_sys_time_upload	:2;		//	0--未更新，1--通过gps 更新，2--通过服务器更新
+	uint32 st_sys_time_upload	:2;		//	0--未更新，1--通过gps 更新，2--通过服务器更新，3 -- 通过设备内部时钟更新
 	uint32 unused				:19;
 } _sys_st_major_s;
 

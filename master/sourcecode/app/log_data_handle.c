@@ -27,8 +27,10 @@ void InitLog(void)
 	while (store_log_sem == NULL);
 	
 	ReadExternMemery(&log_index,LOG_START_ADDR,sizeof(_log_manage_s));
-	if (log_index.log_end == LOG_START_ADDR)		//	如果还没有存入过log
+	//	如果还没有存入过log 或者数据错误
+	if ((log_index.log_end <= LOG_START_ADDR) || (log_index.log_end >= (LOG_START_ADDR + LOG_MEMERY_LENGHT)))
 	{
+		log_index.log_end = LOG_START_ADDR;
 		memset(&log_data,0,sizeof(_log_s));			//	不需要读取log 
 	}
 	else
