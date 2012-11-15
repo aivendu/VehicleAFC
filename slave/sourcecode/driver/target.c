@@ -365,12 +365,12 @@
 
 /* 设置实时时钟 */
 /* initialize RTC*/
-    CCR = 1;
-    PREINT = Fpclk / 32768 - 1;
-    PREFRAC = Fpclk - (Fpclk / 32768) * 32768;
-    //YEAR = 2012;
-    //MONTH = 12;
-   // DOM = 14;
+    PREINT=Fpclk/32768-1;
+	PREFRAC=Fpclk-(Fpclk/32768)*32768; 
+	CIIR=0x00;
+	ILR=0x03;
+	CCR=0x11;
+
     
 /* initialize VIC*/
     VICIntEnClr = 0xffffffff;
