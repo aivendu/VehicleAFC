@@ -85,6 +85,7 @@ const uint8 hopperTest_bak[5]={0x03,0x00,0x01,0xA3,0x59};/////////test
 
 const uint8 hopperQuerySensor_bak[5]={0x03,0x00,0x01,0xD9,0x23};
 
+
 /*
 *********************************************************************************************************
 ** 函数名称 ：IRQ_UART0()
@@ -93,8 +94,6 @@ const uint8 hopperQuerySensor_bak[5]={0x03,0x00,0x01,0xD9,0x23};
 ** 出口参数 ：无
 *********************************************************************************************************
 */
-
-
 
 void sendCommand(uint8 flag){
 	//
@@ -885,7 +884,7 @@ void  TaskHopperExe(void *pdata)
 			device_control.sys_device.coin_machine_state = COIN_MACHINE_CHANGE_RUNNING;
 			RequestHardResource();
 			DISABLESPI0();
-			dispenseCoin(0,&temp);
+			dispenseCoin(1,&temp);
 			ENABLESPI0();
 			FreeHardResource();
 			//device_control.trade.cr.coin_reject = temp;
