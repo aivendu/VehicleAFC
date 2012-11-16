@@ -546,15 +546,35 @@ void PrintAmount(void)
 	//	打印车票
 	sprintf(print_buffer,"交易统计");
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));
-	Ent(2);
-	
+	Ent(1);
 	print_mode(0);
 	set_position(LEFT);
 	SetLeftMargin(10);
 	Ent(1);
+	sprintf(print_buffer,"===============================");
+	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
+	Ent(1);
+	OSTimeDly(10);
 	//	打印时间
-	sprintf(print_buffer,"日  期: %4d-%02d-%02d",YEAR,MONTH,DOM);
+	sprintf(print_buffer,"打印时间: %4d-%02d-%02d %02d:%02d:%02d",YEAR,MONTH,DOM,HOUR,MIN,SEC);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
+	Ent(2);
+	OSTimeDly(10);
+	sprintf(print_buffer,"-------------------------------");
+	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
+	Ent(1);
+	OSTimeDly(10);
+	sprintf(print_buffer,"交易日期: %4d-%02d-%02d",device_control.trade_amount.year,
+									device_control.trade_amount.month,device_control.trade_amount.day);
+	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
+	Ent(1);
+	OSTimeDly(10);
+	device_control.trade_amount.driver_id[9] = 0;
+	sprintf(print_buffer,"司机工号: %s",device_control.trade_amount.driver_id);
+	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
+	Ent(1);
+	OSTimeDly(10);sprintf(print_buffer,"-------------------------------");
+	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
 	OSTimeDly(10);
 	sprintf(print_buffer,"实收总额: %d元",device_control.trade_amount.realpay_amount);
@@ -578,6 +598,10 @@ void PrintAmount(void)
 	Ent(1);
 	OSTimeDly(10);
 	sprintf(print_buffer,"交易笔数: %d次",device_control.trade_amount.trade_num);
+	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
+	Ent(1);
+	OSTimeDly(10);
+	sprintf(print_buffer,"上车人数: %d人",device_control.trade_amount.trade_people);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
 	OSTimeDly(10);
@@ -588,18 +612,15 @@ void PrintAmount(void)
 void PrintReceipt(void)
 {
 	uint8 i;
-	Ent(1);
-	print_mode(BOLD|HIGH|WIGTH);
-	set_position(CENTER);
-	//	打印车票
-	sprintf(print_buffer,"乘 车 小 票");
-	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));
-	Ent(1);
 	
 	print_mode(0);
 	set_position(LEFT);
 	SetLeftMargin(10);
 	Ent(1);
+	sprintf(print_buffer,"===============================");
+	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
+	Ent(1);
+	OSTimeDly(10);
 	//	打印时间
 	sprintf(print_buffer,"时  间: %4d-%02d-%02d %02d:%02d:%02d",device_control.trade.tm.year+2000,device_control.trade.tm.month,
 					device_control.trade.tm.day,device_control.trade.tm.hour,device_control.trade.tm.min,device_control.trade.tm.sec);
@@ -632,12 +653,22 @@ void PrintReceipt(void)
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
 	OSTimeDly(10);	
+	
+	sprintf(print_buffer,"-------------------------------");
+	 PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer)); 
+	Ent(1);
+	OSTimeDly(10);
 
 	sprintf(print_buffer,"起点站  终点站  票价(元) 人数");				//	打印标题
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));
 	Ent(1);
 	OSTimeDly(10);
 	
+	sprintf(print_buffer,"-------------------------------");
+	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer)); 
+	Ent(1);
+	OSTimeDly(10);
+		
 	for (i=0;i<device_control.trade.tm.des_num;i++) {		//	循环打印每个站点的信息
 		sprintf(print_buffer,"%-8s%-8s%  -9d%  -2d",curr_line.station[device_control.trade.rm[i].trade_start_st-1].station_name,
 			curr_line.station[device_control.trade.rm[i].trade_end_st-1].station_name,device_control.trade.rm[i].price,device_control.trade.rm[i].number_of_people);
@@ -645,8 +676,6 @@ void PrintReceipt(void)
 		Ent(1);
 		OSTimeDly(10);
 	}
-	Ent(3);
-	CutALL();
 }
 
 void  TaskPTRExe(void *pdata)
@@ -668,7 +697,18 @@ void  TaskPTRExe(void *pdata)
 			device_control.sys_device.print_machine_state = PRINT_MACHINE_PRINT_RUNNING;
 			print_exe.exe_st = CMD_RUNNING;
 			RequestUart0(PRINTER_UART0,0);
+			//	打印车票抬头
+			Ent(1);
+			print_mode(BOLD|HIGH|WIGTH);
+			set_position(CENTER);
+			sprintf(print_buffer,"乘 车 小 票");
+			PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));
+			Ent(1);
+			//	打印交易数据
 			PrintReceipt();
+			//	切纸
+			Ent(4);
+			CutALL();
 			FreeUart0();
 			print_exe.exe_st = CMD_EXE_END;
 			device_control.sys_device.print_machine_state = PRINT_MACHINE_NORMAL;
@@ -676,11 +716,49 @@ void  TaskPTRExe(void *pdata)
 		}
 		else if (print_amount_exe.exe_st == CMD_NO_EXE)
 		{
+			device_control.sys_device.print_machine_state = PRINT_MACHINE_PRINT_RUNNING;
 			print_amount_exe.exe_st = CMD_RUNNING;
 			RequestUart0(PRINTER_UART0,0);
 			PrintAmount();
 			FreeUart0();
 			print_amount_exe.exe_st = CMD_EXE_END;
+			device_control.sys_device.print_machine_state = PRINT_MACHINE_NORMAL;
+		}
+		else if(device_control.cmd.print_record.exe_st == CMD_NO_EXE)
+		{
+			device_control.sys_device.print_machine_state = PRINT_MACHINE_PRINT_RUNNING;
+			//	打印车票抬头
+			RequestUart0(PRINTER_UART0,0);
+			Ent(1);
+			print_mode(BOLD|HIGH|WIGTH);
+			set_position(CENTER);
+			sprintf(print_buffer,"交易明细");
+			PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));
+			Ent(1);
+			FreeUart0();
+			while (1)
+			{
+				if (device_control.cmd.print_record.exe_st == CMD_NO_EXE)
+				{
+					//	打印交易数据
+					device_control.cmd.print_record.exe_st = CMD_RUNNING;
+					RequestUart0(PRINTER_UART0,0);
+					PrintReceipt();
+					FreeUart0();
+					device_control.cmd.print_record.exe_st = CMD_EXE_END;
+				}
+				else if (device_control.cmd.print_record.exe_st == CMD_WITE)
+				{
+					//	打印结束，切纸
+					RequestUart0(PRINTER_UART0,0);
+					Ent(4);
+					CutALL();
+					FreeUart0();
+					break;	
+				}
+				OSTimeDly(1);
+			}
+			device_control.sys_device.print_machine_state = PRINT_MACHINE_NORMAL;
 		}
 		else
 		{

@@ -47,7 +47,7 @@ unsigned int CRCByte(unsigned int crc_data, unsigned char b)
 
 /*********************************************************************************************************
 ** 函数名称: TimeDay
-** 功能描述: 将现在的时间变为从2010年1月1日到当天的秒数
+** 功能描述: 将现在的时间变为从2000年1月1日到当天的秒数
 ** 输　入: 无
 **		   
 ** 输　出: 秒数
@@ -86,15 +86,13 @@ uint32 TimeDay(void)
 	else if (monthnow==1) Continueddaynow = daynow;
 	else Continueddaynow=31+daynow;
 	
-	
-	/*
+ 
 	iflag = 0;
-	datas = 2010;
+	datas = 2000;
 	for (; datas < yearnow; ++datas) {
 		if ((((datas % 4) == 0) && ((datas % 100) != 0)) || ((datas % 400) == 0))
 			iflag++;
-	}
-	*/
+	} 
 	
 	Continueddaynow = Continueddaynow - 1 ;
 	
@@ -107,7 +105,7 @@ uint32 TimeDay(void)
 
 /*********************************************************************************************************
 ** 函数名称: TimeMin
-** 功能描述: 将现在的时间变为从2010年1月1日到当天的分钟数
+** 功能描述: 将现在的时间变为从2000年1月1日到当天的分钟数
 ** 输　入: 无
 **		   
 ** 输　出: 分数
@@ -134,7 +132,7 @@ uint32 TimeSec(uint16 yearnow,uint8 monthnow, uint8 daynow, uint8 hournow, uint8
 	
 	
 	iflag = 0;
-	datas = 2010;
+	datas = 2000;
 	for (; datas < yearnow; ++datas) {
 		if ((((datas % 4) == 0) && ((datas % 100) != 0)) || ((datas % 400) == 0))
 			iflag++;

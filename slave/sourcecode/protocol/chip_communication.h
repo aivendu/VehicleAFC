@@ -120,16 +120,22 @@ typedef struct {
 	_exe_s print;
 	_exe_s power_down;
 	_exe_s print_amount;
+	_exe_s print_record;
 } _cmd_exe_s;
 
 typedef struct
 {
+	uint16 year;
+	uint8  month;
+	uint8  day;
 	uint32 realpay_amount;
 	uint32 needpay_amount;
 	uint16 coin_dis_amount;
 	uint16 note_1_dis_amount;
 	uint16 note_2_dis_amount;
 	uint16 trade_num;
+	uint16 trade_people;
+	char   driver_id[10];
 } _trade_amount_s;
 
 

@@ -7,6 +7,7 @@ _exe_s	coinchange_exe;
 _exe_s	notechange_exe;
 _exe_s	print_exe;
 _exe_s  print_amount_exe;
+_exe_s  print_record;
 
 
 
