@@ -99,38 +99,6 @@ void TaskChipComm(void *pdata) {
 			}
 		}
 		
-		if (device_control.cmd.print.exe_st == CMD_NO_EXE)		//	¥Ú”°√¸¡Ó¥¶¿Ì
-		{
-			device_control.cmd.print.exe_st = CMD_RUNNING;
-			if (device_control.trade.ts.print_end == 0)
-			{
-				print_exe.exe_st = CMD_NO_EXE;
-				device_control.trade.ts.print_end = 1;
-			}
-		}
-		else if (device_control.cmd.print.exe_st == CMD_RUNNING)
-		{
-			if ((print_exe.exe_st == CMD_EXE_END) || (print_exe.exe_st == CMD_WITE))
-			{
-				device_control.trade.ts.print_end = 0;
-				print_exe.exe_st = CMD_WITE;
-				device_control.cmd.print.exe_st = CMD_EXE_END;
-			}
-		}
-		if (device_control.cmd.print_amount.exe_st == CMD_NO_EXE)
-		{
-			print_amount_exe.exe_st = CMD_NO_EXE;
-			device_control.cmd.print_amount.exe_st = CMD_RUNNING;
-		}
-		else if (device_control.cmd.print_amount.exe_st == CMD_RUNNING)
-		{
-			if ((print_amount_exe.exe_st == CMD_EXE_END) || (print_amount_exe.exe_st == CMD_WITE))
-			{
-				device_control.cmd.print_amount.exe_st = CMD_EXE_END;
-				print_amount_exe.exe_st = CMD_WITE;
-			}
-		}
-		
 		if (device_control.cmd.speak.exe_st == CMD_NO_EXE)
 		{
 			device_control.cmd.speak.exe_st = CMD_EXE_END;

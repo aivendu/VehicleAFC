@@ -770,10 +770,10 @@ RETRY:
 				sendCommand(REQUESTSTATUS);
 				temp = calSr5Method(REQUESTSTATUS);
 				if(temp == num){
-						OSTimeDly(100);
+						OSTimeDly(10);
 						sendCommand(EMERGENCYSTOP);
 						calSr5Method(EMERGENCYSTOP);
-						OSTimeDly(40);
+						OSTimeDly(2);
 						sendCommand(REQUESTDISACCOUNT);
 						ReTmp = calSr5Method(REQUESTDISACCOUNT);
 						if(ReTmp == 0)
@@ -787,7 +787,7 @@ RETRY:
 						ReTmp = (num - ReturnValue);						
 						//SendMoneyToPC((uint8 *)"NC",(uint8 *)"",ReTmp);
 						//SendMoneyToPC(ReTmp);
-						OSTimeDly(10);//ÐÞ¸Ä
+						//OSTimeDly(10);//ÐÞ¸Ä
 					break;
 				}
 				OSTimeDly(40);
@@ -889,7 +889,7 @@ void  TaskHopperExe(void *pdata)
 			FreeHardResource();
 			//device_control.trade.cr.coin_reject = temp;
 			device_control.trade.cr.coin_dis = coin_machine_cmd.changenum - temp;
-			if (temp == coin_machine_cmd.changenum) {
+			if (temp == 0) {
 				device_control.sys_device.coin_machine_state = COIN_MACHINE_NORMAL;
 			}
 			else

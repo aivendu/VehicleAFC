@@ -21,7 +21,7 @@ char print_buffer[TEMPSIZE];				//	用于缓存打印命令数据
 #define		CENTER		0x01
 #define		RIGHT		0x02
 
-#define		WaitPrintCommand()			(print_exe.exe_st != CMD_NO_EXE)
+#define		WaitPrintCommand()			(device_control.cmd.print.exe_st == CMD_NO_EXE)
 #define		SetPrintEndFlag()			SetPrintCommand(EXE_WAIT)
 
 struct memDot{
@@ -692,10 +692,10 @@ void  TaskPTRExe(void *pdata)
 	for(;;)
 	{
 		//OSSemPend(pPTRSEM,0,&errno);
-		if (WaitPrintCommand() == 0) {
+		if (WaitPrintCommand()) {
 			//OSTimeDly(OS_TICKS_PER_SEC*5);
 			device_control.sys_device.print_machine_state = PRINT_MACHINE_PRINT_RUNNING;
-			print_exe.exe_st = CMD_RUNNING;
+			device_control.cmd.print.exe_st = CMD_RUNNING;
 			RequestUart0(PRINTER_UART0,0);
 			//	打印车票抬头
 			Ent(1);
@@ -710,18 +710,18 @@ void  TaskPTRExe(void *pdata)
 			Ent(4);
 			CutALL();
 			FreeUart0();
-			print_exe.exe_st = CMD_EXE_END;
+			device_control.cmd.print.exe_st = CMD_EXE_END;
 			device_control.sys_device.print_machine_state = PRINT_MACHINE_NORMAL;
 			SetPrintEndFlag();	//	任务结束，修改标志
 		}
-		else if (print_amount_exe.exe_st == CMD_NO_EXE)
+		else if (device_control.cmd.print_amount.exe_st == CMD_NO_EXE)
 		{
 			device_control.sys_device.print_machine_state = PRINT_MACHINE_PRINT_RUNNING;
-			print_amount_exe.exe_st = CMD_RUNNING;
+			device_control.cmd.print_amount.exe_st = CMD_RUNNING;
 			RequestUart0(PRINTER_UART0,0);
 			PrintAmount();
 			FreeUart0();
-			print_amount_exe.exe_st = CMD_EXE_END;
+			device_control.cmd.print_amount.exe_st = CMD_EXE_END;
 			device_control.sys_device.print_machine_state = PRINT_MACHINE_NORMAL;
 		}
 		else if(device_control.cmd.print_record.exe_st == CMD_NO_EXE)
