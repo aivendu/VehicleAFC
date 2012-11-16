@@ -73,7 +73,7 @@ uint8 ChipReadFrame(uint8 fun,uint16 addr,uint8 len,void *data) {
 
 uint8 ChipDataUpload(uint8 flag,uint8 fun,uint16 addr,uint16 len,void *data){
 	uint8 num;
-	if (flag) {
+	if (flag == CHIP_WRITE) {
 		while (1) {
 			if (len > 32) {
 				memcpy(chip_communication_temp,data,32);	//	取数据
@@ -94,7 +94,7 @@ uint8 ChipDataUpload(uint8 flag,uint8 fun,uint16 addr,uint16 len,void *data){
 			}
 		}
 	}
-	else  {
+	else if (flag == CHIP_READ){
 		while (1) {
 			if (len > 32) {
 				num = 0;
@@ -115,6 +115,10 @@ uint8 ChipDataUpload(uint8 flag,uint8 fun,uint16 addr,uint16 len,void *data){
 			}
 		}
 	}
+	else
+	{
+		return FALSE;
+	}
 	return TRUE;
 }
 
@@ -126,7 +130,7 @@ uint8 SysCommandHandle(uint8 state,uint8 cmd)
 			break;
 			
 		case EXE_WRITED:
-			if (ChipDataUpload(1,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,&device_control.cmd.changemoney) == TRUE) 
+			if (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,&device_control.cmd.changemoney) == TRUE) 
 			{
 				state = EXE_RUNNING;
 			}
@@ -164,7 +168,7 @@ uint8 TradeHandle(uint8 state)
 			}
 			break;
 		case EXE_WRITED:
-			if (ChipDataUpload(1,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,&device_control.cmd.changemoney) == TRUE) 
+			if (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,&device_control.cmd.changemoney) == TRUE) 
 			{
 				state = EXE_RUNNING;
 			}
@@ -193,6 +197,8 @@ void TaskChipComm(void *pdata) {
 
 	uint8 err=0,i;
 	uint8 temp=0;
+
+	void * point_temp;
 	//uint8 data_temp;
 	//uint8 addr[2];
 	pdata = pdata;
@@ -232,9 +238,9 @@ void TaskChipComm(void *pdata) {
 	while(1) {
 		OSSemPend(data_upload_sem,40,&err);		//	判断是否有
 		if (err == OS_NO_ERR) {
-			if (ChipDataUpload(0,0x00,CONTROL_CMD_INDEX_ADDR,CONTROL_CMD_LENGHT,&device_control.cmd) == TRUE)
+			if (ChipDataUpload(CHIP_READ,0x00,CONTROL_CMD_INDEX_ADDR,CONTROL_CMD_LENGHT,&device_control.cmd) == TRUE)
 			{
-				while (ChipDataUpload(1,0x00,CONTROL_TRADE_INDEX_ADDR,CONTROL_TRADE_LENGHT,&device_control.trade.tm) != TRUE)
+				while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_TRADE_INDEX_ADDR,CONTROL_TRADE_LENGHT,&device_control.trade.tm) != TRUE)
 				{
 					OSTimeDly(2);
 				}
@@ -242,7 +248,7 @@ void TaskChipComm(void *pdata) {
 					&& ((device_control.cmd.speak.exe_st == EXE_WAIT) || (device_control.cmd.speak.exe_st == EXE_RUN_END)))
 				{
 					device_control.cmd.speak.exe_st = EXE_WRITED;
-					while (ChipDataUpload(1,0x00,CONTROL_CMD_SPEAK_INDEX_ADDR,CONTROL_CMD_SPEAK_LENGHT,&device_control.cmd.speak) != TRUE) 
+					while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_SPEAK_INDEX_ADDR,CONTROL_CMD_SPEAK_LENGHT,&device_control.cmd.speak) != TRUE) 
 					{
 						OSTimeDly(2);
 					}
@@ -267,7 +273,7 @@ void TaskChipComm(void *pdata) {
 					else
 					{
 						device_control.cmd.changemoney.exe_st = EXE_WRITED;
-						while (ChipDataUpload(1,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,&device_control.cmd.changemoney) != TRUE) 
+						while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,&device_control.cmd.changemoney) != TRUE) 
 						{
 							OSTimeDly(2);
 						}
@@ -282,7 +288,7 @@ void TaskChipComm(void *pdata) {
 					&& ((device_control.cmd.print.exe_st == EXE_WAIT) || (device_control.cmd.print.exe_st == EXE_RUN_END)))
 				{
 					device_control.cmd.print.exe_st = EXE_WRITED;
-					while (ChipDataUpload(1,0x00,CONTROL_CMD_PRINT_INDEX_ADDR,CONTROL_CMD_PRINT_LENGHT,&device_control.cmd.print) != TRUE) 
+					while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_PRINT_INDEX_ADDR,CONTROL_CMD_PRINT_LENGHT,&device_control.cmd.print) != TRUE) 
 					{
 						OSTimeDly(2);
 					}
@@ -297,7 +303,7 @@ void TaskChipComm(void *pdata) {
 				{
 					device_control.cmd.power_off.exe_st = EXE_WRITED;
 					
-					while (ChipDataUpload(1,0x00,CONTROL_CMD_POWEROFF_INDEX_ADDR,CONTROL_CMD_POWEROFF_LENGHT,&device_control.cmd.power_off) != TRUE) 
+					while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_POWEROFF_INDEX_ADDR,CONTROL_CMD_POWEROFF_LENGHT,&device_control.cmd.power_off) != TRUE) 
 					{
 						OSTimeDly(2);
 					}
@@ -309,21 +315,34 @@ void TaskChipComm(void *pdata) {
 				if ((sys_state.ss.st_cmd.se.printamount.exe_st == EXE_WRITED)/* && (sys_state.ss.st_major.ssm.st_user == USER_NO_CARD)*/
 					&& ((device_control.cmd.print_amount.exe_st == EXE_WAIT) || (device_control.cmd.print_amount.exe_st == EXE_RUN_END)))
 				{
-					sys_state.ss.st_cmd.se.printamount.exe_st = EXE_RUNNING;
-					device_control.trade_amount.realpay_amount = trade_manage_data_temp.realpay_amount;
-					device_control.trade_amount.needpay_amount = trade_manage_data_temp.needpay_amount;
-					device_control.trade_amount.coin_dis_amount = trade_manage_data_temp.coin_dis_amount;
-					device_control.trade_amount.note_1_dis_amount = trade_manage_data_temp.note_1_dis_amount;
-					device_control.trade_amount.note_2_dis_amount = trade_manage_data_temp.note_2_dis_amount;
-					device_control.trade_amount.trade_num = trade_manage_data_temp.trade_num;
-					while (ChipDataUpload(1,0x00,CONTROL_TRADEAMOUNT_INDEX_ADDR,CONTROL_TRADEAMOUNT_LENGHT,&device_control.trade_amount) != TRUE) 
+					point_temp = GetPADCommandData();
+					if (point_temp != NULL)
 					{
-						OSTimeDly(2);
+						device_control.trade_amount.year = ((_trade_manage_data_s *)point_temp)->year;
+						device_control.trade_amount.month= ((_trade_manage_data_s *)point_temp)->month;
+						device_control.trade_amount.day= ((_trade_manage_data_s *)point_temp)->day;
+						device_control.trade_amount.realpay_amount = ((_trade_manage_data_s *)point_temp)->realpay_amount;
+						device_control.trade_amount.needpay_amount = ((_trade_manage_data_s *)point_temp)->needpay_amount;
+						device_control.trade_amount.coin_dis_amount = ((_trade_manage_data_s *)point_temp)->coin_dis_amount;
+						device_control.trade_amount.note_1_dis_amount = ((_trade_manage_data_s *)point_temp)->note_1_dis_amount;
+						device_control.trade_amount.note_2_dis_amount = ((_trade_manage_data_s *)point_temp)->note_2_dis_amount;
+						device_control.trade_amount.trade_num = ((_trade_manage_data_s *)point_temp)->trade_num;
+						device_control.trade_amount.trade_people = ((_trade_manage_data_s *)point_temp)->people_amount;
+						memcpy(device_control.trade_amount.driver_id,((_trade_manage_data_s *)point_temp)->driver_id,7);
+						sys_state.ss.st_cmd.se.printamount.exe_st = EXE_RUNNING;
+						while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_TRADEAMOUNT_INDEX_ADDR,CONTROL_TRADEAMOUNT_LENGHT,&device_control.trade_amount) != TRUE) 
+						{
+							OSTimeDly(2);
+						}
+						device_control.cmd.print_amount.exe_st = EXE_WRITED;
+						while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_PRINTAMOUNT_INDEX_ADDR,CONTROL_CMD_PRINTAMOUNT_LENGHT,&device_control.cmd.print_amount) != TRUE) 
+						{
+							OSTimeDly(2);
+						}
 					}
-					device_control.cmd.print_amount.exe_st = EXE_WRITED;
-					while (ChipDataUpload(1,0x00,CONTROL_CMD_PRINTAMOUNT_INDEX_ADDR,CONTROL_CMD_PRINTAMOUNT_LENGHT,&device_control.cmd.print_amount) != TRUE) 
+					else
 					{
-						OSTimeDly(2);
+						sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WAIT;
 					}
 					
 				}
@@ -337,7 +356,7 @@ void TaskChipComm(void *pdata) {
 				}
 				
 				if (sys_state.ss.st_cmd.se.upload_line_data.exe_st == EXE_WRITED) {
-					while (ChipDataUpload(1,0x07,0,sizeof(_line_mess_s),&curr_line) != TRUE) {
+					while (ChipDataUpload(CHIP_WRITE,0x07,0,sizeof(_line_mess_s),&curr_line) != TRUE) {
 						OSTimeDly(2);
 					}
 					sys_state.ss.st_cmd.se.upload_line_data.exe_st = EXE_RUNNING;
@@ -350,24 +369,32 @@ void TaskChipComm(void *pdata) {
 		}
 		
 		//	更新交易状态信息
-		if (ChipDataUpload(0,0x00,CONTROL_TRADE_STATE_INDEX_ADDR,CONTROL_TRADE_STATE_LENGHT+sizeof(_device_state_s),&device_control.trade.ts) == TRUE) {
+		if (ChipDataUpload(CHIP_READ,0x00,CONTROL_SYS_DEVICE_INDEX_ADDR,CONTROL_SYS_DEVICE_LENGHT,&device_control.sys_device) == TRUE) {
 			memcpy(sys_state.ss.st_other.sso_b,&device_control.sys_device,3);
 		}
-		if (ChipDataUpload(0,0x00,CONTROL_CMD_INDEX_ADDR,CONTROL_CMD_LENGHT,&device_control.cmd) == TRUE)
+		if (ChipDataUpload(CHIP_READ,0x00,CONTROL_CMD_INDEX_ADDR,CONTROL_CMD_LENGHT,&device_control.cmd) == TRUE)
 		{
 			if (device_control.cmd.changemoney.exe_st == EXE_RUN_END)
 			{
 				sys_state.ss.st_cmd.se.makechange.exe_st = EXE_RUN_END;
 				device_control.cmd.changemoney.exe_st = EXE_WAIT;
 				device_control.cmd.print.exe_st = EXE_WRITED;
-				while (ChipDataUpload(1,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,&device_control.cmd.changemoney) != TRUE)
+				//	更新找零命令
+				while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,&device_control.cmd.changemoney) != TRUE)
 				{
 					OSTimeDly(2);
 				}
-				while (ChipDataUpload(1,0x00,CONTROL_CMD_PRINT_INDEX_ADDR,CONTROL_CMD_PRINT_LENGHT,&device_control.cmd.print) != TRUE)
+				//	更新打印命令
+				while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_PRINT_INDEX_ADDR,CONTROL_CMD_PRINT_LENGHT,&device_control.cmd.print) != TRUE)
 				{
 					OSTimeDly(2);
 				}
+				//	获取找零结果
+				while (ChipDataUpload(CHIP_READ,0x00,CONTROL_TRADE_STATE_INDEX_ADDR,CONTROL_TRADE_STATE_LENGHT,&device_control.trade.ts) != TRUE)
+				{
+					OSTimeDly(2);
+				}
+				//	存储找零数据
 				sys_state.ss.st_cmd.se.store_trade_data.exe_st = EXE_WRITED;
 			}
 			else if (device_control.cmd.print.exe_st == EXE_RUN_END)
@@ -380,10 +407,12 @@ void TaskChipComm(void *pdata) {
 				OSSemPost(data_upload_sem);
 				OSTimeDly(OS_TICKS_PER_SEC*5);
 #endif
-				while (ChipDataUpload(1,0x00,CONTROL_CMD_PRINT_INDEX_ADDR,CONTROL_CMD_PRINT_LENGHT,&device_control.cmd.print) != TRUE)
+				while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_PRINT_INDEX_ADDR,CONTROL_CMD_PRINT_LENGHT,&device_control.cmd.print) != TRUE)
 				{
 					OSTimeDly(2);
 				}
+#if 0
+				//	上传数据
 				trade_data_temp.year = device_control.trade.tm.year+2000;
 				trade_data_temp.month= device_control.trade.tm.month;
 				trade_data_temp.day = device_control.trade.tm.day;
@@ -409,19 +438,20 @@ void TaskChipComm(void *pdata) {
 				}
 				GetNextPackage();
 				ServerUploadTradeData(&trade_data_temp);
+#endif
 			}
 			if (device_control.cmd.print_amount.exe_st == EXE_RUN_END)
 			{
 				device_control.cmd.print_amount.exe_st = EXE_WAIT;
 				sys_state.ss.st_cmd.se.printamount.exe_st = EXE_RUN_END;
-				while (ChipDataUpload(1,0x00,CONTROL_CMD_PRINTAMOUNT_INDEX_ADDR,CONTROL_CMD_PRINTAMOUNT_LENGHT,&device_control.cmd.print_amount) != TRUE) 
+				while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_PRINTAMOUNT_INDEX_ADDR,CONTROL_CMD_PRINTAMOUNT_LENGHT,&device_control.cmd.print_amount) != TRUE) 
 				{
 					OSTimeDly(2);
 				}
 			}
 		}
 		//	更新时间、用户信息、gps信息
-		if (ChipDataUpload(0,0x00,CONTROL_TIME_INDEX_ADDR,CONTROL_TIME_LENGHT+CONTROL_USER_LENGHT+CONTROL_GPS_LENGHT,&device_control.time) == TRUE)
+		if (ChipDataUpload(CHIP_READ,0x00,CONTROL_TIME_INDEX_ADDR,CONTROL_TIME_LENGHT+CONTROL_USER_LENGHT+CONTROL_GPS_LENGHT,&device_control.time) == TRUE)
 		{
 			YEAR = device_control.time.year;
 			MONTH = device_control.time.month;

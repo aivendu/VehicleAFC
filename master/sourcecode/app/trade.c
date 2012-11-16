@@ -123,6 +123,7 @@ void TaskTrade(void *pdata)
 				trade_manage_data_temp.note_1_dis_amount = 0;
 				trade_manage_data_temp.note_2_dis_amount = 0;
 				trade_manage_data_temp.trade_num = 0;
+				memcpy(trade_manage_data_temp.driver_id,device_control.user.uinfo.staffid,7);
 				if (current_trade_index == TRADE_DATA_START_ADDR)		//	是否有交易数据存储
 				{
 					//	交易数据接着current_trade_index 存储
@@ -221,6 +222,11 @@ void TaskTrade(void *pdata)
 				}
 				WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
 				sys_state.ss.st_cmd.se.store_trade_data.exe_st = EXE_WAIT;
+				if (GetTradeUploadState() == 0)
+				{
+					SetTradeUploadState(1);		//	进行上传数据
+					SetSaveConfig(EXE_WRITED);
+				}
 				trade_state = IDLE;
 
 				//	
@@ -232,4 +238,39 @@ void TaskTrade(void *pdata)
 		}
 	}
 }
+
+//	搜索指定日期的交易总帐
+uint8 SearchTradeData(uint16 year, uint8 month, uint8 day,_trade_manage_data_s *data)
+{
+	*data = trade_manage_data_temp;
+	while ((data->year != year) || (data->month != month) || (data->day != day))
+	{
+		if (data->last_day_addr == TRADE_DATA_START_ADDR)
+		{
+			//	当前交易是第一天交易，没有搜索到数据
+			return FALSE;
+		}
+		if (trade_manage_data_temp.in > current_trade_index)		//	判断当天的日志存储区域是否经过越界点
+		{
+			//	没有经过越界点
+			if ((data->last_day_addr < trade_manage_data_temp.in) && (data->last_day_addr > current_trade_index))
+			{
+				//	上一日的日志已被覆盖，没有搜索到数据
+				return FALSE;
+			}
+		}
+		else
+		{
+			//	经过越界点
+			if ((data->last_day_addr < trade_manage_data_temp.in) || (data->last_day_addr > current_trade_index))
+			{
+				//	上一日的日志已被覆盖，没有搜索到数据
+				return FALSE;
+			}
+		}
+		ReadExternMemery(data,data->last_day_addr,sizeof(_trade_manage_data_s));
+	}
+	return TRUE;
+}
+
 

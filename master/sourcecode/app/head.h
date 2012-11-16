@@ -12,6 +12,7 @@ typedef enum {
 	TaskChipCommPrio,
 	TaskTradePrio,
 	TaskDataUploadPrio,
+	TaskSysConfigPrio,
 	
 	PRIOEND
 } _task_prio_e;

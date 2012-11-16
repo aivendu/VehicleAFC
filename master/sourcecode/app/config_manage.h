@@ -12,7 +12,7 @@
 //	定义和控制系统功能
 typedef struct
 {
-	uint32	config_state			:2;		//	配置状态
+	uint32	config_state			:2;		//	配置状态，0--未初始化，1--默认初始化，2--用户配置
 	uint32	login_mod				:2;		//	登录模式
 	uint32	trade_upload_state		:1;		//	交易数据上传完成
 	uint32	unused					:28;
@@ -95,8 +95,7 @@ typedef struct
 	_parameter_u pa;
 } _config_s;
 
-extern char * GetDeviceAddr(void);
-extern uint8 SetDeviceAddr(char *arg);
+
 #define GetGprsAnswerResponseTime()		(config_ram.pa.pa.gprs_answer_response_time)
 #define SetGprsAnswerResponseTime(c)	(config_ram.pa.pa.gprs_answer_response_time = c)
 #define GetGpsSamplingTime()			(config_ram.pa.pa.gps_sampling_time)
@@ -181,6 +180,9 @@ extern uint8 SetDeviceAddr(char *arg);
 
 extern _config_s config_ram;
 
+extern char * GetDeviceAddr(void);
+extern uint8 SetDeviceAddr(char *arg);
+extern void TaskSysConfig(void *pdata);
 extern void ConfigInit(void);
 
 

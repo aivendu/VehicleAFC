@@ -4,6 +4,8 @@
 #include "comm.h"
 #include "virtual_memery.h"
 
+#define	CHIP_READ			0
+#define	CHIP_WRITE			1
 
 typedef struct {
 	uint16	year;
@@ -147,7 +149,7 @@ typedef struct {
 
 #define CONTROL_HEAD_ADDR					((uint32)&device_control)
 #define CONTROL_TIME_INDEX_ADDR				0
-#define CONTROL_TIME_LENGHT					((uint32)&device_control.user-(uint32)&device_control)
+#define CONTROL_TIME_LENGHT					((uint32)&device_control.user - CONTROL_HEAD_ADDR)
 #define CONTROL_USER_INDEX_ADDR				CONTROL_TIME_LENGHT
 #define CONTROL_USER_LENGHT					((uint32)&device_control.gps-(uint32)&device_control.user)
 #define CONTROL_GPS_INDEX_ADDR				(CONTROL_USER_INDEX_ADDR+CONTROL_USER_LENGHT)
@@ -158,7 +160,7 @@ typedef struct {
 #define CONTROL_TRADE_LENGHT				((uint32)&device_control.trade.ts-(uint32)&device_control.trade)
 #define CONTROL_TRADE_STATE_INDEX_ADDR		(CONTROL_TRADE_INDEX_ADDR+CONTROL_TRADE_LENGHT)
 #define CONTROL_TRADE_STATE_LENGHT			((uint32)&device_control.sys_device-(uint32)&device_control.trade.ts)
-#define CONTROL_SYS_DEVICE_INDEX_ADDR		(CONTROL_TRADE_INDEX_ADDR+CONTROL_TRADE_LENGHT)
+#define CONTROL_SYS_DEVICE_INDEX_ADDR		((uint32)&device_control.sys_device - CONTROL_HEAD_ADDR)
 #define CONTROL_SYS_DEVICE_LENGHT			sizeof(_device_state_s)
 #define CONTROL_TRADEAMOUNT_INDEX_ADDR		((uint32)&device_control.trade_amount- CONTROL_HEAD_ADDR)
 #define CONTROL_TRADEAMOUNT_LENGHT			sizeof(_trade_amount_s)

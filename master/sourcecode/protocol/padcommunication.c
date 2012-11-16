@@ -14,7 +14,7 @@
 #define DisableRJ45RecAndSend()		(IO0SET |= RJ45_CTS)
 
 static _pad_com_task rec_com,send_com;
-static OS_EVENT *pad_event_sem;
+static OS_EVENT *pad_event_sem,*pad_mess_mbox;
 uint32 delay_time = 60;			//	调试代码
 
 uint8 station_quantity;
@@ -42,6 +42,17 @@ void PadCommInit(void) {
 	if (pad_event_sem ==  NULL) {
 		while(1);
 	}
+	pad_mess_mbox = OSMboxCreate(NULL);
+	while (pad_mess_mbox == NULL);
+}
+
+/*
+*	传PAD 参数数据
+*/
+void * GetPADCommandData(void)
+{
+	uint8 err;
+	return OSMboxPend(pad_mess_mbox,1,&err);
 }
 
 /*
@@ -414,6 +425,7 @@ uint16 MakeChange(void *arg) {
 uint16 Print(void *arg) {
 	uint8 err;
 	_df_device_and_pad_comm temp;
+	_trade_manage_data_s trade_temp;
 	err = 0;
 	if (rec_com.arg == 0x31) {
 		if ((rec_com.old_package_num != rec_com.package_num)) {
@@ -457,8 +469,21 @@ uint16 Print(void *arg) {
 	}
 	else if (rec_com.arg == 0x33)
 	{
-		sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WRITED;
-		RequestUpload();
+		if (rec_com.package_num != rec_com.old_package_num)
+		{
+			if (SearchTradeData(rec_com.data[0]*100+rec_com.data[1],rec_com.data[2],rec_com.data[3],&trade_temp) == TRUE)
+			{
+				//	搜索到数据			
+				sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WRITED;
+				OSMboxPost(pad_mess_mbox,&trade_temp);
+				RequestUpload();
+				//	等待执行
+				while (sys_state.ss.st_cmd.se.printamount.exe_st == EXE_WRITED)
+				{
+					OSTimeDly(1);
+				}
+			}
+		}
 		temp.len = 2+2+1;
 		temp.backage_num = rec_com.package_num;
 		temp.err_no = 0x0000;
@@ -469,8 +494,21 @@ uint16 Print(void *arg) {
 	}
 	else if (rec_com.arg == 0x34)
 	{
-		sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WRITED;
-		RequestUpload();
+		if (rec_com.package_num != rec_com.old_package_num)
+		{
+			if (SearchTradeData(rec_com.data[0]*100+rec_com.data[1],rec_com.data[2],rec_com.data[3],&trade_temp) == TRUE)
+			{
+				//	搜索到数据
+				sys_state.ss.st_cmd.se.printamount.exe_st = EXE_WRITED;
+				OSMboxPost(pad_mess_mbox,&trade_temp);
+				RequestUpload();
+				//	等待执行
+				while (sys_state.ss.st_cmd.se.printamount.exe_st == EXE_WRITED)
+				{
+					OSTimeDly(1);
+				}
+			}
+		}
 		temp.len = 2+2+1;
 		temp.backage_num = rec_com.package_num;
 		temp.err_no = 0x0000;
@@ -1406,6 +1444,7 @@ void TaskDeviceCommand(void *pdata) {
 				if (err == SYS_NO_ERR) {
 					if (sys_state.ss.st_cmd.se.logout.exe_st == EXE_WRITED)
 					{
+						WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
 						sys_state.ss.st_cmd.se.logout.exe_st = EXE_WAIT;
 						sys_state.ss.st_major.ssm.st_user = USER_HAVE_CARD_NO_LOGIN;
 						arg[0] = 0x31;

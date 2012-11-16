@@ -80,13 +80,23 @@ uint8 SetDeviceAddr(char *arg)
 		return FALSE;
 	}
 }
-void TaskConfig(void *pdata)
+void TaskSysConfig(void *pdata)
 {
 	pdata= pdata;
 
-	if (sizeof(_function_config_s) > 4)
+	while (1)
 	{
-		while(1);
+		OSTimeDly(10);
+		if (GetSaveConfig() == EXE_WRITED)
+		{
+			SetSaveConfig(EXE_RUNNING);
+			//	¥Ê¥¢œµÕ≥≈‰÷√
+			WriteExternMemery(&config_ram,CONFIG_SAVE_START_ADDR,sizeof(_config_s));
+		}
+		else
+		{
+			SetSaveConfig(EXE_WAIT);
+		}
 	}
 	
 }

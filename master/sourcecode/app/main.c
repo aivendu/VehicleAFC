@@ -33,6 +33,7 @@
 #define TaskChipCommSize		256
 #define TaskTradeSize			256
 #define TaskDataUploadSize		256
+#define TaskSysConfigSize		256
 
 
 const char completeversion[16]={VERSION};
@@ -43,6 +44,7 @@ OS_STK TaskServerHandleStk[TaskServerHandleSize];
 OS_STK TaskChipCommStk[TaskChipCommSize];
 OS_STK TaskTradeStk[TaskTradeSize];
 OS_STK TaskDataUploadStk[TaskDataUploadSize];
+OS_STK TaskSysConfigStk[TaskSysConfigSize];
 
 
 /* º¯ÊýÉùÃ÷ */
@@ -67,6 +69,7 @@ int main (void)
 	OSTaskCreate (TaskServerHandle, (void *)0, &TaskServerHandleStk[TaskServerHandleSize - 1], TaskServerHandlePrio);
 	OSTaskCreate (TaskTrade, (void *)0, &TaskTradeStk[TaskTradeSize - 1], TaskTradePrio);
 	OSTaskCreate (TaskDataUpload, (void *)0, &TaskDataUploadStk[TaskDataUploadSize - 1], TaskDataUploadPrio);
+	OSTaskCreate (TaskSysConfig, (void *)0, &TaskSysConfigStk[TaskSysConfigSize - 1], TaskSysConfigPrio);
 
 
 	OSTaskSuspend(TaskTestPrio);

@@ -115,6 +115,7 @@ extern uint16 Login(void *arg);
 extern uint16 TimeSync(void *arg);
 extern uint16 GetStationMess(void *arg);
 extern uint16 StationSync(void *arg);
+extern void * GetPADCommandData(void);
 
 
 

@@ -60,6 +60,7 @@ typedef struct {
 	_exe_s change_site;
 	_exe_s store_trade_data;
 	_exe_s printamount;
+	_exe_s saveconfig;
 } _sys_exe_st_s;
 
 typedef union {
@@ -108,6 +109,9 @@ extern _sys_st_u sys_state;
 #define SetChangeMoneyCommand(c)		(sys_state.ss.st_cmd.se.makechange.exe_st = c)
 #define GetTimeUploadState()			(sys_state.ss.st_major.ssm.st_sys_time_upload)
 #define SetTimeUploadState(c)			(sys_state.ss.st_major.ssm.st_sys_time_upload = c)
+
+#define SetSaveConfig(c)					(sys_state.ss.st_cmd.se.saveconfig.exe_st = c)
+#define GetSaveConfig()					(sys_state.ss.st_cmd.se.saveconfig.exe_st)
 
 #define GetCommandState()				
 

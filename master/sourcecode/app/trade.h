@@ -21,7 +21,7 @@ typedef struct
 	uint16	note_2_dis_amount;	//	当日前期纸币钱箱二找零的总个数
 	uint16	trade_num;			//	当日前期交易的总笔数
 	uint16	people_amount;		//	当日前期的客流量
-	uint16	unused;
+	char    driver_id[10];
 } _trade_manage_data_s;
 
 
@@ -30,6 +30,7 @@ extern _trade_data_to_server_s trade_data_temp;
 extern uint32	current_trade_index;
 
 extern void TaskTrade(void *pdata);
+extern uint8 SearchTradeData(uint16 year, uint8 month, uint8 day,_trade_manage_data_s *data);
 
 
 #endif

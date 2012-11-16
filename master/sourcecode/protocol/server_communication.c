@@ -631,7 +631,16 @@ uint8 ServerDownloadConfigData(void)
 	{
 		if (memcmp(gprs_rec_buffer.argument,config_corresponding_table[i].command,2) == 0)
 		{
-			return config_corresponding_table[i].funcset(NULL);
+			if (config_corresponding_table[i].funcset(NULL) == TRUE)
+			{
+				SetConfigState(2);			//	改变配置状态为用户配置
+				SetSaveConfig(EXE_WRITED);	//	保存配置
+				return TRUE;
+			}
+			else
+			{
+				return FALSE;
+			}
 			
 		}
 		if (memcmp(config_corresponding_table[++i].command,"FF",2) == 0)
@@ -831,6 +840,7 @@ uint8 GprsReceiveFrameFromServer(void)
 			case GPRS_HEAD:
 				if (data_temp == SERVER_COMMUNICATION_HEAD)
 				{
+					//	接收到头，准备接受地址数据
 					state = GPRS_ADDR;
 					data_num = 0;
 					check_sun = 0;
@@ -838,9 +848,10 @@ uint8 GprsReceiveFrameFromServer(void)
 				break;
 				
 			case GPRS_ADDR:
-				if ((data_temp >= '0') && (data_temp <= '9'))
+				if (((data_temp >= '0') && (data_temp <= '9')) || ((data_temp >= 'A') && (data_temp <= 'F'))
+					|| ((data_temp >= 'a') && (data_temp <= 'f')))
 				{
-					//	计算地址
+					//	保存该数据的地址
 					device_addr[data_num] = data_temp;
 					check_sun = CRCByte(check_sun,data_temp);
 				}
@@ -851,6 +862,7 @@ uint8 GprsReceiveFrameFromServer(void)
 				}
 				if ((++data_num) >= 4)
 				{
+					//	地址接收完成
 					state = GPRS_PACKAGE;
 					gprs_rec_buffer.package_no = 0;
 					data_num = 0;
@@ -860,7 +872,7 @@ uint8 GprsReceiveFrameFromServer(void)
 			case GPRS_PACKAGE:
 				if ((data_temp >= '0') && (data_temp <= '9'))
 				{
-					//
+					//	包号转换为整数
 					gprs_rec_buffer.package_no = gprs_rec_buffer.package_no * 10 + (data_temp - '0');
 					check_sun = CRCByte(check_sun,data_temp);
 				}
@@ -871,6 +883,7 @@ uint8 GprsReceiveFrameFromServer(void)
 				}
 				if ((++data_num) >= 2)
 				{
+					//	包号接收完成
 					state = GPRS_LENGHT;			//	准备接收长度
 					gprs_rec_buffer.data_lenght = 0;
 					data_num = 0;
@@ -880,9 +893,9 @@ uint8 GprsReceiveFrameFromServer(void)
 			case GPRS_LENGHT:
 				if ((data_temp >= '0') && (data_temp <= '9'))
 				{
-					//	计算长度
+					//	计算长度，转换为整数
 					gprs_rec_buffer.data_lenght = gprs_rec_buffer.data_lenght * 10 + (data_temp - '0');	
-					check_sun = CRCByte(check_sun,data_temp);
+					check_sun = CRCByte(check_sun,data_temp);		//	计算校验
 				}
 				else
 				{
@@ -891,8 +904,10 @@ uint8 GprsReceiveFrameFromServer(void)
 				}
 				if ((++data_num) >= 2)
 				{
-					if ((gprs_rec_buffer.data_lenght > (86+2+2)) || (gprs_rec_buffer.data_lenght < 4))		//	长度错误，重新接收
+					//	长度接收完成
+					if ((gprs_rec_buffer.data_lenght > (86+2+2)) || (gprs_rec_buffer.data_lenght < 4))
 					{
+						//	长度错误，重新接收
 						state = GPRS_HEAD;			//	重新接收
 						data_num = 0;
 					}
@@ -906,9 +921,10 @@ uint8 GprsReceiveFrameFromServer(void)
 
 			case GPRS_COMMAND:
 				gprs_rec_buffer.command[data_num] = data_temp;
-				check_sun = CRCByte(check_sun,data_temp);
+				check_sun = CRCByte(check_sun,data_temp);		//	计算校验
 				if ((++data_num) >= 2)
 				{
+					//	命令字接收完成
 					state = GPRS_ARGU;		//	准备接收命令
 					data_num = 0;
 				}
@@ -916,11 +932,13 @@ uint8 GprsReceiveFrameFromServer(void)
 
 			case GPRS_ARGU:
 				gprs_rec_buffer.argument[data_num] = data_temp;
-				check_sun = CRCByte(check_sun,data_temp);
+				check_sun = CRCByte(check_sun,data_temp);		//	计算校验
 				if ((++data_num) >= 2)
 				{
+					//	接收完参数
 					if (gprs_rec_buffer.data_lenght == 4)
 					{
+						//	不带数据
 						gprs_rec_buffer.data[0] = 0;
 						state = GPRS_CHECK;
 						gprs_rec_buffer.check = 0;
@@ -936,9 +954,10 @@ uint8 GprsReceiveFrameFromServer(void)
 
 			case GPRS_DATA:
 				gprs_rec_buffer.data[data_num] = data_temp;
-				check_sun = CRCByte(check_sun,data_temp);
+				check_sun = CRCByte(check_sun,data_temp);		//	计算校验
 				if ((gprs_rec_buffer.data_lenght - 4) <= (++data_num))
 				{
+					//	接收完成数据
 					gprs_rec_buffer.data[data_num] = 0;
 					state = GPRS_CHECK;
 					data_num = 0;
@@ -951,6 +970,8 @@ uint8 GprsReceiveFrameFromServer(void)
 				check_temp[data_num] = data_temp;
 				if ((++data_num) >= 4)
 				{
+					//	接收完整check 数据，进行校验
+					//	转换为整数
 					gprs_rec_buffer.check = (uint16)stoi(16,4,check_temp,&err);
 					if (gprs_rec_buffer.check == check_sun)
 					{
@@ -983,35 +1004,47 @@ uint8 GprsReceiveFrameFromServer(void)
 		{
 			if (memcmp(GetDeviceAddr(),device_addr,4) != 0)
 			{
+				//	不是当前设备地址的数据，回复错误号"99"
 				ReturnER("99",gprs_rec_buffer.package_no);
-			}
-			else if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
-			{
-				OSSemPost(server_return_sem);
-			}
-			else if (memcmp(gprs_rec_buffer.command,"ER",2) == 0)
-			{
-				OSSemPost(server_return_sem);
 			}
 			else if (memcmp(gprs_rec_buffer.command,"MS",2) == 0)
 			{
+				//	处理消息命令
 				if (DisplayMessage(gprs_rec_buffer.data) == SYS_NO_ERR) 
 				{
+					//	消息发送成功，返回OK
 					ReturnOK("00",gprs_rec_buffer.package_no);
 				}
 				else
 				{
+					//	消息命令发送失败，返回ER
 					ReturnER("00",gprs_rec_buffer.package_no);
 				}
 			}
 			else if (memcmp(gprs_rec_buffer.command,"WS",2) == 0)
 			{
+				//	处理写配置命令
 				ServerDownloadConfigData();
 				ReturnOK(gprs_rec_buffer.argument,gprs_rec_buffer.package_no);
 			}
 			else if (memcmp(gprs_rec_buffer.command,"RS",2) == 0)
 			{
+				//	处理读配置命令
 				ReturnConfig(gprs_rec_buffer.argument,gprs_rec_buffer.package_no);
+			}
+			else if (gprs_rec_buffer.package_no != gprs_send_buffer.package_no)
+			{
+				//	该条回复不是当前命令的回复，丢掉
+			}
+			else if (memcmp(gprs_rec_buffer.command,"OK",2) == 0)
+			{
+				//	处理回复OK 的命令
+				OSSemPost(server_return_sem);
+			}
+			else if (memcmp(gprs_rec_buffer.command,"ER",2) == 0)
+			{
+				//	处理回复ER 的命令
+				OSSemPost(server_return_sem);
 			}
 			state = GPRS_HEAD;
 		}
