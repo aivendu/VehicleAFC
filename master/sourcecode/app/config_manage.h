@@ -87,12 +87,13 @@ typedef union
 //	配置项
 typedef struct
 {
-	char config_version[9];			//	配置版本号
-	char print_customer[19];		//	客户名称，提供打印
+	char print_customer[17];		//	客户名称，提供打印
 	_function_config_u fc;			//	功能配置
 	_cashbox_config_u  cc;			//	
 	_uart_manage_u um;
 	_parameter_u pa;
+	char config_version[9];			//	配置版本号
+	char trade_form_version[6];		//	交易数据格式版本号
 } _config_s;
 
 

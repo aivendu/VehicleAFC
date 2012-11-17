@@ -135,6 +135,7 @@ typedef struct {
 	_exe_s print;
 	_exe_s power_off;
 	_exe_s print_amount;
+	_exe_s print_record;
 } _cmd_exe_s;
 
 typedef struct {

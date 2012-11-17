@@ -9,7 +9,6 @@ _config_s config_ram;
 
 const _config_s config_init_from_rom = 
 {
-	{"cv-100"},
 	{"无锡客运有限公司"},
 	{FUNCTION_INIT_VALUE},
 	{10,5,10,10,10,5,0,0},
@@ -25,24 +24,28 @@ const _config_s config_init_from_rom =
 		9,9600,		//	未使用
 	},
 	{'F','F','F','F',5,0,3,0,30,0,10,0,0x1d,0x57,120,195,217,32},
+	{"cv-100"},
+	{"tv-10"},
 };
 
 void ConfigInit(void)
 {
 #if 1
 	ReadExternMemery(&config_ram,CONFIG_SAVE_START_ADDR,sizeof(_config_s));		//	上电初始化配置参数
-	//	判断是否有初始化过
+	//	初始化交易数据
+	if ((GetConfigState() == 0) 
+		|| (memcmp(GetConfigVersion(),config_init_from_rom.config_version,strlen(config_init_from_rom.trade_form_version) != 0)))
+	{
+		current_trade_index = TRADE_DATA_START_ADDR;
+		log_index.log_start = LOG_START_ADDR;
+		log_index.log_end = LOG_START_ADDR;
+		WriteExternMemery(&current_trade_index,TRADE_DATA_START_ADDR,sizeof(current_trade_index));
+		WriteExternMemery(&log_index,LOG_START_ADDR,sizeof(_log_manage_s));
+	}
+	//	判断是否有初始化过配置数据
 	if ((GetConfigState() == 0) 
 		|| (memcmp(GetConfigVersion(),config_init_from_rom.config_version,strlen(config_init_from_rom.config_version) != 0)))
 	{
-		if (GetConfigState() == 0)
-		{
-			current_trade_index = TRADE_DATA_START_ADDR;
-			log_index.log_start = LOG_START_ADDR;
-			log_index.log_end = LOG_START_ADDR;
-			WriteExternMemery(&current_trade_index,TRADE_DATA_START_ADDR,sizeof(current_trade_index));
-			WriteExternMemery(&log_index,LOG_START_ADDR,sizeof(_log_manage_s));
-		}
 		config_ram = config_init_from_rom;
 		WriteExternMemery(&config_ram,CONFIG_SAVE_START_ADDR,sizeof(_config_s));		//	重新初始化
 	}

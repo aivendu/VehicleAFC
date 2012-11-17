@@ -26,7 +26,7 @@
 #define __CONFIG_H
 
 //	软件版本号
-#define	VERSION	"AQ01-L0.0.2"
+#define	VERSION	"AQ01-L0.0.3"
 
 //这一段无需改动
 //This segment should not be modified

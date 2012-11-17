@@ -252,6 +252,7 @@ void TaskChipComm(void *pdata) {
 					{
 						OSTimeDly(2);
 					}
+					sys_state.ss.st_cmd.se.speak.exe_st = EXE_RUNNING;
 				}
 				else if (sys_state.ss.st_cmd.se.speak.exe_st == EXE_WRITED)
 				{
@@ -269,6 +270,7 @@ void TaskChipComm(void *pdata) {
 						sprintf(promptmess,"’“¡„¥ÌŒÛ:01");
 						temp = 0x33;
 						DisplayMessage(&temp);
+						sys_state.ss.st_cmd.se.makechange.exe_st = EXE_WAIT;
 					}
 					else
 					{
@@ -277,6 +279,7 @@ void TaskChipComm(void *pdata) {
 						{
 							OSTimeDly(2);
 						}
+						sys_state.ss.st_cmd.se.makechange.exe_st = EXE_RUNNING;
 					}
 				}
 				else if (sys_state.ss.st_cmd.se.makechange.exe_st == EXE_WRITED)
@@ -292,6 +295,7 @@ void TaskChipComm(void *pdata) {
 					{
 						OSTimeDly(2);
 					}
+					sys_state.ss.st_cmd.se.print.exe_st = EXE_RUNNING;
 				}
 				else if (sys_state.ss.st_cmd.se.print.exe_st == EXE_WRITED)
 				{
@@ -302,7 +306,7 @@ void TaskChipComm(void *pdata) {
 					&& ((device_control.cmd.power_off.exe_st == EXE_WAIT) || (device_control.cmd.power_off.exe_st == EXE_RUN_END)))
 				{
 					device_control.cmd.power_off.exe_st = EXE_WRITED;
-					
+					sys_state.ss.st_cmd.se.shutdown.exe_st = EXE_RUNNING;
 					while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_POWEROFF_INDEX_ADDR,CONTROL_CMD_POWEROFF_LENGHT,&device_control.cmd.power_off) != TRUE) 
 					{
 						OSTimeDly(2);
@@ -359,7 +363,7 @@ void TaskChipComm(void *pdata) {
 					while (ChipDataUpload(CHIP_WRITE,0x07,0,sizeof(_line_mess_s),&curr_line) != TRUE) {
 						OSTimeDly(2);
 					}
-					sys_state.ss.st_cmd.se.upload_line_data.exe_st = EXE_RUNNING;
+					sys_state.ss.st_cmd.se.upload_line_data.exe_st = EXE_WAIT;
 				}
 			}
 			else
