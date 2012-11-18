@@ -184,6 +184,12 @@ void TaskTrade(void *pdata)
 				break;
 
 			case STORE:
+				memset(promptmess,0,sizeof(promptmess));
+				sprintf(promptmess,"实找%d元: 1元 %d个; 5元 %d张; 10元 %d张",
+					(device_control.trade.cr.coin_dis+device_control.trade.cr.cass1_dis*5+device_control.trade.cr.cass2_dis*10),
+					device_control.trade.cr.coin_dis,device_control.trade.cr.cass1_dis,device_control.trade.cr.cass2_dis);
+				i = 0x33;
+				DisplayMessage(&i);
 				trade_data_temp.year = device_control.trade.tm.year+2000;
 				trade_data_temp.month = device_control.trade.tm.month;
 				trade_data_temp.day = device_control.trade.tm.day;
