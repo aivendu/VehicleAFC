@@ -83,10 +83,10 @@ typedef struct {
 
 //	路线数据
 typedef struct {
+	_station_mess_s station[MAX_STATION_NUM];
 	uint16 line_no;
 	uint8  line_station_amount;
 	char   line_version[9];  
-	_station_mess_s station[MAX_STATION_NUM];
 } _line_mess_s;
 
 
