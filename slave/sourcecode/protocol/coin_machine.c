@@ -5,8 +5,8 @@
 
 #define	DataSendToCoin(a,b,c)				Uart0SendBytes(a,b,c)				//	coin	发送数据接口
 #define	DataRecFromCoin(a,b,c)				Uart0RecByte(a,b,c)					//	coin	接收数据接口
-#define	RequestHardResource()				RequestUart0(COINMACHINE_UART0,0)	//	coin 发送请求硬件资源
-#define	FreeHardResource()					FreeUart0()							//	coin 发送请求硬件资源
+#define	RequestHardResource()				RequestUart(COINMACHINE_UART0,0)	//	coin 发送请求硬件资源
+#define	FreeHardResource()					FreeUart(COINMACHINE_UART0)							//	coin 发送请求硬件资源
 #define OpenCoinPower()						(IO0SET |= POWER_CONTROL_COIN_MACHINE)
 #define CloseCoinPower()					(IO0CLR |= POWER_CONTROL_COIN_MACHINE)
 
@@ -854,16 +854,16 @@ void  TaskHopperExe(void *pdata)
 		while (err) {
 			OSTimeDly(2);
 			if (err == 1) {
-				RequestUart0(change_num_temp,0);
+				RequestUart(change_num_temp,0);
 				if (Uart0RecByte(&temp,1,1) == FALSE);
 				else	Uart0SendByte(temp,0);
-				FreeUart0();
+				FreeUart(COINMACHINE_UART0);
 			}
 			else if (err == 2) {
-				RequestUart1(change_num_temp,0);
+				RequestUart(change_num_temp,0);
 				if (Uart1RecByte(&temp,1,1)== FALSE);
 				else	Uart1SendByte(temp,0);
-				FreeUart1();
+				FreeUart(COINMACHINE_UART0);
 			}
 		}
 	}

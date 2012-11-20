@@ -40,18 +40,6 @@
 #define UART0_REC_QUEUE_LENGHT		128
 
 
-typedef enum {
-	UART0_INIT,
-	PRINTER_UART0,
-	COINMACHINE_UART0,
-	NOTE_MACHINE_UART0
-} _uart0_fun;
-
-typedef struct {
-	uint8 channal;
-	uint32 bps;
-} _uart_config_s;
-
 
 //extern OS_EVENT *Uart0_Channel_Sem;
 
@@ -68,7 +56,7 @@ typedef struct {
 extern uint8 UART0Init(void);
 
 //	请求UART0 资源
-extern uint8 RequestUart0(uint8 ch,uint16 t);
+extern uint8 RequestUart0(uint16 t, uint8 ch,uint32 bps);
 
 //	 释放资源
 extern void FreeUart0(void);

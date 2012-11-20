@@ -78,6 +78,7 @@
 #include "queue.h"
 #include "head.h"
 #include "comm.h"
+#include "config_manage.h"
 #include "uart0.h"
 #include "uart1.h"
 #include "i2c0.h"

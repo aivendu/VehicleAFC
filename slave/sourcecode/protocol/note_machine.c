@@ -3,8 +3,8 @@
 
 #define	DataSendToSDM2000(a,b,c)			Uart0SendBytes(a,b,c)				//	coin	发送数据接口
 #define	DataRecFromSDM2000(a,b,c)			Uart0RecByte(a,b,c)					//	coin	接收数据接口
-#define	RequestHardResource()				RequestUart0(NOTE_MACHINE_UART0,0)	//	coin 发送请求硬件资源
-#define	FreeHardResource()					FreeUart0()							//	coin 发送请求硬件资源
+#define	RequestHardResource()				RequestUart(NOTE_MACHINE_UART0,0)	//	coin 发送请求硬件资源
+#define	FreeHardResource()					FreeUart(NOTE_MACHINE_UART0)							//	coin 发送请求硬件资源
 #define OpenNotePower()						(IO0SET |= POWER_CONTROL_NOTE_MACHINE)
 #define CloseNotePower()					(IO0CLR |= POWER_CONTROL_NOTE_MACHINE)
 

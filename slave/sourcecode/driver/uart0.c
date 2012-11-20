@@ -43,13 +43,6 @@ static uint8 UART0RecBuf[UART0_REC_QUEUE_LENGHT];
 
 
 static uint8 uart0_channel_ic_flag;
- 
-static _uart_config_s const uart0_config[] = {
- 	{0,	9600		},		//	0- init
- 	{3,	38400		},		//	1- print machine
-	{2,	9600		},		//	2- coin machine
- 	{1,	9600		},		//	3- note machine
- };
 
  //
   
@@ -116,7 +109,7 @@ uint8 UART0Init(void)
 	IO0SET = IO0SET |( UART0_B );
 #endif
     U0LCR = 0x80;                               /* 允许访问分频因子寄存器 */
-    Fdiv = (Fpclk / 16) / uart0_config[UART0_INIT].bps;                  /* 设置波特率 */
+    Fdiv = (Fpclk / 16) / 9600;                  /* 设置波特率 */
     U0DLM = Fdiv / 256;							
 	U0DLL = Fdiv % 256;						
     U0LCR = 0x03;                               /* 禁止访问分频因子寄存器 */
@@ -167,13 +160,10 @@ uint8 UART0Init(void)
 } 
 
 
-static uint8 Uart0ChangeCh(uint8 ch)
+static uint8 Uart0ChangeCh(uint8 ch,uint32 bps)
 {
     uint16 Fdiv;
-	uint32 bps;
-   
-	bps = uart0_config[ch].bps;
-    ch = uart0_config[ch].channal;
+	
     OS_ENTER_CRITICAL();
 #if	UART0_MULTIPLEX_EN >= 1
     if (ch == 3)			// ICReader
@@ -222,7 +212,7 @@ static uint8 Uart0ChangeCh(uint8 ch)
 
 
 //	申请UART0  资源
-uint8 RequestUart0(uint8 ch,uint16 t) {
+uint8 RequestUart0(uint16 t, uint8 ch,uint32 bps) {
 	uint8 err;
 	OSSemPend(Uart0_Channel_Sem, t, &err);  //	取得资源
 	if ((err == OS_NO_ERR) && (uart0_channel_ic_flag != ch)) {
@@ -231,7 +221,7 @@ uint8 RequestUart0(uint8 ch,uint16 t) {
 		}
 		uart0_channel_ic_flag = ch;				//	保存当前通道号
 #if	UART0_MULTIPLEX_EN >= 1
-		Uart0ChangeCh(ch);  					//	切换通道
+		Uart0ChangeCh(ch,bps);  					//	切换通道
 		QueueFlush(UART0RecBuf);				//	清除接收buffer
 #endif                                                            
 	}

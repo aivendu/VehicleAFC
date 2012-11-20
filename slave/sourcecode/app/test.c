@@ -39,7 +39,7 @@ void TaskTest(void *pdata) {
 switch (testitem)
 {
 	case 1:
-			RequestUart0(PRINTER_UART0,0);
+			RequestUart(PRINTER_UART0,0);
 			memset(rec_data,0,sizeof(rec_data));
 			Uart0SendString(textdata,1);
 			for (i = 0; i < sizeof(rec_data); i++)
@@ -54,11 +54,11 @@ switch (testitem)
 			{
 				test_result |= (1<<1);
 			}
-			FreeUart0();
+			FreeUart(PRINTER_UART0);
 			testitem++;
 	break;
 	case 2:
-			RequestUart0(COINMACHINE_UART0,0);
+			RequestUart(COINMACHINE_UART0,0);
 			memset(rec_data,0,sizeof(rec_data));
 			//Uart0SendString(textdata,1);
 			Uart0SendByte(0x00,0);
@@ -76,11 +76,11 @@ switch (testitem)
 			{
 				test_result |= (1<<2);
 			}
-			FreeUart0();
+			FreeUart(COINMACHINE_UART0);
 			testitem++;
 	break;
 	case 3:
-			RequestUart0(NOTE_MACHINE_UART0,0);
+			RequestUart(NOTE_MACHINE_UART0,0);
 			memset(rec_data,0,sizeof(rec_data));
 			Uart0SendString(textdata,1);
 			for (i = 0; i < sizeof(rec_data); i++)
@@ -95,11 +95,11 @@ switch (testitem)
 			{
 				test_result |= (1<<3);
 			}
-			FreeUart0();
+			FreeUart(NOTE_MACHINE_UART0);
 			testitem++;
 	break;
 	case 4:
-			RequestUart0(UART0_INIT,0);
+			RequestUart(UNUSED1,0);
 			memset(rec_data,0,sizeof(rec_data));
 			Uart0SendString(textdata,1);
 			for (i = 0; i < sizeof(rec_data); i++)
@@ -114,11 +114,11 @@ switch (testitem)
 			{
 				test_result |= (1<<4);
 			}
-			FreeUart0();
+			FreeUart(UNUSED1);
 			testitem++;
 	break;
 	case 5:
-			RequestUart1(SPEAKER_UART1,0);
+			RequestUart(SPEAKER_UART1,0);
 			memset(rec_data,0,sizeof(rec_data));
 			Uart1SendString(textdata,1);
 			for (i = 0; i < sizeof(rec_data); i++)
@@ -133,11 +133,11 @@ switch (testitem)
 			{
 				test_result |= (1<<5);
 			}
-			FreeUart1();
+			FreeUart(SPEAKER_UART1);
 			testitem++;
 	break;
 	case 6:	
-			RequestUart1(IC_MACHINE_UART1,0);
+			RequestUart(IC_MACHINE_UART1,0);
 			memset(rec_data,0,sizeof(rec_data));
 			Uart1SendString(textdata,1);
 			for (i = 0; i < sizeof(rec_data); i++)
@@ -152,11 +152,11 @@ switch (testitem)
 			{
 				test_result |= (1<<0);
 			}
-			FreeUart1();
+			FreeUart(IC_MACHINE_UART1);
 			testitem++;
 	break;
 	case 7:
-			RequestUart1(GPS_UART1,6);
+			RequestUart(GPS_UART1,6);
 			memset(rec_data,0,sizeof(rec_data));
 			Uart1SendString(textdata,1);
 			for (i = 0; i < sizeof(rec_data); i++)
@@ -171,11 +171,11 @@ switch (testitem)
 			{
 				test_result |= (1<<7);
 			}
-			FreeUart1();
+			FreeUart(GPS_UART1);
 			testitem++;
 	break;
 	case 8:
-			RequestUart1(UART1_INIT,0);
+			RequestUart(UNUSED2,0);
 			memset(rec_data,0,sizeof(rec_data));
 			Uart1SendString(textdata,1);
 			for (i = 0; i < sizeof(rec_data); i++)
@@ -190,7 +190,7 @@ switch (testitem)
 			{
 				test_result |= (1<<8);
 			}
-			FreeUart1();
+			FreeUart(UNUSED2);
 			testitem = 1;
 			break;
 
@@ -215,22 +215,22 @@ switch (testitem)
 		break;
 
 	case 10:
-		RequestUart1(PRINTER_UART0,0);
+		RequestUart(PRINTER_UART0,0);
 		Uart1SendByte(0x55,0);
-		FreeUart1();
+		FreeUart(PRINTER_UART0);
 		break;
 
 	case 11:
-		RequestUart0(PRINTER_UART0,0);
+		RequestUart(PRINTER_UART0,0);
 		Uart0SendByte(0x55,0);
-		FreeUart0();
+		FreeUart(PRINTER_UART0);
 		break;
 		
 	default:
 		break;
 	}
 			
-			//RequestUart0(SYN6288_CHNNEL);
+			//RequestUart(SYN6288_CHNNEL);
 			//testsyn6228(text);
 			//run_flag = 0;
 			//OSSemPost(Uart0_Channel_Sem);

@@ -28,6 +28,45 @@ void TaskChipComm(void *pdata) {
 	
 	pdata = pdata;
 	ENABLESPI0();
+	while (1)			//	初始化
+	{
+		OSTimeDly(1);
+		//	时间同步
+		device_control.time.year = YEAR;
+		device_control.time.month = MONTH;
+		device_control.time.day = DOM;
+		device_control.time.hour = HOUR;
+		device_control.time.min = MIN;
+		device_control.time.sec = SEC;
+		if (spi0_tick > OS_TICKS_PER_SEC)
+		{
+#if (SPI0_MODE == 0)
+			S0PCR  =(0 << 2) |				//	每帧数据8bit
+					(0 << 3) |				// CPHA = 0, 数据在SCK 的第一个时钟沿采样
+		 			(1 << 4) |				// CPOL = 1, SCK 为低有效
+		 			(0 << 5) |				// MSTR = 0, SPI 处于从模式
+		 			(1 << 6) |				// LSBF = 1, SPI 数据传输LSB (位0)在先
+		 			(1 << 7);				// SPIE = 1, SPI 中断被使能
+			S0PSR |= 0x00;
+			S0PDR = 0x00;
+			VICIntEnable = 1 << 9;
+			spi0_tick = 0;
+#endif
+		}
+		if (memcmp(GetConfigVersion(),"cv",2) == 0)
+		{
+			//	 配置项更新成功
+			//OSTaskResume(TaskTestPrio);
+			OSTaskResume(TaskCrt188Prio);
+			OSTaskResume(TaskNoteMachinePrio);
+			OSTaskResume(TaskPTRExePrio);
+			OSTaskResume(TaskHopperExePrio);
+			OSTaskResume(TaskGPSPrio);
+				
+			break;
+		}
+	}
+	
 	while(1) {
 		OSTimeDly(1);
 		device_control.time.year = YEAR;
@@ -51,23 +90,27 @@ void TaskChipComm(void *pdata) {
 			spi0_tick = 0;
 #endif
 		}
+		if (strlen(GetConfigVersion()) > 0)
+		{
+			continue;
+		}
 		if (device_control.cmd.changemoney.exe_st == CMD_NO_EXE)	//	找零命令处理
 		{
 			device_control.cmd.changemoney.exe_st = CMD_RUNNING;
 			memset(&device_control.trade.cr,0,sizeof(_change_result_s));	//	清零返回值
 			if (device_control.trade.ts.trade_exe == 0) 
 			{
-				if (device_control.trade.tm.changemoney >= 5) {		//	判断是否需要找纸币
-					note_machine_cmd.cass1 = device_control.trade.tm.changemoney/5%2;
-					note_machine_cmd.cass2 = device_control.trade.tm.changemoney/5/2;
+				if (device_control.trade.tm.changemoney >= GetCashbox2Value()) {		//	判断是否需要找纸币
+					note_machine_cmd.cass1 = (device_control.trade.tm.changemoney % GetCashbox3Value()) / GetCashbox2Value();
+					note_machine_cmd.cass2 = device_control.trade.tm.changemoney / GetCashbox3Value();
 					note_machine_cmd.note.exe_st = CMD_NO_EXE;		//	执行纸币找零
 					device_control.trade.ts.change_note = 1;
 					OSTimeDly(OS_TICKS_PER_SEC*2);					//	等待找纸币执行
 				}
 				else {
 				}
-				if (device_control.trade.tm.changemoney % 5) {		//	判断是否需要找硬币
-					coin_machine_cmd.changenum = device_control.trade.tm.changemoney % 5;
+				if (device_control.trade.tm.changemoney % GetCashbox2Value()) {		//	判断是否需要找硬币
+					coin_machine_cmd.changenum = device_control.trade.tm.changemoney % GetCashbox2Value();
 					coin_machine_cmd.coin.exe_st = CMD_NO_EXE;		//	执行硬币找零
 					device_control.trade.ts.change_coin = 1;
 				}

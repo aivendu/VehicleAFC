@@ -2,8 +2,8 @@
 
 #define Syn6288SendByte(c)			Uart1SendByte(c,0)
 #define Syn6288RecByte(a)			Uart1RecByte(a,0,0)
-#define RequestHardResource()		RequestUart1(SPEAKER_UART1,0)
-#define FreeHardResource()			FreeUart1()
+#define RequestHardResource()		RequestUart(SPEAKER_UART1,0)
+#define FreeHardResource()			FreeUart(SPEAKER_UART1)
 #define Syn6288CheckBusy()			(((IO0PIN & SYN6288_BUSY) == SYN6288_BUSY))
 
 

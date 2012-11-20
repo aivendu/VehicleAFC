@@ -73,11 +73,11 @@ int main (void)
 
 
 	OSTaskSuspend(TaskTestPrio);
-	//OSTaskSuspend(TaskCrt188Prio);
-	//OSTaskSuspend(TaskNoteMachinePrio);
-	//OSTaskSuspend(TaskPTRExePrio);
-	//OSTaskSuspend(TaskHopperExePrio);
-	//OSTaskSuspend(TaskGPSPrio);
+	OSTaskSuspend(TaskCrt188Prio);
+	OSTaskSuspend(TaskNoteMachinePrio);
+	OSTaskSuspend(TaskPTRExePrio);
+	OSTaskSuspend(TaskHopperExePrio);
+	OSTaskSuspend(TaskGPSPrio);
 	//OSTaskSuspend(TaskChipCommPrio);
 
 	

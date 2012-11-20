@@ -44,13 +44,7 @@ uint8 UART1SendBuf[UART1_SEND_QUEUE_LENGHT];
 uint8 UART1RecBuf[UART1_REC_QUEUE_LENGHT];
 
 static uint8 uart1_channel_ic_flag;
- 
-static _uart_config_s const uart1_config[] = {
- 	{0,	9600		},		//	0- init
-	{1,	9600		},		//	1- speaker
- 	{2,	19200		},		//	2- IC Card machine
- 	{3,	9600		},		//	3- GPS module
- };
+
 
 /*********************************************************************************************************
 ** 函数名称: Uart1WriteFull
@@ -120,7 +114,7 @@ uint8 UART1Init(void)
 	IO0SET = IO0SET |( UART1_B );
 #endif
     U1LCR = 0x80;                               /* 允许访问分频因子寄存器 */
-    Fdiv = (Fpclk / 16) / uart1_config[UART1_INIT].bps;                  /* 设置波特率 */
+    Fdiv = (Fpclk / 16) / 9600;                  /* 设置波特率 */
     U1DLM = Fdiv / 256;							
 	U1DLL = Fdiv % 256;						
     U1LCR = 0x03;                               /* 禁止访问分频因子寄存器 */
@@ -171,13 +165,10 @@ uint8 UART1Init(void)
 } 
 
 
-static uint8 Uart1ChangeCh(uint8 ch)
+static uint8 Uart1ChangeCh(uint8 ch, uint32 bps)
 {
-    uint16 Fdiv;
-	uint32 bps;
-   
-	bps = uart1_config[ch].bps;
-    ch = uart1_config[ch].channal;
+    uint16 Fdiv;   
+	
     OS_ENTER_CRITICAL();
 #if	UART1_MULTIPLEX_EN >= 1
     if (ch == 3)			// ICReader
@@ -228,7 +219,7 @@ static uint8 Uart1ChangeCh(uint8 ch)
 
 
 //	申请UART1  资源
-uint8 RequestUart1(uint8 ch,uint16 t) {
+uint8 RequestUart1(uint16 t, uint8 ch,uint32 bps) {
 	uint8 err;
 	OSSemPend(Uart1_Channel_Sem, t, &err);  //	取得资源
 	if ((err == OS_NO_ERR) && (uart1_channel_ic_flag != ch)) {
@@ -237,7 +228,7 @@ uint8 RequestUart1(uint8 ch,uint16 t) {
 		}
 		uart1_channel_ic_flag = ch;				//	保存当前通道号
 #if	UART1_MULTIPLEX_EN >= 1
-		Uart1ChangeCh(ch);  					//	切换通道
+		Uart1ChangeCh(ch,bps);  					//	切换通道
 #endif
 	}
 	OSTimeDly(2);

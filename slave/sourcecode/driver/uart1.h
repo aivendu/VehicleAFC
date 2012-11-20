@@ -34,15 +34,6 @@
 #define UART1_REC_QUEUE_LENGHT		256
 
 
-typedef enum {
-	UART1_INIT,
-	SPEAKER_UART1,
-	IC_MACHINE_UART1,
-	GPS_UART1
-} _uart1_fun;
-
-
-
 /*********************************************************************************************************
 ** 函数名称: UART1Init
 ** 功能描述: 初始化UART1 
@@ -55,8 +46,8 @@ typedef enum {
 ********************************************************************************************************/
 extern uint8 UART1Init(void);
 
-//	请求UART0 资源
-extern uint8 RequestUart1(uint8 ch,uint16 t);
+//	请求UART1 资源
+extern uint8 RequestUart1(uint16 t, uint8 ch,uint32 bps);
 
 
 //	 释放资源

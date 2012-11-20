@@ -348,11 +348,11 @@ void TaskGPS(void *pdata) {
 	IO0SET |= POWER_CONTROL_GPS;
 	
 	while(1) {
-		while (gps_tick < 560) {				//	每隔3S 采集一次GPS 数据
-			OSTimeDly(5);
+		while (gps_tick < (GetGpsSamplingTime() * 200 - 40)) {				//	每隔一定时间 采集一次GPS 数据，可配置
+			OSTimeDly(4);						//	20ms一个单位
 		}
 		err = FALSE;
-		if (RequestUart1(GPS_UART1,0) == OS_NO_ERR) {					//	申请uart资源
+		if (RequestUart(GPS_UART1,0) == OS_NO_ERR) {					//	申请uart资源
 			time_num = 50;
 			memset(gps_buf,0,sizeof(gps_buf));
 			while (GetAndCheckNMEAGpsData(gps_buf,time_num) == TRUE) {	//	接收数据
@@ -412,7 +412,7 @@ void TaskGPS(void *pdata) {
 			else {
 				failure_num ++;
 			}
-			FreeUart1();			//	清零定时器，准备下一次接收
+			FreeUart(GPS_UART1);			//	清零定时器，准备下一次接收
 		}
 		//	计算采样到的数据
 		device_control.gps = gps_data;

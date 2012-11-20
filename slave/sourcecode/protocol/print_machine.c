@@ -696,7 +696,7 @@ void  TaskPTRExe(void *pdata)
 			//OSTimeDly(OS_TICKS_PER_SEC*5);
 			device_control.sys_device.print_machine_state = PRINT_MACHINE_PRINT_RUNNING;
 			device_control.cmd.print.exe_st = CMD_RUNNING;
-			RequestUart0(PRINTER_UART0,0);
+			RequestUart(PRINTER_UART0,0);
 			//	打印车票抬头
 			Ent(1);
 			print_mode(BOLD|HIGH|WIGTH);
@@ -709,7 +709,7 @@ void  TaskPTRExe(void *pdata)
 			//	切纸
 			Ent(4);
 			CutALL();
-			FreeUart0();
+			FreeUart(PRINTER_UART0);
 			device_control.cmd.print.exe_st = CMD_EXE_END;
 			device_control.sys_device.print_machine_state = PRINT_MACHINE_NORMAL;
 			SetPrintEndFlag();	//	任务结束，修改标志
@@ -718,9 +718,9 @@ void  TaskPTRExe(void *pdata)
 		{
 			device_control.sys_device.print_machine_state = PRINT_MACHINE_PRINT_RUNNING;
 			device_control.cmd.print_amount.exe_st = CMD_RUNNING;
-			RequestUart0(PRINTER_UART0,0);
+			RequestUart(PRINTER_UART0,0);
 			PrintAmount();
-			FreeUart0();
+			FreeUart(PRINTER_UART0);
 			device_control.cmd.print_amount.exe_st = CMD_EXE_END;
 			device_control.sys_device.print_machine_state = PRINT_MACHINE_NORMAL;
 		}
@@ -728,32 +728,32 @@ void  TaskPTRExe(void *pdata)
 		{
 			device_control.sys_device.print_machine_state = PRINT_MACHINE_PRINT_RUNNING;
 			//	打印车票抬头
-			RequestUart0(PRINTER_UART0,0);
+			RequestUart(PRINTER_UART0,0);
 			Ent(1);
 			print_mode(BOLD|HIGH|WIGTH);
 			set_position(CENTER);
 			sprintf(print_buffer,"交易明细");
 			PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));
 			Ent(1);
-			FreeUart0();
+			FreeUart(PRINTER_UART0);
 			while (1)
 			{
 				if (device_control.cmd.print_record.exe_st == CMD_NO_EXE)
 				{
 					//	打印交易数据
 					device_control.cmd.print_record.exe_st = CMD_RUNNING;
-					RequestUart0(PRINTER_UART0,0);
+					RequestUart(PRINTER_UART0,0);
 					PrintReceipt();
-					FreeUart0();
+					FreeUart(PRINTER_UART0);
 					device_control.cmd.print_record.exe_st = CMD_EXE_END;
 				}
 				else if (device_control.cmd.print_record.exe_st == CMD_WITE)
 				{
 					//	打印结束，切纸
-					RequestUart0(PRINTER_UART0,0);
+					RequestUart(PRINTER_UART0,0);
 					Ent(4);
 					CutALL();
-					FreeUart0();
+					FreeUart(PRINTER_UART0);
 					break;	
 				}
 				OSTimeDly(1);

@@ -53,8 +53,8 @@ void Spi0Init(void) {
 	data_pond[4].len           = 0;
 	data_pond[5].fun_data_addr = NULL;
 	data_pond[5].len           = 0;
-	data_pond[6].fun_data_addr = NULL;
-	data_pond[6].len           = 0;
+	data_pond[6].fun_data_addr = &config_ram;
+	data_pond[6].len           = sizeof(_config_s);
 	data_pond[7].fun_data_addr = &curr_line;
 	data_pond[7].len           = sizeof(_line_mess_s);
 }

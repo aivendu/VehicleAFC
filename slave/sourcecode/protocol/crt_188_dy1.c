@@ -20,8 +20,8 @@ _crt188_cmd_s crt188_cmd_temp;
 #define Crt188SendByte(data)				(Uart1SendByte(data,0))
 #define Crt188SendString(data,lenght)   	(Uart1SendBytes(data,lenght,0))
 #define Crt188RecData(a,b)					(Uart1RecByte(a,1,b))
-#define	RequestHardResource()				(RequestUart1(IC_MACHINE_UART1,0))	//	ic_reader 发送请求硬件资源
-#define	FreeHardResource()					(FreeUart1())							//	ic_reader 发送请求硬件资源
+#define	RequestHardResource()				(RequestUart(IC_MACHINE_UART1,0))	//	ic_reader 发送请求硬件资源
+#define	FreeHardResource()					(FreeUart(IC_MACHINE_UART1))							//	ic_reader 发送请求硬件资源
 #define Crt188OpenPower()					(IO0SET |= POWER_CONTROL_IC_MACHINE)
 #define Crt188ClosePower()					(IO0CLR |= POWER_CONTROL_IC_MACHINE)
 
@@ -863,8 +863,9 @@ UART_COMMUNICATION_ERR_HANDLE:
 	state_time = 0;
 	while (1) {
 		OSTimeDly(20);
-		RequestHardResource();
+		RequestHardResource();		//	请求硬件资源
 		if (Crt188Reset() != SYS_NO_ERR) {
+			//	复位失败
 			if ((++failure_time) > CARD_MACHINE_FAULT_CHECK_TIME) {
 				card_machine_state = SYS_ERR_CRT188_SERIAL_PORT_FAULT;			//	卡机故障
 				device_control.sys_device.ic_machine_state = IC_MACHINE_ABNORMAL;
@@ -880,21 +881,24 @@ UART_COMMUNICATION_ERR_HANDLE:
 	state_time = 0;
 	fault_time = 0;
 	while (1) {
-		OSTimeDly(OS_TICKS_PER_SEC);
+		OSTimeDly(OS_TICKS_PER_SEC/10);
 		RequestHardResource();
 		err = Crt188ReadState();			//	读卡状态
-		if (err == CRT188_NO_CARD) {		//	卡机内无卡
-			if ((++state_time) > NO_CARD_STATE_CHECK_TIME) {	//	卡机退卡滤波
+		if (err == CRT188_NO_CARD) {
+			//	卡机内无卡
+			if ((++state_time) > (GetLoginRemainTime() / 5 / (OS_TICKS_PER_SEC / 10))) {	//	卡机退卡滤波
 				card_machine_state = CRT188_NO_CARD;				//	确实已退卡
 				device_control.sys_device.ic_machine_state = IC_MACHINE_NO_CARD;
 			}
 			FreeHardResource();
 			continue;
 		}
-		else if (err == SYS_NO_ERR) {			//	有卡插入
+		else if (err == SYS_NO_ERR) {
+			//	有卡插入
 			state_time = 0;
 		}
 		else if ((err == UART_COMMUNICATION_ERR_COMM_NACK) || (err == CRT188_COMMAND_EXE_ERR) || (err == UART_COMMUNICATION_ERR_RETURN_DATA_ERR)) {
+			//	通信有异常
 			if ((++fault_time) > CARD_MACHINE_FAULT_CHECK_TIME) {
 				card_machine_state = SYS_ERR_CRT188_MACHINE_FAULT;
 				device_control.sys_device.ic_machine_state = IC_MACHINE_ABNORMAL;
