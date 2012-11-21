@@ -90,27 +90,23 @@ void TaskChipComm(void *pdata) {
 			spi0_tick = 0;
 #endif
 		}
-		if (strlen(GetConfigVersion()) > 0)
-		{
-			continue;
-		}
 		if (device_control.cmd.changemoney.exe_st == CMD_NO_EXE)	//	’“¡„√¸¡Ó¥¶¿Ì
 		{
 			device_control.cmd.changemoney.exe_st = CMD_RUNNING;
 			memset(&device_control.trade.cr,0,sizeof(_change_result_s));	//	«Â¡„∑µªÿ÷µ
 			if (device_control.trade.ts.trade_exe == 0) 
 			{
-				if (device_control.trade.tm.changemoney >= GetCashbox2Value()) {		//	≈–∂œ «∑Ò–Ë“™’“÷Ω±“
-					note_machine_cmd.cass1 = (device_control.trade.tm.changemoney % GetCashbox3Value()) / GetCashbox2Value();
-					note_machine_cmd.cass2 = device_control.trade.tm.changemoney / GetCashbox3Value();
+				if (device_control.trade.tm.changenum >= 100) {		//	≈–∂œ «∑Ò–Ë“™’“÷Ω±“
+					note_machine_cmd.cass1 = device_control.trade.tm.changenum / 2000;
+					note_machine_cmd.cass2 = device_control.trade.tm.changenum % 2000 / 100;
 					note_machine_cmd.note.exe_st = CMD_NO_EXE;		//	÷¥––÷Ω±“’“¡„
 					device_control.trade.ts.change_note = 1;
 					OSTimeDly(OS_TICKS_PER_SEC*2);					//	µ»¥˝’“÷Ω±“÷¥––
 				}
 				else {
 				}
-				if (device_control.trade.tm.changemoney % GetCashbox2Value()) {		//	≈–∂œ «∑Ò–Ë“™’“”≤±“
-					coin_machine_cmd.changenum = device_control.trade.tm.changemoney % GetCashbox2Value();
+				if (device_control.trade.tm.changenum % 100) {		//	≈–∂œ «∑Ò–Ë“™’“”≤±“
+					coin_machine_cmd.changenum = device_control.trade.tm.changenum % 100;
 					coin_machine_cmd.coin.exe_st = CMD_NO_EXE;		//	÷¥––”≤±“’“¡„
 					device_control.trade.ts.change_coin = 1;
 				}

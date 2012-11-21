@@ -838,7 +838,7 @@ RETRY:
 */
 void  TaskHopperExe(void *pdata)
 {
-	uint8   err=1;
+	//uint8   err=1;
 	uint8	temp;
 	
     pdata = pdata;                            	/* ±ÜÃâ±àÒë¾¯¸æ */

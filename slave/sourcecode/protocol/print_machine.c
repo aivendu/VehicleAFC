@@ -554,57 +554,62 @@ void PrintAmount(void)
 	sprintf(print_buffer,"===============================");
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 	//	打印时间
 	sprintf(print_buffer,"打印时间: %4d-%02d-%02d %02d:%02d:%02d",YEAR,MONTH,DOM,HOUR,MIN,SEC);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(2);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
+	
 	sprintf(print_buffer,"-------------------------------");
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
+	
 	sprintf(print_buffer,"交易日期: %4d-%02d-%02d",device_control.trade_amount.year,
 									device_control.trade_amount.month,device_control.trade_amount.day);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
+	
 	device_control.trade_amount.driver_id[9] = 0;
 	sprintf(print_buffer,"司机工号: %s",device_control.trade_amount.driver_id);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
-	OSTimeDly(10);sprintf(print_buffer,"-------------------------------");
+	OSTimeDly(PRINT_TIME_TICK);
+	
+	sprintf(print_buffer,"-------------------------------");
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 	sprintf(print_buffer,"实收总额: %d元",device_control.trade_amount.realpay_amount);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 	sprintf(print_buffer,"营收总额: %d元",device_control.trade_amount.needpay_amount);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 	sprintf(print_buffer,"硬币找零个数: %d个",device_control.trade_amount.coin_dis_amount);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 	sprintf(print_buffer,"纸币钱箱1找零张数: %d张",device_control.trade_amount.note_1_dis_amount);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 	sprintf(print_buffer,"纸币钱箱2找零张数: %d张",device_control.trade_amount.note_2_dis_amount);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 	sprintf(print_buffer,"交易笔数: %d次",device_control.trade_amount.trade_num);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 	sprintf(print_buffer,"上车人数: %d人",device_control.trade_amount.trade_people);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 	Ent(5);
 	CutALL();
 }
@@ -620,67 +625,67 @@ void PrintReceipt(void)
 	sprintf(print_buffer,"===============================");
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 	//	打印时间
 	sprintf(print_buffer,"时  间: %4d-%02d-%02d %02d:%02d:%02d",device_control.trade.tm.year+2000,device_control.trade.tm.month,
 					device_control.trade.tm.day,device_control.trade.tm.hour,device_control.trade.tm.min,device_control.trade.tm.sec);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
-	OSTimeDly(10);		
+	OSTimeDly(PRINT_TIME_TICK);		
 	//	打印流水号
 	sprintf(print_buffer,"流水号: 223%010d%05d",TimeSec(device_control.trade.tm.year+2000,device_control.trade.tm.month,device_control.trade.tm.day,
 					device_control.trade.tm.hour,device_control.trade.tm.min,device_control.trade.tm.sec),device_control.trade.tm.serail_num);		//	流水号格式"df"+"时间的秒数+"序列号"
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
-	OSTimeDly(10);		
+	OSTimeDly(PRINT_TIME_TICK);		
 
 	sprintf(print_buffer,"车牌号: %s",sys_config_ram.sc.license_plate);		//	打印车牌号
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
-	OSTimeDly(10);			
+	OSTimeDly(PRINT_TIME_TICK);			
 
 	sprintf(print_buffer,"总票价: %d元",device_control.trade.tm.needpay);			//	打印总票价
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
-	OSTimeDly(10);			
+	OSTimeDly(PRINT_TIME_TICK);			
 
 	sprintf(print_buffer,"付  款: %d元",device_control.trade.tm.realpay);			//	打印总票价
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
-	OSTimeDly(10);	
+	OSTimeDly(PRINT_TIME_TICK);	
 
 	sprintf(print_buffer,"找  零: %d元",(device_control.trade.cr.cass1_dis * 5 + device_control.trade.cr.cass2_dis * 10 + device_control.trade.cr.coin_dis));			//	打印总票价
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
-	OSTimeDly(10);	
+	OSTimeDly(PRINT_TIME_TICK);	
 	
 	sprintf(print_buffer,"-------------------------------");
 	 PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer)); 
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 
 	sprintf(print_buffer,"起点站  终点站  票价(元) 人数");				//	打印标题
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 	
 	sprintf(print_buffer,"-------------------------------");
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer)); 
 	Ent(1);
-	OSTimeDly(10);
+	OSTimeDly(PRINT_TIME_TICK);
 		
 	for (i=0;i<device_control.trade.tm.des_num;i++) {		//	循环打印每个站点的信息
 		sprintf(print_buffer,"%-8s%-8s%  -9d%  -2d",curr_line.station[device_control.trade.rm[i].trade_start_st-1].station_name,
 			curr_line.station[device_control.trade.rm[i].trade_end_st-1].station_name,device_control.trade.rm[i].price,device_control.trade.rm[i].number_of_people);
 		PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));
 		Ent(1);
-		OSTimeDly(10);
+		OSTimeDly(PRINT_TIME_TICK);
 	}
 }
 
 void  TaskPTRExe(void *pdata)
 {
-	uint8 i;
+	//uint8 i;
 	
 	memset((char *)print_buffer,0,TEMPSIZE);
 	

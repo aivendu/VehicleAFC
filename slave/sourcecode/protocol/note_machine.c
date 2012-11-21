@@ -482,13 +482,13 @@ void NoteDispenseBill(uint8 *dst) {
 	//sprintf((char *)ret_buf,"<type=Separate;BillNum=%02d;CoinNum=%2d>",ret_dat[22],err);
 	//UART1SendMtd((uint8 *)ret_buf,strlen((char *)ret_buf));	
 }
-
+/*
 static void SetNoteMachineState(uint8 st) {
 	if (device_control.sys_device.note_machine_state != st) {
 		device_control.sys_device.note_machine_state = st;
 	}
 }
-
+*/
 /*
 *	原型:	void TaskNoteMachine(void * pdata)
 *	描述:	找零和找零机状态处理
@@ -502,8 +502,6 @@ void TaskNoteMachine(void * pdata) {
 	
 	pdata = pdata;
 	
-init:
-
 	while (1) {
 		OSTimeDly(10);			//	延时50 ms
 		state = device_control.sys_device.note_machine_state;

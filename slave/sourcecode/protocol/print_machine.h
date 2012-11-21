@@ -3,6 +3,7 @@
 
 
 
+#define PRINT_TIME_TICK				10
 
 
 #define  TIMEX			32
