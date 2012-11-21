@@ -269,6 +269,7 @@ uint16 RideMess(void *arg) {
 			if ((++device_control.trade.tm.des_num) > MAX_RIDE_NUMBER_OF_PEOPLE) break;
 			
 		}
+		sys_state.ss.st_cmd.se.change_ride_mess.exe_st = EXE_WRITED;
 	}
 	/*field_temp = (char *)(&rec_com.data[0]);			//	准备乘车信息
 	next_field = field_temp;
@@ -351,6 +352,7 @@ uint16 MakeChange(void *arg) {
 			memcpy(&device_control.trade.tm,&rec_com.data[2],6);						//	存储交易时间
 			device_control.trade.tm.realpay = rec_com.data[8]*256+rec_com.data[9];
 			device_control.trade.tm.changemoney = rec_com.data[12]*256+rec_com.data[13];
+#if 0
 			if (device_control.trade.tm.changemoney == (device_control.trade.tm.realpay - device_control.trade.tm.needpay)) {
 				RequestUpload();
 				data_temp[0]= PAD_ACK;
@@ -362,6 +364,11 @@ uint16 MakeChange(void *arg) {
 				data_temp[0]= PAD_ACK;
 				temp.err_no = 0x0000;		//	计算错误
 			}
+#else
+			RequestUpload();
+			data_temp[0]= PAD_ACK;
+			temp.err_no = 0x0000;
+#endif
 		}
 		else if (sys_state.ss.st_cmd.se.makechange.exe_flag != 0) {
 			data_temp[0] = PAD_NACK;
@@ -595,7 +602,16 @@ uint16 CashboxInit(void *arg){
 	uint8 err;
 	_df_device_and_pad_comm temp;
 	err = 0;
-	
+
+	//	存储钱箱初始化值
+	SetCashbox1Deposit(rec_com.data[0]*256+rec_com.data[1]);
+	SetCashbox1Deposit(rec_com.data[2]*256+rec_com.data[3]);
+	SetCashbox1Deposit(rec_com.data[4]*256+rec_com.data[5]);
+	SetCashbox1Balance(GetCashbox1Deposit());
+	SetCashbox2Balance(GetCashbox1Deposit());
+	SetCashbox3Balance(GetCashbox1Deposit());
+	SetSaveConfig(EXE_WRITED);		//	保存配置信息
+	LogStoreDeposit();				//	保存日志
 	OSTimeDly(2);
 	//	准备回复数据
 	err = PAD_ACK;
@@ -711,7 +727,7 @@ uint16 Online(void *arg) {
 					PAD_version[15] = 0;
 				}
 				else if (*(uint8 *)arg == 0x32) {
-					memcpy(&sys_state.ss.st_pad,send_com.data,8);
+					memcpy(sys_state.ss.st_pad.ssp_b,send_com.data,8);
 				}
 				else {
 					return PAD_COMMUNICATION_DATA_ERR;
@@ -1207,6 +1223,7 @@ void TaskPADRecHandle(void *pdata) {
 #define RUNNING					4
 #define NO_LOGIN				5
 #define CHANGE_SITE				6
+#define SUPERUSER_LOGIN			7
 
 
 
@@ -1262,12 +1279,7 @@ void TaskDeviceCommand(void *pdata) {
 					OSTimeDly(OS_TICKS_PER_SEC);	//	通信失败，等1S 再发
 					break;
 				}
-				while (device_control.time.year < 2012) OSTimeDly(20);
-				if ((device_control.sys_device.gps_mode_state != GPS_MODE_NORMAL)
-					&& (sys_state.ss.st_major.ssm.st_sys_time_upload == 0))
-				{
-					sys_state.ss.st_major.ssm.st_sys_time_upload = 3;
-				}
+				while (GetTimeUploadState() == 0) OSTimeDly(20);
 				err = TimeSync(NULL);	//	同步时间
 				if (err == SYS_NO_ERR)
 				{
@@ -1346,6 +1358,11 @@ void TaskDeviceCommand(void *pdata) {
 						break;
 					}
 				}
+				else if (sys_state.ss.st_major.ssm.st_user == USER_SUPERUSER)
+				{
+					run_state = LOGIN;		//	登录
+					break;
+				}
 				else
 				{
 					OSTimeDly(OS_TICKS_PER_SEC/100);	//	没有用户，继续等待
@@ -1403,8 +1420,6 @@ void TaskDeviceCommand(void *pdata) {
 
 			case LOGIN:
 				//changesite_flag = 0;
-				GetNextPackage();
-				ServerLogin(device_control.user.uinfo.staffid);
 				sys_state.ss.st_cmd.se.change_site.exe_st = EXE_WAIT;
 				sys_state.ss.st_cmd.se.config_match.exe_st = EXE_WAIT;
 				sys_state.ss.st_cmd.se.login.exe_st = EXE_WAIT;
@@ -1417,11 +1432,18 @@ void TaskDeviceCommand(void *pdata) {
 				arg[0] = sys_state.ss.st_major.ssm.st_user;
 				err = Login(arg);
 				if (err == SYS_NO_ERR) {
-					sys_state.ss.st_cmd.se.logout.exe_st = EXE_WAIT;
-					run_state = DOWNLOAD_DATA;			//	下载数据
-					arg[0] = 0x32;
-					arg[1] = 1;
-					station = 1;
+					if (sys_state.ss.st_major.ssm.st_user == USER_SUPERUSER)
+					{
+						run_state = SUPERUSER_LOGIN;
+					}
+					else
+					{
+						sys_state.ss.st_cmd.se.logout.exe_st = EXE_WAIT;
+						run_state = DOWNLOAD_DATA;			//	下载数据
+						arg[0] = 0x32;
+						arg[1] = 1;
+						station = 1;
+					}
 				}
 				else if (err == COMMUNICATION_TIMEOUT)
 				{
@@ -1455,7 +1477,7 @@ void TaskDeviceCommand(void *pdata) {
 						run_state = LOGOUT;
 						arg[0] = sys_state.ss.st_major.ssm.st_user;
 					}
-					else if (sys_state.ss.st_pad.login_st == 0x00)
+					else if (sys_state.ss.st_pad.ssp.login_st == 0x00)
 					{
 						run_state = NO_LOGIN;
 					}
@@ -1515,7 +1537,27 @@ void TaskDeviceCommand(void *pdata) {
 					}
 				}
 				break;
-				
+
+			case SUPERUSER_LOGIN:
+				if (sys_state.ss.st_major.ssm.st_user == USER_NO_CARD)
+				{
+					arg[0] = USER_NO_CARD;
+					err = Login(arg);
+					if (err == SYS_NO_ERR)
+					{
+						arg[0] = 0x31;
+						run_state = NO_LOGIN;
+					}
+					else
+					{
+						if (err == COMMUNICATION_TIMEOUT)
+						{
+							sys_state.ss.st_major.ssm.st_pad_online = PAD_COMMUNICATION_NOT_CONNECT;
+							run_state = OUT_LINE;
+						}
+					}
+				}
+				break;
 			default:
 				run_state = OUT_LINE;
 				break;

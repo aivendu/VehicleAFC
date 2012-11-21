@@ -4,11 +4,12 @@ _trade_data_to_server_s trade_data_temp;
 _trade_manage_data_s	trade_manage_data_temp;
 uint32	current_trade_index;
 
-#define	IDLE					0
-#define	CHANGE_MONEY			1
-#define	PRINT					2
-#define	UPLOAD					3
-#define	STORE					4
+#define	IDLE					0		//	空闲状态
+#define	CHANGE_MONEY			1		//	找零
+#define	PRINT					2		//	打印
+#define	TRADE_END				3		//	交易结束处理
+#define	STORE					4		//	存储交易数据
+#define OBTAIN_RIDE_MESS		5		//	更新交易信息
 
 void InitTradeManageData(void)
 {
@@ -103,84 +104,255 @@ void TaskTrade(void *pdata)
 	InitLog();
 	while (1)
 	{
-		if (GetTimeUploadState() != 0)
-		{
-			if ((YEAR > trade_manage_data_temp.year)
-				|| ((YEAR == trade_manage_data_temp.year)
-					&& ((MONTH > trade_manage_data_temp.month)
-						|| ((MONTH == trade_manage_data_temp.month) && (DOM > trade_manage_data_temp.day))
-						)
-					)
-				)
-			{
-				trade_manage_data_temp.last_day_addr = current_trade_index;
-				trade_manage_data_temp.year = YEAR;
-				trade_manage_data_temp.month = MONTH;
-				trade_manage_data_temp.day = DOM;
-				trade_manage_data_temp.needpay_amount = 0;
-				trade_manage_data_temp.realpay_amount = 0;
-				trade_manage_data_temp.coin_dis_amount = 0;
-				trade_manage_data_temp.note_1_dis_amount = 0;
-				trade_manage_data_temp.note_2_dis_amount = 0;
-				trade_manage_data_temp.trade_num = 0;
-				memcpy(trade_manage_data_temp.driver_id,device_control.user.uinfo.staffid,7);
-				if (current_trade_index == TRADE_DATA_START_ADDR)		//	是否有交易数据存储
-				{
-					//	交易数据接着current_trade_index 存储
-					current_trade_index = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
-					//	交易日志存储接着trade_manage_data_temp 存储
-					trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
-				}
-				else
-				{
-					if ((trade_manage_data_temp.in + sizeof(_trade_manage_data_s)) 		//	下一天的交易是否会超出存储区域
-						>= (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
-					{
-						//	超出了，接着current_trade_index 开始存储
-						current_trade_index = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
-						trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
-					}
-					else
-					{
-						//	修改当前日期的交易数据索引地址
-						current_trade_index = trade_manage_data_temp.in;
-						trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
-						if ((trade_manage_data_temp.in + sizeof(_trade_data_to_server_s)) 	//	下一笔交易是否会超出存储区域
-								>= (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
-						{
-							//	超出了，接着current_trade_index 开始存储
-							trade_manage_data_temp.in = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
-						}
-					}
-					
-				}
-				trade_manage_data_temp.out = trade_manage_data_temp.in;
-				//	存储数据
-				WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
-				WriteExternMemery(&current_trade_index, TRADE_DATA_START_ADDR,sizeof(current_trade_index));
-			}
-		}
 		switch (trade_state)
 		{
 			case IDLE:
-				if (sys_state.ss.st_cmd.se.store_trade_data.exe_st == EXE_WRITED)
+				if (sys_state.ss.st_cmd.se.change_ride_mess.exe_st == EXE_WRITED)
+				{
+					sys_state.ss.st_cmd.se.change_ride_mess.exe_st = EXE_RUNNING;
+					trade_state = OBTAIN_RIDE_MESS;
+				}
+				else if (sys_state.ss.st_cmd.se.makechange.exe_st == EXE_WRITED)
+				{
+					sys_state.ss.st_cmd.se.makechange.exe_st = EXE_RUNNING;
+					trade_state = CHANGE_MONEY;
+				}
+				/*else if (sys_state.ss.st_cmd.se.store_trade_data.exe_st == EXE_WRITED)
 				{
 					sys_state.ss.st_cmd.se.store_trade_data.exe_st = EXE_RUNNING;
 					trade_state = STORE;
-				}
+				}*/
 				else
 				{
+					if (GetTimeUploadState() != 0)
+					{
+						//	时间已更新
+						if ((YEAR > trade_manage_data_temp.year)
+							|| ((YEAR == trade_manage_data_temp.year)
+								&& ((MONTH > trade_manage_data_temp.month)
+									|| ((MONTH == trade_manage_data_temp.month) && (DOM > trade_manage_data_temp.day))
+									)
+								)
+							)
+						{
+							//	新的一天的交易数据
+							if (GetIntelligentChange() == 0)
+							{
+								SetCashbox1Balance(200);
+								SetCashbox2Balance(20);
+								SetCashbox3Balance(40);
+							}
+							trade_manage_data_temp.last_day_addr = current_trade_index;
+							trade_manage_data_temp.year = YEAR;
+							trade_manage_data_temp.month = MONTH;
+							trade_manage_data_temp.day = DOM;
+							trade_manage_data_temp.needpay_amount = 0;
+							trade_manage_data_temp.realpay_amount = 0;
+							trade_manage_data_temp.coin_dis_amount = 0;
+							trade_manage_data_temp.note_1_dis_amount = 0;
+							trade_manage_data_temp.note_2_dis_amount = 0;
+							trade_manage_data_temp.trade_num = 0;
+							memcpy(trade_manage_data_temp.driver_id,device_control.user.uinfo.staffid,7);
+							if (current_trade_index == TRADE_DATA_START_ADDR)		//	是否有交易数据存储
+							{
+								//	交易数据接着current_trade_index 存储
+								current_trade_index = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
+								//	交易日志存储接着trade_manage_data_temp 存储
+								trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
+							}
+							else
+							{
+								if ((trade_manage_data_temp.in + sizeof(_trade_manage_data_s)) 		//	下一天的交易是否会超出存储区域
+									>= (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
+								{
+									//	超出了，接着current_trade_index 开始存储
+									current_trade_index = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
+									trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
+								}
+								else
+								{
+									//	修改当前日期的交易数据索引地址
+									current_trade_index = trade_manage_data_temp.in;
+									trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
+									if ((trade_manage_data_temp.in + sizeof(_trade_data_to_server_s)) 	//	下一笔交易是否会超出存储区域
+											>= (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
+									{
+										//	超出了，接着current_trade_index 开始存储
+										trade_manage_data_temp.in = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
+									}
+								}
+								
+							}
+							trade_manage_data_temp.out = trade_manage_data_temp.in;
+							//	存储数据
+							WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
+							WriteExternMemery(&current_trade_index, TRADE_DATA_START_ADDR,sizeof(current_trade_index));
+						}
+					}
 					OSTimeDly(2);
 				}
 				break;
 
+			case OBTAIN_RIDE_MESS:
+				//	更新交易数据
+				while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_TRADE_INDEX_ADDR,CONTROL_TRADE_LENGHT,CONTROL_TRADE_ADDR) != TRUE)
+				{
+					OSTimeDly(2);
+				}
+				sys_state.ss.st_cmd.se.change_ride_mess.exe_st = EXE_WAIT;
+				
+				if (sys_state.ss.st_cmd.se.speak.exe_st == EXE_WRITED)
+				{
+					//	播放语音
+					device_control.cmd.speak.exe_st = EXE_WRITED;
+					while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_SPEAK_INDEX_ADDR,CONTROL_CMD_SPEAK_LENGHT,CONTROL_CMD_SPEAK_ADDR) != TRUE) 
+					{
+						OSTimeDly(2);
+					}
+					sys_state.ss.st_cmd.se.speak.exe_st = EXE_WAIT;
+				}
+				trade_state = IDLE;
+				break;
+
 			case CHANGE_MONEY:
+				if ((device_control.trade.tm.changemoney != (device_control.trade.tm.realpay - device_control.trade.tm.needpay))
+					|| (device_control.trade.tm.changemoney > 99)		//	最多找零99 元
+					)
+				{
+					//	找零数据不正确
+					memset(promptmess,0,sizeof(promptmess));
+					sprintf(promptmess,"找零数据错误，只能找零0元到99元，请重新操作");
+					i = 0x33;
+					DisplayMessage(&i);
+					sys_state.ss.st_cmd.se.makechange.exe_st = EXE_WAIT;
+					trade_state = IDLE;
+					break;
+				}
+				else{
+					device_control.trade.tm.changenum = 0;
+					
+					if (GetIntelligentChange())			//	是否使用智能找零功能
+					{
+						//	计算第三钱箱找零个数
+						if ((device_control.trade.tm.changemoney / GetCashbox3Value()) > GetCashbox3Balance())
+						{
+							//	第三钱箱的钱不够
+							//	(第三钞箱* 2000 +第二钞箱个数*100 +第一钞箱个数)
+							device_control.trade.tm.changenum = GetCashbox3Balance() * 2000;	//	把剩余金额找完
+							device_control.trade.tm.changemoney -= GetCashbox3Balance() * GetCashbox3Value();
+						}
+						else
+						{
+							device_control.trade.tm.changenum = (device_control.trade.tm.changemoney / GetCashbox3Value()) * 2000;
+							device_control.trade.tm.changemoney = device_control.trade.tm.changemoney % GetCashbox3Value();
+						}
+						//	计算第二钱箱找零个数
+						if ((device_control.trade.tm.changemoney / GetCashbox2Value()) > GetCashbox2Balance())
+						{
+							//	第二钱箱的钱不够
+							device_control.trade.tm.changenum += GetCashbox2Balance() * 100;		//	把剩余金额找完
+							device_control.trade.tm.changemoney -= GetCashbox2Balance() * GetCashbox2Value();
+						}
+						else
+						{
+							device_control.trade.tm.changenum = (device_control.trade.tm.changemoney / GetCashbox2Value()) * 100;
+							device_control.trade.tm.changemoney = device_control.trade.tm.changemoney % GetCashbox2Value();
+							
+						}
+						//	计算第一钱箱找零个数
+						if ((device_control.trade.tm.changemoney / GetCashbox1Value()) > GetCashbox1Balance())
+						{
+							//	第一钱箱的钱不够
+							memset(promptmess,0,sizeof(promptmess));
+							sprintf(promptmess,"钱箱金额不够，不能找零");
+							i = 0x33;
+							DisplayMessage(&i);
+							sys_state.ss.st_cmd.se.makechange.exe_st = EXE_WAIT;
+							trade_state = IDLE;
+							break;
+						}
+						else
+						{
+							device_control.trade.tm.changenum += (device_control.trade.tm.changemoney / GetCashbox1Value());
+							device_control.trade.tm.changemoney = device_control.trade.tm.changemoney % GetCashbox1Value();
+							
+						}
+						device_control.trade.tm.changemoney = device_control.trade.tm.realpay - device_control.trade.tm.needpay;
+					}
+					else
+					{
+						device_control.trade.tm.changenum = device_control.trade.tm.changemoney / GetCashbox3Value() * 2000
+												+ (device_control.trade.tm.changemoney % GetCashbox3Value()) / GetCashbox2Value() * 100
+												+ (device_control.trade.tm.changemoney % GetCashbox2Value()) / GetCashbox1Value();
+					}
+					//	读找零和打印命令
+					if (ChipDataUpload(CHIP_READ,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT+CONTROL_CMD_PRINT_LENGHT,CONTROL_CMD_CHANGE_ADDR) == TRUE)
+					{
+						if (((device_control.cmd.changemoney.exe_st == EXE_RUN_END) || (device_control.cmd.changemoney.exe_st == EXE_WAIT))
+							|| ((device_control.cmd.print.exe_st == EXE_RUN_END) || (device_control.cmd.print.exe_st == EXE_WAIT)))
+						{
+							//	设备空闲，可以继续进行找零
+						}
+						else
+						{
+							//	设备正在找零或打印，不能进行找零
+							memset(promptmess,0,sizeof(promptmess));
+							sprintf(promptmess,"设备正在找零或打印，不能进行新的找零或打印");
+							i = 0x33;
+							DisplayMessage(&i);
+							sys_state.ss.st_cmd.se.makechange.exe_st = EXE_WAIT;
+							trade_state = IDLE;
+							break;
+						}
+
+						//	更新交易数据
+						while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_TRADE_INDEX_ADDR,CONTROL_TRADE_LENGHT,CONTROL_TRADE_ADDR) != TRUE)
+						{
+							OSTimeDly(2);
+						}
+						if (device_control.trade.tm.changenum > 0)
+						{
+							//	找零
+							device_control.cmd.changemoney.exe_st = EXE_WRITED;
+							while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,CONTROL_CMD_CHANGE_ADDR) != TRUE) 
+							{
+								OSTimeDly(2);
+							}
+							OSTimeDly(200);
+						}
+						else
+						{
+							device_control.cmd.changemoney.exe_st = EXE_RUN_END;
+						}
+						sys_state.ss.st_cmd.se.makechange.exe_st = EXE_RUNNING;
+						trade_state = PRINT;
+					}
+				}
 				break;
 
 			case PRINT:
-				break;
-
-			case UPLOAD:
+				if (ChipDataUpload(CHIP_READ,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT+CONTROL_CMD_PRINT_LENGHT,CONTROL_CMD_CHANGE_ADDR) == TRUE)
+				{
+					if (device_control.cmd.changemoney.exe_st == EXE_RUN_END)
+					{
+						sys_state.ss.st_cmd.se.makechange.exe_st = EXE_RUN_END;		//	找零结束
+						sys_state.ss.st_cmd.se.print.exe_st = EXE_RUNNING;			//	开始打印
+						//	读取找零结果
+						while (ChipDataUpload(CHIP_READ,0x00,CONTROL_TRADE_STATE_INDEX_ADDR,CONTROL_TRADE_STATE_LENGHT,CONTROL_TRADE_STATE_ADDR) != TRUE)
+						{
+							OSTimeDly(2);
+						}
+						//	找零结束，开始打印
+						device_control.cmd.changemoney.exe_st = EXE_WAIT;
+						device_control.cmd.print.exe_st = EXE_WRITED;
+						//	更新找零和打印命令
+						while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT+CONTROL_CMD_PRINT_LENGHT,CONTROL_CMD_CHANGE_ADDR) != TRUE)
+						{
+							OSTimeDly(2);
+						}
+						trade_state = STORE;
+					}
+				}
 				break;
 
 			case STORE:
@@ -227,17 +399,38 @@ void TaskTrade(void *pdata)
 					trade_manage_data_temp.in = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
 				}
 				WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
+				
+				//	更新余额
+				SetCashbox1Balance(GetCashbox1Balance() - device_control.trade.cr.coin_dis);
+				SetCashbox2Balance(GetCashbox2Balance() - device_control.trade.cr.cass1_dis);
+				SetCashbox3Balance(GetCashbox3Balance() - device_control.trade.cr.cass2_dis);
 				sys_state.ss.st_cmd.se.store_trade_data.exe_st = EXE_WAIT;
 				if (GetTradeUploadState() == 0)
 				{
 					SetTradeUploadState(1);		//	进行上传数据
 					SetSaveConfig(EXE_WRITED);
 				}
-				trade_state = IDLE;
+				trade_state = TRADE_END;
 
 				//	
 				break;
 
+			case TRADE_END:
+				if (ChipDataUpload(CHIP_READ,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT+CONTROL_CMD_PRINT_LENGHT,CONTROL_CMD_CHANGE_ADDR) == TRUE)
+				{
+					if (device_control.cmd.print.exe_st == EXE_RUN_END)
+					{
+						//	找零结束
+						device_control.cmd.print.exe_st = EXE_WAIT;
+						while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT+CONTROL_CMD_PRINT_LENGHT,CONTROL_CMD_CHANGE_ADDR) != TRUE)
+						{
+							OSTimeDly(2);
+						}
+						sys_state.ss.st_cmd.se.print.exe_st = EXE_RUN_END;
+						trade_state = IDLE;
+					}
+				}
+				break;
 			default:
 				trade_state = IDLE;
 				break;

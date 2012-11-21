@@ -26,8 +26,6 @@ typedef struct {
 	uint32 st_gps_machine		:4;
 	uint32 st_motherboard		:4;
 	uint32 unused1				:8;
-	uint32 unused2				:32;
-	uint32 unused3				:32;
 } _sys_st_other_s;
 
 typedef union {
@@ -61,12 +59,14 @@ typedef struct {
 	_exe_s store_trade_data;
 	_exe_s printamount;
 	_exe_s saveconfig;
-} _sys_exe_st_s;
+	_exe_s uploadmemery;
+	_exe_s change_ride_mess;
+} _sys_st_exe_s;
 
 typedef union {
-	uint8 se_b[sizeof(_sys_exe_st_s)];
-	_sys_exe_st_s se;
-} _sys_exe_st_u;
+	uint8 se_b[sizeof(_sys_st_exe_s)];
+	_sys_st_exe_s se;
+} _sys_st_exe_u;
 
 typedef struct
 {
@@ -81,13 +81,20 @@ typedef struct
 	uint32 line_no			:16;
 	uint32 current_state	:8;
 	uint32 unused2			:24;
-} _sys_pad_st_u;
+} _sys_st_pad_s;
+
+typedef union
+{
+	uint8 ssp_b[sizeof(_sys_st_pad_s)];
+	_sys_st_pad_s ssp;
+} _sys_st_pad_u;
+
 
 typedef struct {
-	_sys_st_major_u	st_major;
-	_sys_st_other_u st_other;
-	_sys_exe_st_u   st_cmd;
-	_sys_pad_st_u	st_pad;
+	_sys_st_major_u	st_major;		//	设备主要状态
+	_sys_st_other_u st_other;		//	设备其他状态
+	_sys_st_pad_u	st_pad;			//	PAD 状态
+	_sys_st_exe_u   st_cmd;
 } _sys_st_s;
 
 typedef union {

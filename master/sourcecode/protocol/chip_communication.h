@@ -24,10 +24,10 @@ typedef struct {
 } _station_mess_s;
 
 typedef struct {
+	_station_mess_s station[30];
 	uint16 line_no;
 	uint8  line_station_amount;
 	char   line_version[9];  
-	_station_mess_s station[30];
 } _line_mess_s;
 
 typedef struct {
@@ -131,8 +131,8 @@ typedef union {
 
 typedef struct {
 	_exe_s speak;
-	_exe_s changemoney;
-	_exe_s print;
+	_exe_s changemoney;		//	’“¡„√¸¡Ó£¨’“¡„√¸¡Ó∫Õ¥Ú”°√¸¡Ó≤ªƒ‹∏Ù∆‰À˚√¸¡Ó
+	_exe_s print;			//	¥Ú”°√¸¡Ó
 	_exe_s power_off;
 	_exe_s print_amount;
 	_exe_s print_record;
@@ -150,36 +150,52 @@ typedef struct {
 
 #define CONTROL_HEAD_ADDR					((uint32)&device_control)
 #define CONTROL_TIME_INDEX_ADDR				0
+#define CONTROL_TIME_ADDR					(&device_control.time)
 #define CONTROL_TIME_LENGHT					((uint32)&device_control.user - CONTROL_HEAD_ADDR)
 #define CONTROL_USER_INDEX_ADDR				CONTROL_TIME_LENGHT
+#define CONTROL_USER_ADDR					(&device_control.user)
 #define CONTROL_USER_LENGHT					((uint32)&device_control.gps-(uint32)&device_control.user)
 #define CONTROL_GPS_INDEX_ADDR				(CONTROL_USER_INDEX_ADDR+CONTROL_USER_LENGHT)
+#define CONTROL_GPS_ADDR					(&device_control.gps)
 #define CONTROL_GPS_LENGHT					((uint32)&device_control.cmd-(uint32)&device_control.gps)
 #define CONTROL_CMD_INDEX_ADDR				(CONTROL_GPS_INDEX_ADDR+CONTROL_GPS_LENGHT)
+#define CONTROL_CMD_ADDR					(&device_control.cmd)
 #define CONTROL_CMD_LENGHT					((uint32)&device_control.trade-(uint32)&device_control.cmd)
 #define CONTROL_TRADE_INDEX_ADDR			(CONTROL_CMD_INDEX_ADDR+CONTROL_CMD_LENGHT)
+#define CONTROL_TRADE_ADDR					(&device_control.trade)
 #define CONTROL_TRADE_LENGHT				((uint32)&device_control.trade.ts-(uint32)&device_control.trade)
 #define CONTROL_TRADE_STATE_INDEX_ADDR		(CONTROL_TRADE_INDEX_ADDR+CONTROL_TRADE_LENGHT)
+#define CONTROL_TRADE_STATE_ADDR			(&device_control.trade.ts)
 #define CONTROL_TRADE_STATE_LENGHT			((uint32)&device_control.sys_device-(uint32)&device_control.trade.ts)
 #define CONTROL_SYS_DEVICE_INDEX_ADDR		((uint32)&device_control.sys_device - CONTROL_HEAD_ADDR)
+#define CONTROL_SYS_DEVICE_ADDR				(&device_control.sys_device)
 #define CONTROL_SYS_DEVICE_LENGHT			sizeof(_device_state_s)
 #define CONTROL_TRADEAMOUNT_INDEX_ADDR		((uint32)&device_control.trade_amount- CONTROL_HEAD_ADDR)
+#define CONTROL_TRADEAMOUNT_ADDR			(&device_control.trade_amount)
 #define CONTROL_TRADEAMOUNT_LENGHT			sizeof(_trade_amount_s)
 
 
 
 #define CONTROL_CMD_SPEAK_INDEX_ADDR		((uint32)&device_control.cmd.speak - CONTROL_HEAD_ADDR)
+#define CONTROL_CMD_SPEAK_ADDR				(&device_control.cmd.speak)
 #define CONTROL_CMD_SPEAK_LENGHT			(sizeof(_exe_s))
 #define CONTROL_CMD_CHANGE_INDEX_ADDR		((uint32)&device_control.cmd.changemoney - CONTROL_HEAD_ADDR)
+#define CONTROL_CMD_CHANGE_ADDR				(&device_control.cmd.changemoney)
 #define CONTROL_CMD_CHANGE_LENGHT			(sizeof(_exe_s))
 #define CONTROL_CMD_PRINT_INDEX_ADDR		((uint32)&device_control.cmd.print - CONTROL_HEAD_ADDR)
+#define CONTROL_CMD_PRINT_ADDR				(&device_control.cmd.print)
 #define CONTROL_CMD_PRINT_LENGHT			(sizeof(_exe_s))
 #define CONTROL_CMD_POWEROFF_INDEX_ADDR		((uint32)&device_control.cmd.power_off - CONTROL_HEAD_ADDR)
+#define CONTROL_CMD_POWEROFF_ADDR			(&device_control.cmd.power_off)
 #define CONTROL_CMD_POWEROFF_LENGHT			(sizeof(_exe_s))
 #define CONTROL_CMD_PRINTAMOUNT_INDEX_ADDR	((uint32)&device_control.cmd.print_amount- CONTROL_HEAD_ADDR)
+#define CONTROL_CMD_PRINTAMOUNT_ADDR		(&device_control.cmd.print_amount)
 #define CONTROL_CMD_PRINTAMOUNT_LENGHT		(sizeof(_exe_s))
+#define CONTROL_CMD_PRINTRECORD_INDEX_ADDR	((uint32)&device_control.cmd.print_record- CONTROL_HEAD_ADDR)
+#define CONTROL_CMD_PRINTRECORD_ADDR		(&device_control.cmd.print_record)
+#define CONTROL_CMD_PRINTRECORD_LENGHT		(sizeof(_exe_s))
 
-
+#define CURRENT_LINE_VERSION_INDEX_ADDR		((uint32)curr_line.line_version - (uint32)&curr_line)
 
 #define WRITE			2
 #define	READ			1
@@ -193,6 +209,6 @@ extern _device_control_s device_control;
 extern void ChipCommInit(void);
 extern void RequestUpload(void);
 extern void TaskChipComm(void *pdata);
-
+extern uint8 ChipDataUpload(uint8 flag,uint8 fun,uint16 addr,uint16 len,void *data);
 
 #endif

@@ -74,12 +74,18 @@ typedef struct
 //	Ç®ÏäÅäÖÃÄ£Ê½
 typedef struct
 {
-	char cashbox1_par_value[4];
-	char cashbox2_par_value[4];
-	char cashbox3_par_value[4];
-	char cashbox1_threshold[4];
-	char cashbox2_threshold[4];
-	char cashbox3_threshold[4];
+	char cashbox1_par_value[3];
+	char cashbox2_par_value[3];
+	char cashbox3_par_value[3];
+	char cashbox1_threshold[3];
+	char cashbox2_threshold[3];
+	char cashbox3_threshold[3];
+	char cashbox1_balance[5];	//	Ó²±ÒÇ®ÏäÓà¶î
+	char cashbox2_balance[5];	//	Ö½±ÒÇ®ÏäÒ»±¨Óà¶î
+	char cashbox3_balance[5];	//	Ö½±ÒÇ®Ïä¶ş±¨Óà¶î
+	char cashbox1_deposit[5];	//	Ó²±ÒÇ®Ïä´æÈë×Ü¶î
+	char cashbox2_deposit[5];	//	Ö½±ÒÇ®ÏäÒ»´æÈë×Ü¶î
+	char cashbox3_deposit[5];	//	Ö½±ÒÇ®Ïä¶ş´æÈë×Ü¶î
 } _cashbox_config_from_server_s;
 
 //	ÏµÍ³ĞÔÄÜÅäÖÃ
@@ -106,6 +112,7 @@ typedef struct
 	char line1[16];
 } _print_config_from_server;
 
+
 extern char PAD_version[16];
 
 extern void ServerCommInit(void);
@@ -117,8 +124,9 @@ extern uint8 ServerUploadTradeData(_trade_data_to_server_s *data);
 extern uint8 ServerTimeSync(void);
 extern uint8 ServerCashBoxBalance(uint16 cashbox1, uint16 cashbox2, uint16 cashbox3);
 extern uint8 ServerGPSData(uint8 flag,uint32 latitude, uint32 longitude, uint32 speed);
-extern uint8 ServerLogin(char *staffid);
-extern uint8 ServerLogout(char *staffid);
+extern uint8 ServerLogin(void *data);
+extern uint8 ServerLogout(void *data);
+
 extern uint8 GetNextPackage(void);
 
 

@@ -13,22 +13,22 @@
 typedef struct
 {
 	uint32	config_state			:2;		//	配置状态，0--未初始化，1--默认初始化，2--用户配置
-	uint32	login_mod				:2;		//	登录模式
-	uint32	trade_upload_state		:1;		//	交易数据上传完成
-	uint32	unused					:28;
+	uint32	login_mod				:2;		//	登录模式，0--卡登录，1--帐号登录，3--混合登录
+	uint32	trade_upload_state		:1;		//	交易数据上传完成，0--数据上传完成，1--还有没上传的数据
+	uint32	intelligent_change		:1;		//	智能找零功能，可以根据钱箱余额分配找零张数，0--禁止，1--使能
+	uint32	unused					:27;
 } _function_config_s;
 
 typedef union
 {
-	uint32 fc_b[1];							//	限定只能占用4 byte
 	_function_config_s fc;
+	uint32 fc_b[sizeof(_function_config_s)];							//	限定只能占用4 byte
 } _function_config_u;
 
 
 //	定义和控制系统参数
 typedef struct
 {
-	char	device_addr[4];		//	设备地址, ASCII 字符, 0000-FFFF
 	uint16	gprs_answer_response_time;	//	GPRS 最迟响应时间
 	uint16	gps_sampling_time;			//	GPS 采样时间
 	uint16	gprs_offline_response_time;	//	GPRS 脱机响应时间
@@ -39,8 +39,8 @@ typedef struct
 
 typedef union
 {
-	uint8 pa_b[18];						//	限定只能占用18 byte
 	_parameter_s pa;
+	uint8 pa_b[sizeof(_parameter_s)];	//	限定只能占用18 byte
 } _parameter_u;
 
 
@@ -53,13 +53,19 @@ typedef struct
 	uint8	cashbox1_alarm_threshold;	//	硬币钱箱报警阈值
 	uint8	cashbox2_alarm_threshold;	//	纸币钱箱一报警阈值
 	uint8	cashbox3_alarm_threshold;	//	纸币钱箱二报警阈值
-	uint8	unused[2];
+	uint16	cashbox1_balance;	//	硬币钱箱余额
+	uint16	cashbox2_balance;	//	纸币钱箱一报余额
+	uint16	cashbox3_balance;	//	纸币钱箱二报余额
+	uint16	cashbox1_deposit;	//	硬币钱箱存入总额
+	uint16	cashbox2_deposit;	//	纸币钱箱一存入总额
+	uint16	cashbox3_deposit;	//	纸币钱箱二存入总额
+	uint8	unused[2];	//	
 }_cashbox_config_s;
 
 typedef union
 {
-	uint8 cc_b[8];						//	限定只能占用8 byte
 	_cashbox_config_s cc;
+	uint8 cc_b[sizeof(_cashbox_config_s)];						//	限定只能占用8 byte
 } _cashbox_config_u;
 
 
@@ -80,20 +86,22 @@ typedef struct {
 typedef union
 {
 	_uart_manage_s um;
-	uint8 um_b[80];						//	限定只能占用80 byte
+	uint8 um_b[sizeof(_uart_manage_s)];						//	限定只能占用80 byte
 } _uart_manage_u;
 
 
 //	配置项
 typedef struct
 {
-	char print_customer[17];		//	客户名称，提供打印
+	char print_customer[16];		//	客户名称，提供打印
 	_function_config_u fc;			//	功能配置
 	_cashbox_config_u  cc;			//	
 	_uart_manage_u um;
 	_parameter_u pa;
-	char config_version[9];			//	配置版本号
+	char device_addr[4];			//	设备地址, ASCII 字符, 0000-FFFF
+	char lisence_plate_num[8];		//	车牌号
 	char trade_form_version[6];		//	交易数据格式版本号
+	char config_version[9];			//	配置版本号
 } _config_s;
 
 
@@ -112,13 +120,15 @@ typedef struct
 										 config_ram.pa.pa.server_ip[1] = b;\
 										 config_ram.pa.pa.server_ip[2] = c;\
 										 config_ram.pa.pa.server_ip[3] = d;}
-
+#define GetLisencePlateNum()			(config_ram.lisence_plate_num)
+#define SetLisencePlateNum(c)			(memcpy(config_ram.lisence_plate_num,c,8))
 
 #define GetPrintCustomer()				(config_ram.print_customer)
 #define SetPrintCustomer(c)				{memset(config_ram.print_customer,0,sizeof(config_ram.print_customer));\
 										 strncpy(config_ram.print_customer,c,sizeof(config_ram.print_customer));}
 
 #define GetConfigVersion()				(config_ram.config_version)
+#define GetTradeDataVersion()			(config_ram.trade_form_version)
 
 #define GetConfigState()				(config_ram.fc.fc.config_state)
 #define SetConfigState(c)				(config_ram.fc.fc.config_state = c)
@@ -126,6 +136,9 @@ typedef struct
 #define SetLoginMod(c)					(config_ram.fc.fc.login_mod = c)
 #define GetTradeUploadState()			(config_ram.fc.fc.trade_upload_state)
 #define SetTradeUploadState(c)			(config_ram.fc.fc.trade_upload_state = c)
+#define GetIntelligentChange()			(config_ram.fc.fc.intelligent_change)
+#define SetIntelligentChange(c)			(config_ram.fc.fc.intelligent_change = c)
+
 
 #define GetCashbox1Value()				(config_ram.cc.cc.cashbox1_value)
 #define SetCashbox1Value(c)				(config_ram.cc.cc.cashbox1_value = c)
@@ -139,6 +152,18 @@ typedef struct
 #define SetCashbox2AlarmThreshold(c)	(config_ram.cc.cc.cashbox2_alarm_threshold = c)
 #define GetCashbox3AlarmThreshold()		(config_ram.cc.cc.cashbox3_alarm_threshold)
 #define SetCashbox3AlarmThreshold(c)	(config_ram.cc.cc.cashbox3_alarm_threshold = c)
+#define GetCashbox1Balance()			(config_ram.cc.cc.cashbox1_balance)
+#define SetCashbox1Balance(c)			(config_ram.cc.cc.cashbox1_balance = c)
+#define GetCashbox2Balance()			(config_ram.cc.cc.cashbox2_balance)
+#define SetCashbox2Balance(c)			(config_ram.cc.cc.cashbox2_balance = c)
+#define GetCashbox3Balance()			(config_ram.cc.cc.cashbox3_balance)
+#define SetCashbox3Balance(c)			(config_ram.cc.cc.cashbox3_balance = c)
+#define GetCashbox1Deposit()			(config_ram.cc.cc.cashbox1_deposit)
+#define SetCashbox1Deposit(c)			(config_ram.cc.cc.cashbox1_deposit = c)
+#define GetCashbox2Deposit()			(config_ram.cc.cc.cashbox2_deposit)
+#define SetCashbox2Deposit(c)			(config_ram.cc.cc.cashbox2_deposit = c)
+#define GetCashbox3Deposit()			(config_ram.cc.cc.cashbox3_deposit)
+#define SetCashbox3Deposit(c)			(config_ram.cc.cc.cashbox3_deposit = c)
 
 #define GetRj45UartChannal()			(config_ram.um.um.uc_rj45.channal)
 #define SetRj45UartChannal(c)			(config_ram.um.um.uc_rj45.channal = c)
@@ -175,7 +200,7 @@ typedef struct
 
 
 
-
+#define CONFIG_VERSION_INDEX_ADDR		((uint32)config_ram.config_version - (uint32)&config_ram)
 #define ComputerExternalMemoryAddr(a,head)			((uint32)a-(uint32)head)
 
 

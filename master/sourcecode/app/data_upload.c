@@ -21,6 +21,7 @@ void TaskDataUpload(void *pdata)
 		{
 			if (GetTradeUploadState() == 1)
 			{
+				//	上传交易数据
 				if (upload_manage_temp.out == trade_manage_data_temp.out)		//	是否当天的数据
 				{
 					ReadExternMemery(&upload_data_temp,upload_manage_temp.out,sizeof(_trade_data_to_server_s));
@@ -90,6 +91,7 @@ void TaskDataUpload(void *pdata)
 					}
 				}
 			}
+			//ReadLog(uint8 flag,void * data,uint16 data_lenght);
 			OSTimeDly(OS_TICKS_PER_SEC*5);
 			//OSTaskSuspend(OS_PRIO_SELF);
 		}
@@ -102,5 +104,12 @@ void TaskDataUpload(void *pdata)
 	}
 }
 
-
+uint8 UploadAllMemery(uint32 start, uint32 end)
+{
+	uint8 data_temp[32];
+	while (1)
+	{
+		//ServerLogin();
+	}
+}
 

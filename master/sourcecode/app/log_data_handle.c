@@ -23,7 +23,7 @@ _log_s	log_data;
 
 void InitLog(void)
 {
-	store_log_sem = OSSemCreate(0);
+	store_log_sem = OSSemCreate(1);
 	while (store_log_sem == NULL);
 	
 	ReadExternMemery(&log_index,LOG_START_ADDR,sizeof(_log_manage_s));
@@ -136,6 +136,7 @@ void * ReadLog(uint8 flag,void *data,uint16 data_lenght)
 	_log_s log_temp;
 	if ((log_read_index == 0) || (log_read_index >= (LOG_START_ADDR + LOG_MEMERY_LENGHT)))
 	{
+		//	上电后LOG 还没开始读过
 		log_read_index = log_index.log_end;
 	}
 	OSSemPend(store_log_sem,0,&err);
@@ -191,12 +192,55 @@ void * ReadLog(uint8 flag,void *data,uint16 data_lenght)
 
 
 
+//	保存登录log
+uint8 LogStoreLogin(void)
+{
+	_log_device_use_cmd_s temp;
+	memset(&temp,0,sizeof(_log_device_use_cmd_s));
+	memcpy(temp.staffid,device_control.user.uinfo.staffid,7);
+	temp.year = YEAR;
+	temp.month = MONTH;
+	temp.day = DOM;
+	temp.hour = HOUR;
+	temp.min = MIN;
+	temp.sec = SEC;
+	StoreLog(LOGIN_COMMAND,&temp,sizeof(_log_device_use_cmd_s));
+	return TRUE;
+}
+//	保存注销log
+uint8 LogStoreLogout(void)
+{
+	_log_device_use_cmd_s temp;
+	memset(&temp,0,sizeof(_log_device_use_cmd_s));
+	memcpy(temp.staffid,device_control.user.uinfo.staffid,7);
+	temp.year = YEAR;
+	temp.month = MONTH;
+	temp.day = DOM;
+	temp.hour = HOUR;
+	temp.min = MIN;
+	temp.sec = SEC;
+	StoreLog(LOGOUT_COMMAND,&temp,sizeof(_log_device_use_cmd_s));
+	return TRUE;
+}
 
-
-
-
-
-
+//	保存存钱log
+uint8 LogStoreDeposit(void)
+{
+	_log_deposit_cmd_s temp;
+	memset(&temp,0,sizeof(_log_deposit_cmd_s));
+	memcpy(temp.staffid,device_control.user.uinfo.staffid,7);
+	temp.cashbox1_amount = GetCashbox1Deposit();
+	temp.cashbox2_amount = GetCashbox2Deposit();
+	temp.cashbox3_amount = GetCashbox3Deposit();
+	temp.year = YEAR;
+	temp.month = MONTH;
+	temp.day = DOM;
+	temp.hour = HOUR;
+	temp.min = MIN;
+	temp.sec = SEC;
+	StoreLog(LOGOUT_COMMAND,&temp,sizeof(_log_deposit_cmd_s));
+	return TRUE;
+}
 
 
 
