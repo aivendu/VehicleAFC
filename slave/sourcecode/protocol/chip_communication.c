@@ -97,8 +97,8 @@ void TaskChipComm(void *pdata) {
 			if (device_control.trade.ts.trade_exe == 0) 
 			{
 				if (device_control.trade.tm.changenum >= 100) {		//	≈–∂œ «∑Ò–Ë“™’“÷Ω±“
-					note_machine_cmd.cass1 = device_control.trade.tm.changenum / 2000;
-					note_machine_cmd.cass2 = device_control.trade.tm.changenum % 2000 / 100;
+					note_machine_cmd.cass1 = device_control.trade.tm.changenum % 2000 / 100;
+					note_machine_cmd.cass2 = device_control.trade.tm.changenum / 2000;
 					note_machine_cmd.note.exe_st = CMD_NO_EXE;		//	÷¥––÷Ω±“’“¡„
 					device_control.trade.ts.change_note = 1;
 					OSTimeDly(OS_TICKS_PER_SEC*2);					//	µ»¥˝’“÷Ω±“÷¥––
