@@ -23,6 +23,7 @@ _log_s	log_data;
 
 void InitLog(void)
 {
+	_log_s *log_temp;
 	store_log_sem = OSSemCreate(1);
 	while (store_log_sem == NULL);
 	
@@ -36,6 +37,34 @@ void InitLog(void)
 	else
 	{
 		ReadExternMemery(&log_data,log_index.log_end,sizeof(_log_s));	//	读取最后一个log 块头
+		//log_temp = ReadLog(0,NULL,0,log_index.log_start);
+		while (1)
+		{
+			if ((log_data.lenght + log_index.log_end + sizeof(_log_s)) >= (LOG_START_ADDR + LOG_MEMERY_LENGHT))
+			{
+				//	当前log 记录有越界
+				if ((log_temp->last_log < ((log_data.lenght + log_index.log_end + sizeof(_log_s)) - (LOG_START_ADDR + LOG_MEMERY_LENGHT)))
+					|| (log_temp->last_log >= log_index.log_end))
+				{
+					//	上一数据已被覆盖
+					break;
+				}
+			}
+			else
+			{
+				if ((log_temp->last_log < ((log_data.lenght + log_index.log_end + sizeof(_log_s))))
+					|| (log_temp->last_log >= log_index.log_end))
+				{
+					//	上一数据已被覆盖
+					break;
+				}
+			}
+			if ((log_temp->state != 0) || (log_temp == NULL))
+			{
+				break;
+			}
+			//log_temp = ReadLog(0,NULL,0,log_temp->last_log);
+		}
 	}
 }
 
@@ -52,17 +81,17 @@ uint8 StoreLog(uint16 type, void *data, uint16 data_len)
 	{
 		log_data.type = type;						//	存储第一个日志
 		log_data.lenght = data_len;
-		log_data.last_log = NULL;
+		log_data.last_log = LOG_START_ADDR;
 		log_index.log_end = LOG_START_ADDR + sizeof(_log_manage_s);
 	}
 	else
 	{
 		//	存储
+		log_data.last_log = log_index.log_end;
 		log_index.log_end = log_index.log_end + sizeof(_log_s) + log_data.lenght;	//	修改当前日志索引
 		//	修改日志数据
 		log_data.type = type;
 		log_data.lenght = data_len;
-		log_data.last_log = log_index.log_end;
 	}
 	//	如果剩余存储器可以存日志头部分，则从当前位置写日志，否则数据从日志存储器开始写
 	if ((log_index.log_end + sizeof(_log_s)) < (LOG_START_ADDR + LOG_MEMERY_LENGHT))
@@ -128,49 +157,99 @@ uint8 StoreLog(uint16 type, void *data, uint16 data_len)
 *	读log 函数
 *	返回log 头数据，读取的log 存放在data 中
 */
-void * ReadLog(uint8 flag,void *data,uint16 data_lenght)
+_log_s * ReadLog(uint8 flag,void *data,uint16 data_lenght,uint32 read_index)
 {
 	uint8 err;
 	uint32 len_temp;
 	static uint32 log_read_index = 0;
 	_log_s log_temp;
 	OSSemPend(store_log_sem,0,&err);
-	if ((log_read_index == 0) || (log_read_index >= (LOG_START_ADDR + LOG_MEMERY_LENGHT)))
+	
+	if (flag == 0)
+	{
+		log_read_index = read_index;
+	}
+	else if ((log_read_index == 0) || (log_read_index >= (LOG_START_ADDR + LOG_MEMERY_LENGHT)))
 	{
 		//	上电后LOG 还没开始读过
 		log_read_index = log_index.log_end;
 	}
-	if (flag == 0)			//	读上一个数据的块头
+	if ((log_read_index + sizeof(_log_s)) >= (LOG_START_ADDR + LOG_MEMERY_LENGHT))
 	{
-		ReadExternMemery(&log_temp, log_read_index, sizeof(_log_s));	//	读当前log 块
-		if ((log_temp.last_log > log_index.log_end) && (log_temp.last_log < (log_index.log_end + log_data.lenght)))
+		//	地址不正确
+		return NULL;
+	}
+	if (flag == 0)
+	{
+		if (ReadExternMemery(&log_temp, log_read_index, sizeof(_log_s)) != 0)	//	读当前log 块
 		{
-			//	已经是最前面的日志里，上一日志已被覆盖
-			log_read_index = log_index.log_end;								//	切换当前块
+			OSSemPost(store_log_sem);
+			return NULL;
 		}
 		else
 		{
-			log_read_index = log_temp.last_log;								//	取上一个LOG 的索引
+			OSSemPost(store_log_sem);
+			return &log_temp;
+		}
+	}
+	else if (flag == 1)			//	读上一个数据的块头
+	{
+		ReadExternMemery(&log_temp, log_read_index, sizeof(_log_s));	//	读当前log 块
+		if ((log_data.lenght + log_index.log_end + sizeof(_log_s)) >= (LOG_START_ADDR + LOG_MEMERY_LENGHT))
+		{
+			//	当前log 记录有越界
+			if ((log_temp.last_log < ((log_data.lenght + log_index.log_end + sizeof(_log_s)) - (LOG_START_ADDR + LOG_MEMERY_LENGHT)))
+				|| (log_temp.last_log >= log_index.log_end))
+			{
+				//	上一数据已被覆盖
+				log_read_index = log_index.log_end;			//	切换当前块
+			}
+			else
+			{
+				log_read_index = log_temp.last_log;			//	取上一个LOG 的索引
+			}
+		}
+		else
+		{
+			if ((log_temp.last_log < ((log_data.lenght + log_index.log_end + sizeof(_log_s))))
+				|| (log_temp.last_log >= log_index.log_end))
+			{
+				//	上一数据已被覆盖
+				log_read_index = log_index.log_end;								//	切换当前块
+			}
+			else
+			{
+				log_read_index = log_temp.last_log;			//	取上一个LOG 的索引
+			}
 		}
 		ReadExternMemery(&log_temp, log_read_index, sizeof(_log_s));		//	读当前块头
 		OSSemPost(store_log_sem);
 		return &log_temp;
 	}
-	else if (flag == 1)		//	读下一个数据的块头
+	else if (flag == 2)		//	读下一个数据的块头
 	{
 		ReadExternMemery(&log_temp, log_read_index, sizeof(_log_s));	//	读当前log 块
 		if (log_read_index != log_index.log_end)
 		{
-			log_read_index = log_temp.last_log;								//	取上一个LOG 的索引
+			//	取下一个LOG 的索引
+			if ((log_read_index + sizeof(_log_s)) >= (LOG_START_ADDR + LOG_MEMERY_LENGHT))
+			{
+				//	下一个log 已越界
+				log_read_index = LOG_START_ADDR + sizeof(_log_manage_s);
+			}
+			else
+			{
+				log_read_index = log_read_index + sizeof(_log_s);
+			}
+			ReadExternMemery(&log_temp, log_read_index, sizeof(_log_s));	//	读当前块头
 		}
-		ReadExternMemery(&log_temp, log_read_index, sizeof(_log_s));		//	读当前块头
 		OSSemPost(store_log_sem);
 		return &log_temp;
 	}
-	else if (flag == 2)		//	读数据
+	else if (flag == 3)		//	读数据
 	{
 		ReadExternMemery(&log_temp, log_read_index, sizeof(_log_s));	//	读当前log 块
-		if ((log_temp.lenght + log_read_index) < (LOG_START_ADDR + LOG_MEMERY_LENGHT))
+		if ((log_temp.lenght + log_read_index + sizeof(_log_s)) < (LOG_START_ADDR + LOG_MEMERY_LENGHT))
 		{
 			ReadExternMemery(data,log_read_index + sizeof(_log_s),data_lenght);
 		}
@@ -203,7 +282,7 @@ uint8 LogStoreLogin(void)
 	temp.hour = HOUR;
 	temp.min = MIN;
 	temp.sec = SEC;
-	StoreLog(LOGIN_COMMAND,&temp,sizeof(_log_device_use_cmd_s));
+	//StoreLog(LOGIN_COMMAND,&temp,sizeof(_log_device_use_cmd_s));
 	return TRUE;
 }
 //	保存注销log
@@ -218,7 +297,7 @@ uint8 LogStoreLogout(void)
 	temp.hour = HOUR;
 	temp.min = MIN;
 	temp.sec = SEC;
-	StoreLog(LOGOUT_COMMAND,&temp,sizeof(_log_device_use_cmd_s));
+	//StoreLog(LOGOUT_COMMAND,&temp,sizeof(_log_device_use_cmd_s));
 	return TRUE;
 }
 
@@ -237,7 +316,7 @@ uint8 LogStoreDeposit(void)
 	temp.hour = HOUR;
 	temp.min = MIN;
 	temp.sec = SEC;
-	StoreLog(LOGOUT_COMMAND,&temp,sizeof(_log_deposit_cmd_s));
+	//StoreLog(LOGOUT_COMMAND,&temp,sizeof(_log_deposit_cmd_s));
 	return TRUE;
 }
 

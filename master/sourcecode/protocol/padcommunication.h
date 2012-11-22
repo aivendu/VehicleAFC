@@ -65,11 +65,7 @@ typedef struct {
 4.	0x0103：没有交易信息，不能找零
 5.	0x0104：正在找零，该命令无效
 6.	0x0105：设备异常
-7.	0x0181：无效命令
-8.	0x0182：载入路线编号和原编号相同,仅主界面和找零界面会触发
-9.	0x0183：载入路线编号和原编号不同,仅主界面和找零界面会触发,   登录界面将以后一个路线编号为准
-10.	0x0184：找不到GUID对应的文件
-11.	0x0185：没有接收到GUID
+7.	0x0106：数据长度不正确
 */
 #define PAD_COMMUNICATION_NO_ERROR					0X0000
 #define PAD_COMMUNICATION_GENERAL_ERROR				0x0101
@@ -77,24 +73,20 @@ typedef struct {
 #define PAD_COMMUNICATION_NO_RIDE_MESSEGE_ERROR		0x0103
 #define PAD_COMMUNICATION_IS_CHANGE_ERROR			0x0104
 #define PAD_COMMUNICATION_DEVICE_ERROR				0x0105
+#define PAD_COMMUNICATION_LENGHT_ERROR				0x0106
+/*
+1.	0x0181：无效命令
+2.	0x0182：载入路线编号和原编号相同,仅主界面和找零界面会触发
+3.	0x0183：载入路线编号和原编号不同,仅主界面和找零界面会触发,   登录界面将以后一个路线编号为准
+4.	0x0184：找不到GUID对应的文件
+5.	0x0185：没有接收到GUID
+*/
 #define PAD_COMMUNICATION_INVAILD_COMMAND			0x0181
 #define PAD_COMMUNICATION_SAME_GUID					0x0182
 #define PAD_COMMUNICATION_DIFFERENT_GUID			0x0183
 #define PAD_COMMUNICATION_NO_FILE_WITH_GUID			0x0184
 #define PAD_COMMUNICATION_NO_GUID					0x0185
 #define PAD_COMMUNICATION_FILE_FORM_ERROR			0x0186
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

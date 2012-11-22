@@ -604,20 +604,38 @@ uint16 CashboxInit(void *arg){
 	err = 0;
 
 	//	存储钱箱初始化值
-	SetCashbox1Deposit(rec_com.data[0]*256+rec_com.data[1]);
-	SetCashbox1Deposit(rec_com.data[2]*256+rec_com.data[3]);
-	SetCashbox1Deposit(rec_com.data[4]*256+rec_com.data[5]);
-	SetCashbox1Balance(GetCashbox1Deposit());
-	SetCashbox2Balance(GetCashbox1Deposit());
-	SetCashbox3Balance(GetCashbox1Deposit());
-	SetSaveConfig(EXE_WRITED);		//	保存配置信息
-	LogStoreDeposit();				//	保存日志
-	OSTimeDly(2);
-	//	准备回复数据
-	err = PAD_ACK;
+	if (GetIntelligentChange())
+	{
+		if (rec_com.len == 4+6)
+		{
+			SetCashbox1Deposit(rec_com.data[0]*256+rec_com.data[1]);
+			SetCashbox1Deposit(rec_com.data[2]*256+rec_com.data[3]);
+			SetCashbox1Deposit(rec_com.data[4]*256+rec_com.data[5]);
+			SetCashbox1Balance(GetCashbox1Deposit());
+			SetCashbox2Balance(GetCashbox1Deposit());
+			SetCashbox3Balance(GetCashbox1Deposit());
+			SetSaveConfig(EXE_WRITED);		//	保存配置信息
+			LogStoreDeposit();				//	保存日志
+			
+			//	准备回复数据
+			err = PAD_ACK;
+			temp.err_no = 0x0000;
+		}
+		else
+		{
+			err = PAD_NACK;
+			temp.err_no = 0x0101;
+		}
+		OSTimeDly(2);
+	}
+	else
+	{
+		//	准备回复数据
+		err = PAD_ACK;
+		temp.err_no = 0x0000;
+	}
 	temp.len = 2+2+1;
 	temp.backage_num = rec_com.package_num;
-	temp.err_no = 0x0000;
 	temp.cmd = rec_com.cmd;
 	temp.arg = rec_com.arg;
 	temp.dat = &err;
@@ -1466,7 +1484,11 @@ void TaskDeviceCommand(void *pdata) {
 				if (err == SYS_NO_ERR) {
 					if (sys_state.ss.st_cmd.se.logout.exe_st == EXE_WRITED)
 					{
-						WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
+						if ((current_trade_index >= (TRADE_DATA_START_ADDR + sizeof(current_trade_index))) 
+							|| ((current_trade_index + sizeof(_trade_manage_data_s)) < (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE)))
+						{
+							WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
+						}
 						sys_state.ss.st_cmd.se.logout.exe_st = EXE_WAIT;
 						sys_state.ss.st_major.ssm.st_user = USER_HAVE_CARD_NO_LOGIN;
 						arg[0] = 0x31;

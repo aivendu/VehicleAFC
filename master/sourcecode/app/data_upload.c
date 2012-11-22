@@ -8,6 +8,7 @@ void TaskDataUpload(void *pdata)
 	uint32 upload_index;
 	_trade_manage_data_s upload_manage_temp;
 	_trade_data_to_server_s upload_data_temp;
+	_log_s *upload_log_temp;
 		
 	pdata = pdata;
 	OSTimeDly(OS_TICKS_PER_SEC);
@@ -95,17 +96,40 @@ void TaskDataUpload(void *pdata)
 					{
 						//	更新数据管理数据
 						upload_manage_temp.out += sizeof(_trade_data_to_server_s);
-						WriteExternMemery(&upload_manage_temp,upload_index,sizeof(_trade_manage_data_s));
-						if ((upload_manage_temp.out == upload_manage_temp.in) && (upload_index != current_trade_index))
+						if ((upload_index >= (TRADE_DATA_START_ADDR + sizeof(current_trade_index))) 
+							|| ((upload_index + sizeof(_trade_manage_data_s)) < (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE)))
 						{
-							//	读下一天的数据
-							upload_index = upload_manage_temp.in;
-							ReadExternMemery(&upload_manage_temp,upload_index,sizeof(_trade_manage_data_s));
+							WriteExternMemery(&upload_manage_temp,upload_index,sizeof(_trade_manage_data_s));
+							if ((upload_manage_temp.out == upload_manage_temp.in) && (upload_index != current_trade_index))
+							{
+								//	读下一天的数据
+								upload_index = upload_manage_temp.in;
+								ReadExternMemery(&upload_manage_temp,upload_index,sizeof(_trade_manage_data_s));
+							}
+							
+						}
+						else
+						{
 						}
 					}
 				}
 			}
-			//ReadLog(uint8 flag,void * data,uint16 data_lenght);
+			//upload_log_temp = ReadLog(2,NULL,0,0);
+			if (upload_log_temp != NULL)
+			{
+				if (upload_log_temp->state == 1)
+				{
+					//	已发送数据
+				}
+				else
+				{
+					//ReadLog(2,NULL,0,0);
+				}
+			}
+			else
+			{
+				
+			}
 			OSTimeDly(OS_TICKS_PER_SEC*5);
 			//OSTaskSuspend(OS_PRIO_SELF);
 		}

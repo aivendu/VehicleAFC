@@ -27,35 +27,6 @@ void InitTradeManageData(void)
 	}
 }
 
-uint8 TradeAmountDataSave(_trade_manage_data_s *data)
-{
-	trade_manage_data_temp.realpay_amount += trade_data_temp.realpay;
-	trade_manage_data_temp.needpay_amount += trade_data_temp.needpay;
-	trade_manage_data_temp.coin_dis_amount += trade_data_temp.change_cashbox_1;
-	trade_manage_data_temp.note_1_dis_amount += trade_data_temp.change_cashbox_2;
-	trade_manage_data_temp.note_2_dis_amount += trade_data_temp.change_cashbox_3;
-	trade_manage_data_temp.trade_num++;
-	trade_manage_data_temp.people_amount += trade_data_temp.people_amount;
-	trade_manage_data_temp.in += sizeof(_trade_data_to_server_s);
-	WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
-	return 1;
-}
-
-uint8 TradeAmountDataRead(_trade_manage_data_s *data)
-{
-	return 1;
-}
-
-uint8 TradeDataSave(_trade_manage_data_s *data)
-{
-	return 1;
-	
-}
-
-uint8 TradeDataRead(_trade_manage_data_s *data)
-{
-	return 1;
-}
 
 #define DATA_LENGHT_TEST		11
 char const testdata[6] = "71236";
@@ -387,7 +358,25 @@ void TaskTrade(void *pdata)
 					trade_data_temp.people_amount += device_control.trade.rm[i].number_of_people;
 				}
 				memcpy(trade_data_temp.destination,device_control.trade.rm,MAX_DESTINATION_NUM*4);
-				WriteExternMemery(&trade_data_temp,trade_manage_data_temp.in,sizeof(_trade_data_to_server_s));
+				if ((trade_manage_data_temp.in + sizeof(_trade_data_to_server_s)) > (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
+				{
+					//	存第一部分，存在最后
+					WriteExternMemery(&trade_data_temp,trade_manage_data_temp.in,
+						TRADE_DATA_START_ADDR + TRADE_DATA_SIZE - trade_manage_data_temp.in);
+					
+					trade_manage_data_temp.in = sizeof(_trade_data_to_server_s)
+												- (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE - trade_manage_data_temp.in);
+					//	第二部分存在最开始
+					WriteExternMemery((uint8 *)((uint32)&trade_data_temp + trade_manage_data_temp.in),
+											TRADE_DATA_START_ADDR + sizeof(current_trade_index),trade_manage_data_temp.in);
+					//	修改索引地址
+					trade_manage_data_temp.in += TRADE_DATA_START_ADDR + sizeof(current_trade_index);
+				}
+				else
+				{
+					WriteExternMemery(&trade_data_temp,trade_manage_data_temp.in,sizeof(_trade_data_to_server_s));
+					trade_manage_data_temp.in += sizeof(_trade_data_to_server_s);
+				}
 
 				//	总额统计
 				trade_manage_data_temp.realpay_amount += trade_data_temp.realpay;
@@ -397,12 +386,6 @@ void TaskTrade(void *pdata)
 				trade_manage_data_temp.note_2_dis_amount += trade_data_temp.change_cashbox_3;
 				trade_manage_data_temp.trade_num++;
 				trade_manage_data_temp.people_amount += trade_data_temp.people_amount;
-				trade_manage_data_temp.in += sizeof(_trade_data_to_server_s);
-				if ((trade_manage_data_temp.in + sizeof(_trade_data_to_server_s)) 
-						>= (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
-				{
-					trade_manage_data_temp.in = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
-				}
 				WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
 				
 				//	更新余额
@@ -417,7 +400,6 @@ void TaskTrade(void *pdata)
 				}
 				trade_state = TRADE_END;
 
-				//	
 				break;
 
 			case TRADE_END:

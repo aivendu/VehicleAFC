@@ -419,19 +419,24 @@ void TaskChipComm(void *pdata) {
 			//	有卡插入
 			if (sys_state.ss.st_major.ssm.st_user != USER_HAVE_CARD_NO_LOGIN)
 			{
-				if (strncmp(device_control.user.rinfo.vehicle_plate,GetLisencePlateNum(),8) == 0) {
-					
-					LogStoreLogin();
-					sys_state.ss.st_major.ssm.st_user = USER_VALIDATED;
-				}
-				else if (device_control.user.uinfo.user_role == 1)
+				if ((device_control.user.uinfo.user_role == 1)
+					&& (sys_state.ss.st_major.ssm.st_user != USER_SUPERUSER))
 				{
-					
+					//	超级用户登录
 					LogStoreLogin();
 					sys_state.ss.st_major.ssm.st_user = USER_SUPERUSER;
 				}
-				else
+				else if ((strncmp(device_control.user.rinfo.vehicle_plate,GetLisencePlateNum(),8) == 0)
+					&& (sys_state.ss.st_major.ssm.st_user != USER_VALIDATED))
 				{
+					//	司机登录
+					LogStoreLogin();
+					sys_state.ss.st_major.ssm.st_user = USER_VALIDATED;
+				}
+				else if((strncmp(device_control.user.rinfo.vehicle_plate,GetLisencePlateNum(),8) != 0)
+					&& (device_control.user.uinfo.user_role != 1))
+				{
+					//	不允许登录
 					sys_state.ss.st_major.ssm.st_user = USER_LOGIN_NAME_ERR;
 				}
 			}

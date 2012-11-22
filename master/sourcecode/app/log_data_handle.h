@@ -61,7 +61,7 @@ extern _log_s	log_data;
 
 extern void InitLog(void);
 extern uint8 StoreLog(uint16 type, void *data, uint16 data_len);
-extern void * ReadLog(uint8 flag, void *data, uint16 data_lenght);
+extern _log_s * ReadLog(uint8 flag, void *data, uint16 data_lenght,uint32 read_index);
 extern uint8 LogStoreLogin(void);
 extern uint8 LogStoreLogout(void);
 extern uint8 LogStoreDeposit(void);
