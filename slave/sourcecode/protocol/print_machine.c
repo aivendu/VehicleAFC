@@ -633,8 +633,9 @@ void PrintReceipt(void)
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);		
 	//	打印流水号
-	sprintf(print_buffer,"流水号: 223%010d%05d",TimeSec(device_control.trade.tm.year+2000,device_control.trade.tm.month,device_control.trade.tm.day,
-					device_control.trade.tm.hour,device_control.trade.tm.min,device_control.trade.tm.sec),device_control.trade.tm.serail_num);		//	流水号格式"df"+"时间的秒数+"序列号"
+	sprintf(print_buffer,"流水号: %04d%05d%05d",0,(device_control.trade.tm.hour*60+device_control.trade.tm.min)*60+device_control.trade.tm.sec,
+												device_control.trade.tm.serail_num);		//	流水号格式"设备地址"+"当天时间的秒数+"序列号"
+	memcpy(&print_buffer[8],config_ram.device_addr,4);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);		
