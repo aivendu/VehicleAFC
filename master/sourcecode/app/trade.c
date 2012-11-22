@@ -127,14 +127,23 @@ void TaskTrade(void *pdata)
 					if (GetTimeUploadState() != 0)
 					{
 						//	时间已更新
-						if ((YEAR > trade_manage_data_temp.year)
-							|| ((YEAR == trade_manage_data_temp.year)
-								&& ((MONTH > trade_manage_data_temp.month)
-									|| ((MONTH == trade_manage_data_temp.month) && (DOM > trade_manage_data_temp.day))
-									)
-								)
+						if (	(YEAR != trade_manage_data_temp.year)
+							||	(MONTH != trade_manage_data_temp.month)
+							||	(DOM != trade_manage_data_temp.day)
 							)
 						{
+							if ((GetTimeUploadState() == 1) 
+								&& (	(YEAR < trade_manage_data_temp.year) 
+									||	((YEAR == trade_manage_data_temp.year) 
+										&& ((MONTH < trade_manage_data_temp.month)
+											||	((MONTH == trade_manage_data_temp.month) && (DOM < trade_manage_data_temp.day))
+											)
+										)
+									)
+								)
+							{
+								//	当前日期不对
+							}
 							//	新的一天的交易数据
 							if (GetIntelligentChange() == 0)
 							{
@@ -152,10 +161,11 @@ void TaskTrade(void *pdata)
 							trade_manage_data_temp.note_1_dis_amount = 0;
 							trade_manage_data_temp.note_2_dis_amount = 0;
 							trade_manage_data_temp.trade_num = 0;
+							trade_manage_data_temp.people_amount = 0;
 							memcpy(trade_manage_data_temp.driver_id,device_control.user.uinfo.staffid,7);
 							if (current_trade_index == TRADE_DATA_START_ADDR)		//	是否有交易数据存储
 							{
-								//	交易数据接着current_trade_index 存储
+								//	第一天交易，交易数据接着current_trade_index 存储
 								current_trade_index = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
 								//	交易日志存储接着trade_manage_data_temp 存储
 								trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
@@ -188,6 +198,7 @@ void TaskTrade(void *pdata)
 							WriteExternMemery(&trade_manage_data_temp,current_trade_index,sizeof(_trade_manage_data_s));
 							WriteExternMemery(&current_trade_index, TRADE_DATA_START_ADDR,sizeof(current_trade_index));
 						}
+						
 					}
 					OSTimeDly(2);
 				}
@@ -310,19 +321,11 @@ void TaskTrade(void *pdata)
 						{
 							OSTimeDly(2);
 						}
-						if (device_control.trade.tm.changenum > 0)
+						//	找零
+						device_control.cmd.changemoney.exe_st = EXE_WRITED;
+						while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,CONTROL_CMD_CHANGE_ADDR) != TRUE) 
 						{
-							//	找零
-							device_control.cmd.changemoney.exe_st = EXE_WRITED;
-							while (ChipDataUpload(CHIP_WRITE,0x00,CONTROL_CMD_CHANGE_INDEX_ADDR,CONTROL_CMD_CHANGE_LENGHT,CONTROL_CMD_CHANGE_ADDR) != TRUE) 
-							{
-								OSTimeDly(2);
-							}
-							OSTimeDly(200);
-						}
-						else
-						{
-							device_control.cmd.changemoney.exe_st = EXE_RUN_END;
+							OSTimeDly(2);
 						}
 						sys_state.ss.st_cmd.se.makechange.exe_st = EXE_RUNNING;
 						trade_state = PRINT;
@@ -356,12 +359,14 @@ void TaskTrade(void *pdata)
 				break;
 
 			case STORE:
+				//	在PAD 上播报找零结果
 				memset(promptmess,0,sizeof(promptmess));
-				sprintf(promptmess,"实找%d元: 1元 %d个; 5元 %d张; 10元 %d张",
+				sprintf(promptmess,"实找%d元: 1元 %d个; %d元 %d张; %d元 %d张",
 					(device_control.trade.cr.coin_dis+device_control.trade.cr.cass1_dis*5+device_control.trade.cr.cass2_dis*10),
-					device_control.trade.cr.coin_dis,device_control.trade.cr.cass1_dis,device_control.trade.cr.cass2_dis);
+					device_control.trade.cr.coin_dis,GetCashbox2Value(),device_control.trade.cr.cass1_dis,GetCashbox3Value(),device_control.trade.cr.cass2_dis);
 				i = 0x33;
 				DisplayMessage(&i);
+				//	存储交易信息
 				trade_data_temp.year = device_control.trade.tm.year+2000;
 				trade_data_temp.month = device_control.trade.tm.month;
 				trade_data_temp.day = device_control.trade.tm.day;

@@ -33,7 +33,7 @@ uint16 ReadExternMemery(void *data, uint32 addr, uint32 len)
 			break;
 		}
 	}
-	if (i == EXTERN_CHIP_WITH_IO_NUM)
+	if (i >= EXTERN_CHIP_WITH_IO_NUM)
 	{
 		return EXTERN_MEMERY_ADDR_OVERFLOW;
 	}
@@ -75,7 +75,7 @@ uint16 WriteExternMemery(void *data, uint32 addr, uint32 len)
 			break;
 		}
 	}
-	if (i == EXTERN_CHIP_WITH_IO_NUM)
+	if (i >= EXTERN_CHIP_WITH_IO_NUM)
 	{
 		return EXTERN_MEMERY_ADDR_OVERFLOW;
 	}

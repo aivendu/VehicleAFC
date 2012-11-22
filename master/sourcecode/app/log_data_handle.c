@@ -134,12 +134,12 @@ void * ReadLog(uint8 flag,void *data,uint16 data_lenght)
 	uint32 len_temp;
 	static uint32 log_read_index = 0;
 	_log_s log_temp;
+	OSSemPend(store_log_sem,0,&err);
 	if ((log_read_index == 0) || (log_read_index >= (LOG_START_ADDR + LOG_MEMERY_LENGHT)))
 	{
 		//	上电后LOG 还没开始读过
 		log_read_index = log_index.log_end;
 	}
-	OSSemPend(store_log_sem,0,&err);
 	if (flag == 0)			//	读上一个数据的块头
 	{
 		ReadExternMemery(&log_temp, log_read_index, sizeof(_log_s));	//	读当前log 块
@@ -189,7 +189,6 @@ void * ReadLog(uint8 flag,void *data,uint16 data_lenght)
 		return NULL;
 	}
 }
-
 
 
 //	保存登录log
