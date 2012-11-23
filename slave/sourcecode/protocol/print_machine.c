@@ -33,7 +33,8 @@ struct memDot{
 	uint8  datay;
 }dot[32];
 
-
+  char pchar[]={"====================="};
+  char dchar[]={"---------------------"};
 uint8  dotPtr;
 uint8  PTRData[DISSIZE];//自己创建的队列
 
@@ -551,7 +552,7 @@ void PrintAmount(void)
 	set_position(LEFT);
 	SetLeftMargin(10);
 	Ent(1);
-	sprintf(print_buffer,"===============================");
+	memcpy(print_buffer,pchar,strlen(pchar));
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);
@@ -560,8 +561,9 @@ void PrintAmount(void)
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(2);
 	OSTimeDly(PRINT_TIME_TICK);
-	
-	sprintf(print_buffer,"-------------------------------");
+
+	memset(print_buffer,0,sizeof(print_buffer));
+	memcpy(print_buffer,dchar,strlen(dchar));
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);
@@ -578,7 +580,13 @@ void PrintAmount(void)
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);
 	
-	sprintf(print_buffer,"-------------------------------");
+	sprintf(print_buffer,"车牌号: %s",config_ram.lisence_plate_num);		//	打印车牌号
+	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
+	Ent(1);
+	OSTimeDly(PRINT_TIME_TICK);	
+
+	memset(print_buffer,0,sizeof(print_buffer));
+	memcpy(print_buffer,dchar,strlen(dchar));
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);
@@ -622,7 +630,8 @@ void PrintReceipt(void)
 	set_position(LEFT);
 	SetLeftMargin(10);
 	Ent(1);
-	sprintf(print_buffer,"===============================");
+	memset(print_buffer,0,sizeof(print_buffer));
+	memcpy(print_buffer,pchar,strlen(pchar));
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);
@@ -633,14 +642,17 @@ void PrintReceipt(void)
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);		
 	//	打印流水号
-	sprintf(print_buffer,"流水号: %04d%05d%05d",0,(device_control.trade.tm.hour*60+device_control.trade.tm.min)*60+device_control.trade.tm.sec,
+	sprintf(print_buffer,"流水号: %04d%05d%05d",0,
+			TimeSec(device_control.trade.tm.year,device_control.trade.tm.month,device_control.trade.tm.day,
+			device_control.trade.tm.hour,device_control.trade.tm.min,device_control.trade.tm.sec)/60/60/24,
 												device_control.trade.tm.serail_num);		//	流水号格式"设备地址"+"当天时间的秒数+"序列号"
 	memcpy(&print_buffer[8],config_ram.device_addr,4);
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));		
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);		
 
-	sprintf(print_buffer,"车牌号: %s",sys_config_ram.sc.license_plate);		//	打印车牌号
+	sprintf(print_buffer,"车牌号: %s",config_ram.lisence_plate_num);		//	打印车牌号
+	print_buffer[16] = 0;
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);			
@@ -660,8 +672,9 @@ void PrintReceipt(void)
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);	
 	
-	sprintf(print_buffer,"-------------------------------");
-	 PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer)); 
+	memset(print_buffer,0,sizeof(print_buffer));
+	memcpy(print_buffer,dchar,strlen(dchar));
+	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer)); 
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);
 
@@ -670,7 +683,8 @@ void PrintReceipt(void)
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);
 	
-	sprintf(print_buffer,"-------------------------------");
+	memset(print_buffer,0,sizeof(print_buffer));
+	memcpy(print_buffer,dchar,strlen(dchar));
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer)); 
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);

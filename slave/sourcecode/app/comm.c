@@ -132,7 +132,7 @@ uint32 TimeSec(uint16 yearnow,uint8 monthnow, uint8 daynow, uint8 hournow, uint8
 	
 	
 	iflag = 0;
-	datas = 2000;
+	datas = 2010;
 	for (; datas < yearnow; ++datas) {
 		if ((((datas % 4) == 0) && ((datas % 100) != 0)) || ((datas % 400) == 0))
 			iflag++;
