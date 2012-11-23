@@ -378,7 +378,8 @@ void TaskGPS(void *pdata) {
 							GetDateTimeFromSecond(gps_data.gps_time,(uint8 *)((uint32)&gps_time+1));
 							gps_time.year = ((uint8 *)&gps_time)[1] + 2000;
 							//	定位成功，如果时间不对，更新芯片时间
-							if ((gps_time.min > (MIN+1)) || (gps_time.min < (MIN-1)))
+							if ((gps_time.min > (MIN+1)) || (gps_time.min < (MIN-1)) || (gps_time.hour != HOUR)
+								 || (gps_time.day != DOM) || (gps_time.month != MONTH) || (gps_time.year != YEAR))
 							{
 								SEC = gps_time.sec + 1;
 								MIN = gps_time.min;

@@ -552,6 +552,8 @@ void PrintAmount(void)
 	set_position(LEFT);
 	SetLeftMargin(10);
 	Ent(1);
+	
+	memset(print_buffer,0,sizeof(print_buffer));
 	memcpy(print_buffer,pchar,strlen(pchar));
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
@@ -581,6 +583,7 @@ void PrintAmount(void)
 	OSTimeDly(PRINT_TIME_TICK);
 	
 	sprintf(print_buffer,"≥µ≈∆∫≈: %s",config_ram.lisence_plate_num);		//	¥Ú”°≥µ≈∆∫≈
+	print_buffer[16] = 0;
 	PrintSendBytes((uint8 *)print_buffer,strlen(print_buffer));	
 	Ent(1);
 	OSTimeDly(PRINT_TIME_TICK);	
