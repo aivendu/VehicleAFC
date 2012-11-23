@@ -4,4 +4,4 @@
 *.i32
 *.txt
 */SI3.5/*
-slave/*
+master/*

@@ -461,6 +461,7 @@ uint8 Crt188SetType24CXX(uint8 type) {
 	else {
 		
 	}
+	return err;
 	
 }
 
@@ -634,7 +635,7 @@ uint8 Crt188CPUCardColdReset(void){
 	else {
 
 	}
-
+	return err;
 }
 
 uint8 Crt188CPUCardHotReset(void) {
@@ -674,7 +675,7 @@ uint8 Crt188CPUCardHotReset(void) {
 	else {
 
 	}
-
+	return err;
 }
 
 uint8 Crt188CPUT0CardOp(void *buf,uint8 len){

@@ -28,6 +28,13 @@
 //	软件版本号
 #define	VERSION	"AQ01-L0.0.1"
 
+
+
+
+//	配置项
+#define ERR_EN			0
+
+
 //这一段无需改动
 //This segment should not be modified
 #ifndef TRUE

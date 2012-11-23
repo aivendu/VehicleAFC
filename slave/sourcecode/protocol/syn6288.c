@@ -9,6 +9,7 @@
 
 void Syn6288Init(void) {
 	uint8 err  = 0;
+	err = err;
 }
 
 void Syn6288SendFrame(_syn6288_command_s *cmd) {
