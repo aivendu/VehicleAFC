@@ -356,19 +356,30 @@ void TaskChipComm(void *pdata) {
 		if (ChipDataUpload(CHIP_READ,0x00,CONTROL_TIME_INDEX_ADDR,CONTROL_TIME_LENGHT+CONTROL_USER_LENGHT+CONTROL_GPS_LENGHT,CONTROL_TIME_ADDR) == TRUE)
 		{
 			//	更新系统时间
-			YEAR = device_control.time.year;
-			MONTH = device_control.time.month;
-			DOM = device_control.time.day;
-			HOUR = device_control.time.hour;
-			MIN = device_control.time.min;
-			SEC = device_control.time.sec;
-			if (sys_state.ss.st_other.sso.st_gps_machine == GPS_MODE_NORMAL)	//	gps 是否定位成功
+			if (device_control.time.year >= 2012)
 			{
-				SetTimeUploadState(1);		//	时间通过GPS 更新
-			}
-			else
-			{
-				SetTimeUploadState(3);		//	时间通过从芯片更新
+				YEAR = device_control.time.year;
+				MONTH = device_control.time.month;
+				DOM = device_control.time.day;
+				HOUR = device_control.time.hour;
+				MIN = device_control.time.min;
+				SEC = device_control.time.sec;
+				if (sys_state.ss.st_other.sso.st_gps_machine == GPS_MODE_NORMAL)	//	gps 是否定位成功
+				{
+					if (GetTimeUploadState() != 1)
+					{
+						SetTimeUploadState(1);		//	时间通过GPS 更新
+						SetUploadTime(EXE_WRITED);
+					}
+				}
+				else
+				{
+					if (GetTimeUploadState() != 3)
+					{
+						SetTimeUploadState(3);		//	时间通过从芯片更新
+						SetUploadTime(EXE_WRITED);
+					}
+				}
 			}
 			for (i = 0; i < curr_line.line_station_amount; i++)
 			{

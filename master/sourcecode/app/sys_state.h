@@ -61,6 +61,7 @@ typedef struct {
 	_exe_s saveconfig;
 	_exe_s uploadmemery;
 	_exe_s change_ride_mess;
+	_exe_s upload_time;
 } _sys_st_exe_s;
 
 typedef union {
@@ -119,6 +120,10 @@ extern _sys_st_u sys_state;
 
 #define SetSaveConfig(c)					(sys_state.ss.st_cmd.se.saveconfig.exe_st = c)
 #define GetSaveConfig()					(sys_state.ss.st_cmd.se.saveconfig.exe_st)
+
+#define SetUploadTime(c)					(sys_state.ss.st_cmd.se.upload_time.exe_st = c)
+#define GetUploadTime()					(sys_state.ss.st_cmd.se.upload_time.exe_st)
+
 
 #define GetCommandState()				
 

@@ -1268,6 +1268,17 @@ void TaskDeviceCommand(void *pdata) {
 			sys_state.ss.st_major.ssm.st_pad_online = PAD_COMMUNICATION_DEVICE_OUTAGE;
 			run_state = OUT_LINE;
 		}
+		if (GetUploadTime() == EXE_WRITED)
+		{
+			err = TimeSync(NULL);	//	同步时间
+			if (err == SYS_NO_ERR)
+			{
+				SetUploadTime(EXE_RUN_END);
+			}
+			else
+			{
+			}
+		}
 		switch (run_state)
 		{
 			case OUT_LINE:
@@ -1297,17 +1308,9 @@ void TaskDeviceCommand(void *pdata) {
 					OSTimeDly(OS_TICKS_PER_SEC);	//	通信失败，等1S 再发
 					break;
 				}
-				while (GetTimeUploadState() == 0) OSTimeDly(20);
-				err = TimeSync(NULL);	//	同步时间
-				if (err == SYS_NO_ERR)
+				if (GetUploadTime() == EXE_RUN_END)
 				{
 					run_state = NO_LOGIN;
-					arg[0] = 0x31;
-				}
-				else
-				{
-					sys_state.ss.st_major.ssm.st_pad_online = PAD_COMMUNICATION_ON_LINE;
-					OSTimeDly(OS_TICKS_PER_SEC);	//	通信失败，等1S 再发
 				}
 				break;
 
@@ -1325,7 +1328,6 @@ void TaskDeviceCommand(void *pdata) {
 							err = GetStationMess(&arg);			//	等待PAD读取数据
 							if (err == SYS_NO_ERR)
 							{
-								sys_state.ss.st_major.ssm.st_user = USER_VALIDATED;
 								run_state = LOGIN;		//	登录
 								break;
 							}
@@ -1447,7 +1449,18 @@ void TaskDeviceCommand(void *pdata) {
 				sys_state.ss.st_cmd.se.shutdown.exe_st = EXE_WAIT;
 				sys_state.ss.st_cmd.se.speak.exe_st = EXE_WAIT;
 				sys_state.ss.st_cmd.se.upload_line_data.exe_st = EXE_WAIT;
-				arg[0] = sys_state.ss.st_major.ssm.st_user;
+				
+				if ((sys_state.ss.st_major.ssm.st_user == USER_VALIDATED)
+					|| (sys_state.ss.st_major.ssm.st_user == USER_VALIDATED)
+					)
+				{
+					arg[0] = sys_state.ss.st_major.ssm.st_user;
+				}
+				else
+				{
+					run_state = NO_LOGIN;
+					break;
+				}
 				err = Login(arg);
 				if (err == SYS_NO_ERR) {
 					if (sys_state.ss.st_major.ssm.st_user == USER_SUPERUSER)

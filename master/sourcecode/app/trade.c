@@ -95,10 +95,12 @@ void TaskTrade(void *pdata)
 				}*/
 				else
 				{
-					if (GetTimeUploadState() != 0)
+					if ((GetTimeUploadState() != 0) && (YEAR >= 2012) 
+						&& (trade_manage_data_temp.year >= 2012)
+						)
 					{
 						//	时间已更新
-						if (	(YEAR != trade_manage_data_temp.year)
+						if ((YEAR != trade_manage_data_temp.year)
 							||	(MONTH != trade_manage_data_temp.month)
 							||	(DOM != trade_manage_data_temp.day)
 							)
