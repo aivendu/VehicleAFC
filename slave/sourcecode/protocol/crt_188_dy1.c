@@ -887,10 +887,8 @@ UART_COMMUNICATION_ERR_HANDLE:
 		err = Crt188ReadState();			//	读卡状态
 		if (err == CRT188_NO_CARD) {
 			//	卡机内无卡
-			if ((++state_time) > (GetLoginRemainTime() / 5 / (OS_TICKS_PER_SEC / 10))) {	//	卡机退卡滤波
-				card_machine_state = CRT188_NO_CARD;				//	确实已退卡
-				device_control.sys_device.ic_machine_state = IC_MACHINE_NO_CARD;
-			}
+			card_machine_state = CRT188_NO_CARD;				//	确实已退卡
+			device_control.sys_device.ic_machine_state = IC_MACHINE_NO_CARD;
 			FreeHardResource();
 			continue;
 		}
