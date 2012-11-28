@@ -1256,6 +1256,7 @@ void TaskDeviceCommand(void *pdata) {
 	uint8 arg[2];
 	uint8 station;
 	uint16 time_delay_num=0;
+	uint16 logout_delay;
 	pdata = pdata;
 
 	OSTimeDly(OS_TICKS_PER_SEC*3);
@@ -1371,6 +1372,7 @@ void TaskDeviceCommand(void *pdata) {
 					else if (err == PAD_COMMUNICATION_DIFFERENT_GUID)	//	已经有不同的GUID 登录
 					{
 						run_state = LOGOUT;		//	重新登录
+						logout_delay = 0;
 					}
 					else if (err == COMMUNICATION_TIMEOUT)
 					{
@@ -1510,6 +1512,7 @@ void TaskDeviceCommand(void *pdata) {
 					else if ((sys_state.ss.st_major.ssm.st_user != USER_SUPERUSER) && (sys_state.ss.st_major.ssm.st_user != USER_VALIDATED))
 					{
 						run_state = LOGOUT;
+						logout_delay = 0;
 						arg[0] = sys_state.ss.st_major.ssm.st_user;
 					}
 					else if (sys_state.ss.st_pad.ssp.login_st == 0x00)
@@ -1538,6 +1541,17 @@ void TaskDeviceCommand(void *pdata) {
 				break;
 				
 			case LOGOUT:
+				if (logout_delay < GetLoginRemainTime()/100)
+				{
+					//	滤波，不退出
+					if ((sys_state.ss.st_major.ssm.st_user == USER_VALIDATED)
+						|| (sys_state.ss.st_major.ssm.st_user == USER_SUPERUSER)
+						)
+					{
+						run_state = RUNNING;
+					}
+					break;
+				}
 				arg[0] = USER_NO_CARD;
 				err = Login(arg);
 				if (err == SYS_NO_ERR)
