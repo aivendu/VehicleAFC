@@ -83,13 +83,13 @@
 *                                         EVENT FLAGS
 *********************************************************************************************************
 */
-#define  OS_FLAG_WAIT_CLR_ALL      0        /* Wait for ALL    the bits specified to be CLR (i.e. 0)   */ 
+#define  OS_FLAG_WAIT_CLR_ALL      0        /* Wait for ALL    the bits specified to be CLR (i.e. 0)   */
 #define  OS_FLAG_WAIT_CLR_AND      0
 
 #define  OS_FLAG_WAIT_CLR_ANY      1        /* Wait for ANY of the bits specified to be CLR (i.e. 0)   */
 #define  OS_FLAG_WAIT_CLR_OR       1
 
-#define  OS_FLAG_WAIT_SET_ALL      2        /* Wait for ALL    the bits specified to be SET (i.e. 1)   */ 
+#define  OS_FLAG_WAIT_SET_ALL      2        /* Wait for ALL    the bits specified to be SET (i.e. 1)   */
 #define  OS_FLAG_WAIT_SET_AND      2
 
 #define  OS_FLAG_WAIT_SET_ANY      3        /* Wait for ANY of the bits specified to be SET (i.e. 1)   */
@@ -118,12 +118,12 @@
 *********************************************************************************************************
 */
 #define  OS_POST_OPT_NONE       0x00        /* Post to highest priority task waiting                   */
-#define  OS_POST_OPT_BROADCAST  0x01        /* Broadcast message to ALL tasks waiting                  */  
+#define  OS_POST_OPT_BROADCAST  0x01        /* Broadcast message to ALL tasks waiting                  */
 #define  OS_POST_OPT_FRONT      0x02        /* Post to highest priority task waiting                   */
 
 /*
 *********************************************************************************************************
-*                                 TASK OPTIONS (see OSTaskCreateExt()) 
+*                                 TASK OPTIONS (see OSTaskCreateExt())
 *********************************************************************************************************
 */
 #define  OS_TASK_OPT_STK_CHK  0x0001        /* Enable stack checking for the task                      */
@@ -209,12 +209,13 @@
 */
 
 #if (OS_EVENT_EN > 0) && (OS_MAX_EVENTS > 0)
-typedef struct {
-    INT8U   OSEventType;                   /* Type of event control block (see OS_EVENT_TYPE_???)      */
-    INT8U   OSEventGrp;                    /* Group corresponding to tasks waiting for event to occur  */
-    INT16U  OSEventCnt;                    /* Semaphore Count (not used if other EVENT type)           */
-    void   *OSEventPtr;                    /* Pointer to message or queue structure                    */
-    INT8U   OSEventTbl[OS_EVENT_TBL_SIZE]; /* List of tasks waiting for event to occur                 */
+typedef struct
+{
+	INT8U   OSEventType;                   /* Type of event control block (see OS_EVENT_TYPE_???)      */
+	INT8U   OSEventGrp;                    /* Group corresponding to tasks waiting for event to occur  */
+	INT16U  OSEventCnt;                    /* Semaphore Count (not used if other EVENT type)           */
+	void   *OSEventPtr;                    /* Pointer to message or queue structure                    */
+	INT8U   OSEventTbl[OS_EVENT_TBL_SIZE]; /* List of tasks waiting for event to occur                 */
 } OS_EVENT;
 #endif
 
@@ -226,25 +227,27 @@ typedef struct {
 */
 
 #if (OS_VERSION >= 251) && (OS_FLAG_EN > 0) && (OS_MAX_FLAGS > 0)
-typedef struct {                            /* Event Flag Group                                        */
-    INT8U         OSFlagType;               /* Should be set to OS_EVENT_TYPE_FLAG                     */
-    void         *OSFlagWaitList;           /* Pointer to first NODE of task waiting on event flag     */
-    OS_FLAGS      OSFlagFlags;              /* 8, 16 or 32 bit flags                                   */
-} OS_FLAG_GRP;    
+typedef struct                              /* Event Flag Group                                        */
+{
+	INT8U         OSFlagType;               /* Should be set to OS_EVENT_TYPE_FLAG                     */
+	void         *OSFlagWaitList;           /* Pointer to first NODE of task waiting on event flag     */
+	OS_FLAGS      OSFlagFlags;              /* 8, 16 or 32 bit flags                                   */
+} OS_FLAG_GRP;
 
-    
-    
-typedef struct {                            /* Event Flag Wait List Node                               */
-    void         *OSFlagNodeNext;           /* Pointer to next     NODE in wait list                   */
-    void         *OSFlagNodePrev;           /* Pointer to previous NODE in wait list                   */
-    void         *OSFlagNodeTCB;            /* Pointer to TCB of waiting task                          */  
-    void         *OSFlagNodeFlagGrp;        /* Pointer to Event Flag Group                             */  
-    OS_FLAGS      OSFlagNodeFlags;          /* Event flag to wait on                                   */  
-    INT8U         OSFlagNodeWaitType;       /* Type of wait:                                           */
-                                            /*      OS_FLAG_WAIT_AND                                   */
-                                            /*      OS_FLAG_WAIT_ALL                                   */
-                                            /*      OS_FLAG_WAIT_OR                                    */
-                                            /*      OS_FLAG_WAIT_ANY                                   */
+
+
+typedef struct                              /* Event Flag Wait List Node                               */
+{
+	void         *OSFlagNodeNext;           /* Pointer to next     NODE in wait list                   */
+	void         *OSFlagNodePrev;           /* Pointer to previous NODE in wait list                   */
+	void         *OSFlagNodeTCB;            /* Pointer to TCB of waiting task                          */
+	void         *OSFlagNodeFlagGrp;        /* Pointer to Event Flag Group                             */
+	OS_FLAGS      OSFlagNodeFlags;          /* Event flag to wait on                                   */
+	INT8U         OSFlagNodeWaitType;       /* Type of wait:                                           */
+	/*      OS_FLAG_WAIT_AND                                   */
+	/*      OS_FLAG_WAIT_ALL                                   */
+	/*      OS_FLAG_WAIT_OR                                    */
+	/*      OS_FLAG_WAIT_ANY                                   */
 } OS_FLAG_NODE;
 #endif
 
@@ -256,10 +259,11 @@ typedef struct {                            /* Event Flag Wait List Node        
 */
 
 #if OS_MBOX_EN > 0
-typedef struct {
-    void   *OSMsg;                         /* Pointer to message in mailbox                            */
-    INT8U   OSEventTbl[OS_EVENT_TBL_SIZE]; /* List of tasks waiting for event to occur                 */
-    INT8U   OSEventGrp;                    /* Group corresponding to tasks waiting for event to occur  */
+typedef struct
+{
+	void   *OSMsg;                         /* Pointer to message in mailbox                            */
+	INT8U   OSEventTbl[OS_EVENT_TBL_SIZE]; /* List of tasks waiting for event to occur                 */
+	INT8U   OSEventGrp;                    /* Group corresponding to tasks waiting for event to occur  */
 } OS_MBOX_DATA;
 #endif
 
@@ -270,22 +274,24 @@ typedef struct {
 */
 
 #if (OS_MEM_EN > 0) && (OS_MAX_MEM_PART > 0)
-typedef struct {                       /* MEMORY CONTROL BLOCK                                         */
-    void   *OSMemAddr;                 /* Pointer to beginning of memory partition                     */
-    void   *OSMemFreeList;             /* Pointer to list of free memory blocks                        */
-    INT32U  OSMemBlkSize;              /* Size (in bytes) of each block of memory                      */
-    INT32U  OSMemNBlks;                /* Total number of blocks in this partition                     */
-    INT32U  OSMemNFree;                /* Number of memory blocks remaining in this partition          */
+typedef struct                         /* MEMORY CONTROL BLOCK                                         */
+{
+	void   *OSMemAddr;                 /* Pointer to beginning of memory partition                     */
+	void   *OSMemFreeList;             /* Pointer to list of free memory blocks                        */
+	INT32U  OSMemBlkSize;              /* Size (in bytes) of each block of memory                      */
+	INT32U  OSMemNBlks;                /* Total number of blocks in this partition                     */
+	INT32U  OSMemNFree;                /* Number of memory blocks remaining in this partition          */
 } OS_MEM;
 
 
-typedef struct {
-    void   *OSAddr;                    /* Pointer to the beginning address of the memory partition     */
-    void   *OSFreeList;                /* Pointer to the beginning of the free list of memory blocks   */
-    INT32U  OSBlkSize;                 /* Size (in bytes) of each memory block                         */
-    INT32U  OSNBlks;                   /* Total number of blocks in the partition                      */
-    INT32U  OSNFree;                   /* Number of memory blocks free                                 */
-    INT32U  OSNUsed;                   /* Number of memory blocks used                                 */
+typedef struct
+{
+	void   *OSAddr;                    /* Pointer to the beginning address of the memory partition     */
+	void   *OSFreeList;                /* Pointer to the beginning of the free list of memory blocks   */
+	INT32U  OSBlkSize;                 /* Size (in bytes) of each memory block                         */
+	INT32U  OSNBlks;                   /* Total number of blocks in the partition                      */
+	INT32U  OSNFree;                   /* Number of memory blocks free                                 */
+	INT32U  OSNUsed;                   /* Number of memory blocks used                                 */
 } OS_MEM_DATA;
 #endif
 
@@ -297,12 +303,13 @@ typedef struct {
 */
 
 #if OS_MUTEX_EN > 0
-typedef struct {
-    INT8U   OSEventTbl[OS_EVENT_TBL_SIZE];  /* List of tasks waiting for event to occur                */
-    INT8U   OSEventGrp;                     /* Group corresponding to tasks waiting for event to occur */
-    INT8U   OSValue;                        /* Mutex value (0 = used, 1 = available)                   */
-    INT8U   OSOwnerPrio;                    /* Mutex owner's task priority or 0xFF if no owner         */
-    INT8U   OSMutexPIP;                     /* Priority Inheritance Priority or 0xFF if no owner       */
+typedef struct
+{
+	INT8U   OSEventTbl[OS_EVENT_TBL_SIZE];  /* List of tasks waiting for event to occur                */
+	INT8U   OSEventGrp;                     /* Group corresponding to tasks waiting for event to occur */
+	INT8U   OSValue;                        /* Mutex value (0 = used, 1 = available)                   */
+	INT8U   OSOwnerPrio;                    /* Mutex owner's task priority or 0xFF if no owner         */
+	INT8U   OSMutexPIP;                     /* Priority Inheritance Priority or 0xFF if no owner       */
 } OS_MUTEX_DATA;
 #endif
 
@@ -313,23 +320,25 @@ typedef struct {
 */
 
 #if OS_Q_EN > 0
-typedef struct os_q {                   /* QUEUE CONTROL BLOCK                                         */
-    struct os_q   *OSQPtr;              /* Link to next queue control block in list of free blocks     */
-    void         **OSQStart;            /* Pointer to start of queue data                              */
-    void         **OSQEnd;              /* Pointer to end   of queue data                              */
-    void         **OSQIn;               /* Pointer to where next message will be inserted  in   the Q  */
-    void         **OSQOut;              /* Pointer to where next message will be extracted from the Q  */
-    INT16U         OSQSize;             /* Size of queue (maximum number of entries)                   */
-    INT16U         OSQEntries;          /* Current number of entries in the queue                      */
+typedef struct os_q                     /* QUEUE CONTROL BLOCK                                         */
+{
+	struct os_q   *OSQPtr;              /* Link to next queue control block in list of free blocks     */
+	void         **OSQStart;            /* Pointer to start of queue data                              */
+	void         **OSQEnd;              /* Pointer to end   of queue data                              */
+	void         **OSQIn;               /* Pointer to where next message will be inserted  in   the Q  */
+	void         **OSQOut;              /* Pointer to where next message will be extracted from the Q  */
+	INT16U         OSQSize;             /* Size of queue (maximum number of entries)                   */
+	INT16U         OSQEntries;          /* Current number of entries in the queue                      */
 } OS_Q;
 
 
-typedef struct {
-    void          *OSMsg;               /* Pointer to next message to be extracted from queue          */
-    INT16U         OSNMsgs;             /* Number of messages in message queue                         */
-    INT16U         OSQSize;             /* Size of message queue                                       */
-    INT8U          OSEventTbl[OS_EVENT_TBL_SIZE];  /* List of tasks waiting for event to occur         */
-    INT8U          OSEventGrp;          /* Group corresponding to tasks waiting for event to occur     */
+typedef struct
+{
+	void          *OSMsg;               /* Pointer to next message to be extracted from queue          */
+	INT16U         OSNMsgs;             /* Number of messages in message queue                         */
+	INT16U         OSQSize;             /* Size of message queue                                       */
+	INT8U          OSEventTbl[OS_EVENT_TBL_SIZE];  /* List of tasks waiting for event to occur         */
+	INT8U          OSEventGrp;          /* Group corresponding to tasks waiting for event to occur     */
 } OS_Q_DATA;
 #endif
 
@@ -340,10 +349,11 @@ typedef struct {
 */
 
 #if OS_SEM_EN > 0
-typedef struct {
-    INT16U  OSCnt;                          /* Semaphore count                                         */
-    INT8U   OSEventTbl[OS_EVENT_TBL_SIZE];  /* List of tasks waiting for event to occur                */
-    INT8U   OSEventGrp;                     /* Group corresponding to tasks waiting for event to occur */
+typedef struct
+{
+	INT16U  OSCnt;                          /* Semaphore count                                         */
+	INT8U   OSEventTbl[OS_EVENT_TBL_SIZE];  /* List of tasks waiting for event to occur                */
+	INT8U   OSEventGrp;                     /* Group corresponding to tasks waiting for event to occur */
 } OS_SEM_DATA;
 #endif
 
@@ -354,9 +364,10 @@ typedef struct {
 */
 
 #if OS_TASK_CREATE_EXT_EN > 0
-typedef struct {
-    INT32U  OSFree;                    /* Number of free bytes on the stack                            */
-    INT32U  OSUsed;                    /* Number of bytes used on the stack                            */
+typedef struct
+{
+	INT32U  OSFree;                    /* Number of free bytes on the stack                            */
+	INT32U  OSUsed;                    /* Number of bytes used on the stack                            */
 } OS_STK_DATA;
 #endif
 
@@ -367,50 +378,52 @@ typedef struct {
 *********************************************************************************************************
 */
 
-typedef struct os_tcb {
-    OS_STK        *OSTCBStkPtr;        /* Pointer to current top of stack                              */
+typedef struct os_tcb
+{
+	OS_STK        *OSTCBStkPtr;        /* Pointer to current top of stack                              */
 
 #if OS_TASK_CREATE_EXT_EN > 0
-    void          *OSTCBExtPtr;        /* Pointer to user definable data for TCB extension             */
-    OS_STK        *OSTCBStkBottom;     /* Pointer to bottom of stack                                   */
-    INT32U         OSTCBStkSize;       /* Size of task stack (in number of stack elements)             */
-    INT16U         OSTCBOpt;           /* Task options as passed by OSTaskCreateExt()                  */
-    INT16U         OSTCBId;            /* Task ID (0..65535)                                           */
+	void          *OSTCBExtPtr;        /* Pointer to user definable data for TCB extension             */
+	OS_STK        *OSTCBStkBottom;     /* Pointer to bottom of stack                                   */
+	INT32U         OSTCBStkSize;       /* Size of task stack (in number of stack elements)             */
+	INT16U         OSTCBOpt;           /* Task options as passed by OSTaskCreateExt()                  */
+	INT16U         OSTCBId;            /* Task ID (0..65535)                                           */
 #endif
 
-    struct os_tcb *OSTCBNext;          /* Pointer to next     TCB in the TCB list                      */
-    struct os_tcb *OSTCBPrev;          /* Pointer to previous TCB in the TCB list                      */
+	struct os_tcb *OSTCBNext;          /* Pointer to next     TCB in the TCB list                      */
+	struct os_tcb *OSTCBPrev;          /* Pointer to previous TCB in the TCB list                      */
 
 #if ((OS_Q_EN > 0) && (OS_MAX_QS > 0)) || (OS_MBOX_EN > 0) || (OS_SEM_EN > 0) || (OS_MUTEX_EN > 0)
-    OS_EVENT      *OSTCBEventPtr;      /* Pointer to event control block                               */
+	OS_EVENT      *OSTCBEventPtr;      /* Pointer to event control block                               */
 #endif
 
 #if ((OS_Q_EN > 0) && (OS_MAX_QS > 0)) || (OS_MBOX_EN > 0)
-    void          *OSTCBMsg;           /* Message received from OSMboxPost() or OSQPost()              */
+	void          *OSTCBMsg;           /* Message received from OSMboxPost() or OSQPost()              */
 #endif
 
 #if (OS_VERSION >= 251) && (OS_FLAG_EN > 0) && (OS_MAX_FLAGS > 0)
 #if OS_TASK_DEL_EN > 0
-    OS_FLAG_NODE  *OSTCBFlagNode;      /* Pointer to event flag node                                   */
-#endif    
-    OS_FLAGS       OSTCBFlagsRdy;      /* Event flags that made task ready to run                      */
+	OS_FLAG_NODE  *OSTCBFlagNode;      /* Pointer to event flag node                                   */
+#endif
+	OS_FLAGS       OSTCBFlagsRdy;      /* Event flags that made task ready to run                      */
 #endif
 
-    INT16U         OSTCBDly;           /* Nbr ticks to delay task or, timeout waiting for event        */
-    INT8U          OSTCBStat;          /* Task status                                                  */
-    INT8U          OSTCBPrio;          /* Task priority (0 == highest, 63 == lowest)                   */
+	INT16U         OSTCBDly;           /* Nbr ticks to delay task or, timeout waiting for event        */
+	INT8U          OSTCBStat;          /* Task status                                                  */
+	INT8U          OSTCBPrio;          /* Task priority (0 == highest, 63 == lowest)                   */
 
-    INT8U          OSTCBX;             /* Bit position in group  corresponding to task priority (0..7) */
-    INT8U          OSTCBY;             /* Index into ready table corresponding to task priority        */
-    INT8U          OSTCBBitX;          /* Bit mask to access bit position in ready table               */
-    INT8U          OSTCBBitY;          /* Bit mask to access bit position in ready group               */
+	INT8U          OSTCBX;             /* Bit position in group  corresponding to task priority (0..7) */
+	INT8U          OSTCBY;             /* Index into ready table corresponding to task priority        */
+	INT8U          OSTCBBitX;          /* Bit mask to access bit position in ready table               */
+	INT8U          OSTCBBitY;          /* Bit mask to access bit position in ready group               */
 
 #if OS_TASK_DEL_EN > 0
-    BOOLEAN        OSTCBDelReq;        /* Indicates whether a task needs to delete itself              */
+	BOOLEAN        OSTCBDelReq;        /* Indicates whether a task needs to delete itself              */
 #endif
 } OS_TCB;
 
-/*$PAGE*/
+/*$PAGE*/
+
 /*
 *********************************************************************************************************
 *                                            GLOBAL VARIABLES
@@ -474,14 +487,15 @@ OS_EXT  OS_Q             *OSQFreeList;              /* Pointer to list of free Q
 OS_EXT  OS_Q              OSQTbl[OS_MAX_QS];        /* Table of QUEUE control blocks                   */
 #endif
 
-#if OS_TIME_GET_SET_EN > 0   
+#if OS_TIME_GET_SET_EN > 0
 OS_EXT  volatile  INT32U  OSTime;                   /* Current value of system time (in ticks)         */
 #endif
 
 extern  INT8U  const      OSMapTbl[];               /* Priority->Bit Mask lookup table                 */
 extern  INT8U  const      OSUnMapTbl[];             /* Priority->Index    lookup table                 */
 
-/*$PAGE*/
+/*$PAGE*/
+
 /*
 *********************************************************************************************************
 *                                          FUNCTION PROTOTYPES
@@ -753,7 +767,8 @@ void          OSStatInit(void);
 
 INT16U        OSVersion(void);
 
-/*$PAGE*/
+/*$PAGE*/
+
 /*
 *********************************************************************************************************
 *                                      INTERNAL FUNCTION PROTOTYPES
@@ -795,7 +810,8 @@ void          OS_TaskStat(void *data);
 
 INT8U         OS_TCBInit(INT8U prio, OS_STK *ptos, OS_STK *pbos, INT16U id, INT32U stk_size, void *pext, INT16U opt);
 
-/*$PAGE*/
+/*$PAGE*/
+
 /*
 *********************************************************************************************************
 *                                          FUNCTION PROTOTYPES
@@ -846,7 +862,7 @@ void          OSTickISR(void);
 *********************************************************************************************************
 *                                   LOOK FOR MISSING #define CONSTANTS
 *
-* This section is used to generate ERROR messages at compile time if certain #define constants are 
+* This section is used to generate ERROR messages at compile time if certain #define constants are
 * MISSING in OS_CFG.H.  This allows you to quickly determine the source of the error.
 *
 * You SHOULD NOT change this section UNLESS you would like to add more comments as to the source of the
@@ -863,32 +879,32 @@ void          OSTickISR(void);
 #ifndef OS_FLAG_EN
 #error  "OS_CFG.H, Missing OS_FLAG_EN: Enable (1) or Disable (0) code generation for Event Flags"
 #else
-    #ifndef OS_MAX_FLAGS
-    #error  "OS_CFG.H, Missing OS_MAX_FLAGS: Max. number of Event Flag Groups in your application"
-    #else
-        #if     OS_MAX_FLAGS == 0
-        #error  "OS_CFG.H, OS_MAX_FLAGS must be > 0"
-        #endif
-        #if     OS_MAX_FLAGS > 255
-        #error  "OS_CFG.H, OS_MAX_FLAGS must be <= 255"
-        #endif
-    #endif
+#ifndef OS_MAX_FLAGS
+#error  "OS_CFG.H, Missing OS_MAX_FLAGS: Max. number of Event Flag Groups in your application"
+#else
+#if     OS_MAX_FLAGS == 0
+#error  "OS_CFG.H, OS_MAX_FLAGS must be > 0"
+#endif
+#if     OS_MAX_FLAGS > 255
+#error  "OS_CFG.H, OS_MAX_FLAGS must be <= 255"
+#endif
+#endif
 
-    #ifndef OS_FLAG_WAIT_CLR_EN
-    #error  "OS_CFG.H, Missing OS_FLAG_WAIT_CLR_EN: Include code for Wait on Clear EVENT FLAGS"
-    #endif
+#ifndef OS_FLAG_WAIT_CLR_EN
+#error  "OS_CFG.H, Missing OS_FLAG_WAIT_CLR_EN: Include code for Wait on Clear EVENT FLAGS"
+#endif
 
-    #ifndef OS_FLAG_ACCEPT_EN
-    #error  "OS_CFG.H, Missing OS_FLAG_ACCEPT_EN: Include code for OSFlagAccept()"
-    #endif
+#ifndef OS_FLAG_ACCEPT_EN
+#error  "OS_CFG.H, Missing OS_FLAG_ACCEPT_EN: Include code for OSFlagAccept()"
+#endif
 
-    #ifndef OS_FLAG_DEL_EN
-    #error  "OS_CFG.H, Missing OS_FLAG_DEL_EN: Include code for OSFlagDel()"
-    #endif
+#ifndef OS_FLAG_DEL_EN
+#error  "OS_CFG.H, Missing OS_FLAG_DEL_EN: Include code for OSFlagDel()"
+#endif
 
-    #ifndef OS_FLAG_QUERY_EN
-    #error  "OS_CFG.H, Missing OS_FLAG_QUERY_EN: Include code for OSFlagQuery()"
-    #endif
+#ifndef OS_FLAG_QUERY_EN
+#error  "OS_CFG.H, Missing OS_FLAG_QUERY_EN: Include code for OSFlagQuery()"
+#endif
 #endif
 
 /*
@@ -900,25 +916,25 @@ void          OSTickISR(void);
 #ifndef OS_MBOX_EN
 #error  "OS_CFG.H, Missing OS_MBOX_EN: Enable (1) or Disable (0) code generation for MAILBOXES"
 #else
-    #ifndef OS_MBOX_ACCEPT_EN
-    #error  "OS_CFG.H, Missing OS_MBOX_ACCEPT_EN: Include code for OSMboxAccept()"
-    #endif
+#ifndef OS_MBOX_ACCEPT_EN
+#error  "OS_CFG.H, Missing OS_MBOX_ACCEPT_EN: Include code for OSMboxAccept()"
+#endif
 
-    #ifndef OS_MBOX_DEL_EN
-    #error  "OS_CFG.H, Missing OS_MBOX_DEL_EN: Include code for OSMboxDel()"
-    #endif
+#ifndef OS_MBOX_DEL_EN
+#error  "OS_CFG.H, Missing OS_MBOX_DEL_EN: Include code for OSMboxDel()"
+#endif
 
-    #ifndef OS_MBOX_POST_EN
-    #error  "OS_CFG.H, Missing OS_MBOX_POST_EN: Include code for OSMboxPost()"
-    #endif
+#ifndef OS_MBOX_POST_EN
+#error  "OS_CFG.H, Missing OS_MBOX_POST_EN: Include code for OSMboxPost()"
+#endif
 
-    #ifndef OS_MBOX_POST_OPT_EN
-    #error  "OS_CFG.H, Missing OS_MBOX_POST_OPT_EN: Include code for OSMboxPostOpt()"
-    #endif
+#ifndef OS_MBOX_POST_OPT_EN
+#error  "OS_CFG.H, Missing OS_MBOX_POST_OPT_EN: Include code for OSMboxPostOpt()"
+#endif
 
-    #ifndef OS_MBOX_QUERY_EN
-    #error  "OS_CFG.H, Missing OS_MBOX_QUERY_EN: Include code for OSMboxQuery()"
-    #endif
+#ifndef OS_MBOX_QUERY_EN
+#error  "OS_CFG.H, Missing OS_MBOX_QUERY_EN: Include code for OSMboxQuery()"
+#endif
 #endif
 
 /*
@@ -930,20 +946,20 @@ void          OSTickISR(void);
 #ifndef OS_MEM_EN
 #error  "OS_CFG.H, Missing OS_MEM_EN: Enable (1) or Disable (0) code generation for MEMORY MANAGER"
 #else
-    #ifndef OS_MAX_MEM_PART
-    #error  "OS_CFG.H, Missing OS_MAX_MEM_PART: Max. number of memory partitions"
-    #else
-        #if     OS_MAX_MEM_PART == 0
-        #error  "OS_CFG.H, OS_MAX_MEM_PART must be > 0"
-        #endif
-        #if     OS_MAX_MEM_PART > 255
-        #error  "OS_CFG.H, OS_MAX_MEM_PART must be <= 255"
-        #endif
-    #endif
+#ifndef OS_MAX_MEM_PART
+#error  "OS_CFG.H, Missing OS_MAX_MEM_PART: Max. number of memory partitions"
+#else
+#if     OS_MAX_MEM_PART == 0
+#error  "OS_CFG.H, OS_MAX_MEM_PART must be > 0"
+#endif
+#if     OS_MAX_MEM_PART > 255
+#error  "OS_CFG.H, OS_MAX_MEM_PART must be <= 255"
+#endif
+#endif
 
-    #ifndef OS_MEM_QUERY_EN
-    #error  "OS_CFG.H, Missing OS_MEM_QUERY_EN: Include code for OSMemQuery()"
-    #endif
+#ifndef OS_MEM_QUERY_EN
+#error  "OS_CFG.H, Missing OS_MEM_QUERY_EN: Include code for OSMemQuery()"
+#endif
 #endif
 
 /*
@@ -955,17 +971,17 @@ void          OSTickISR(void);
 #ifndef OS_MUTEX_EN
 #error  "OS_CFG.H, Missing OS_MUTEX_EN: Enable (1) or Disable (0) code generation for MUTEX"
 #else
-    #ifndef OS_MUTEX_ACCEPT_EN
-    #error  "OS_CFG.H, Missing OS_MUTEX_ACCEPT_EN: Include code for OSMutexAccept()"
-    #endif
+#ifndef OS_MUTEX_ACCEPT_EN
+#error  "OS_CFG.H, Missing OS_MUTEX_ACCEPT_EN: Include code for OSMutexAccept()"
+#endif
 
-    #ifndef OS_MUTEX_DEL_EN
-    #error  "OS_CFG.H, Missing OS_MUTEX_DEL_EN: Include code for OSMutexDel()"
-    #endif
+#ifndef OS_MUTEX_DEL_EN
+#error  "OS_CFG.H, Missing OS_MUTEX_DEL_EN: Include code for OSMutexDel()"
+#endif
 
-    #ifndef OS_MUTEX_QUERY_EN
-    #error  "OS_CFG.H, Missing OS_MUTEX_QUERY_EN: Include code for OSMutexQuery()"
-    #endif
+#ifndef OS_MUTEX_QUERY_EN
+#error  "OS_CFG.H, Missing OS_MUTEX_QUERY_EN: Include code for OSMutexQuery()"
+#endif
 #endif
 
 /*
@@ -977,44 +993,44 @@ void          OSTickISR(void);
 #ifndef OS_Q_EN
 #error  "OS_CFG.H, Missing OS_Q_EN: Enable (1) or Disable (0) code generation for QUEUES"
 #else
-    #ifndef OS_MAX_QS
-    #error  "OS_CFG.H, Missing OS_MAX_QS: Max. number of queue control blocks"
-    #else
-        #if     OS_MAX_QS == 0
-        #error  "OS_CFG.H, OS_MAX_QS must be > 0"
-        #endif
-        #if     OS_MAX_QS > 255
-        #error  "OS_CFG.H, OS_MAX_QS must be <= 255"
-        #endif
-    #endif
+#ifndef OS_MAX_QS
+#error  "OS_CFG.H, Missing OS_MAX_QS: Max. number of queue control blocks"
+#else
+#if     OS_MAX_QS == 0
+#error  "OS_CFG.H, OS_MAX_QS must be > 0"
+#endif
+#if     OS_MAX_QS > 255
+#error  "OS_CFG.H, OS_MAX_QS must be <= 255"
+#endif
+#endif
 
-    #ifndef OS_Q_ACCEPT_EN
-    #error  "OS_CFG.H, Missing OS_Q_ACCEPT_EN: Include code for OSQAccept()"
-    #endif
+#ifndef OS_Q_ACCEPT_EN
+#error  "OS_CFG.H, Missing OS_Q_ACCEPT_EN: Include code for OSQAccept()"
+#endif
 
-    #ifndef OS_Q_DEL_EN
-    #error  "OS_CFG.H, Missing OS_Q_DEL_EN: Include code for OSQDel()"
-    #endif
+#ifndef OS_Q_DEL_EN
+#error  "OS_CFG.H, Missing OS_Q_DEL_EN: Include code for OSQDel()"
+#endif
 
-    #ifndef OS_Q_FLUSH_EN
-    #error  "OS_CFG.H, Missing OS_Q_FLUSH_EN: Include code for OSQFlush()"
-    #endif
+#ifndef OS_Q_FLUSH_EN
+#error  "OS_CFG.H, Missing OS_Q_FLUSH_EN: Include code for OSQFlush()"
+#endif
 
-    #ifndef OS_Q_POST_EN
-    #error  "OS_CFG.H, Missing OS_Q_POST_EN: Include code for OSQPost()"
-    #endif
+#ifndef OS_Q_POST_EN
+#error  "OS_CFG.H, Missing OS_Q_POST_EN: Include code for OSQPost()"
+#endif
 
-    #ifndef OS_Q_POST_FRONT_EN
-    #error  "OS_CFG.H, Missing OS_Q_POST_FRONT_EN: Include code for OSQPostFront()"
-    #endif
+#ifndef OS_Q_POST_FRONT_EN
+#error  "OS_CFG.H, Missing OS_Q_POST_FRONT_EN: Include code for OSQPostFront()"
+#endif
 
-    #ifndef OS_Q_POST_OPT_EN
-    #error  "OS_CFG.H, Missing OS_Q_POST_OPT_EN: Include code for OSQPostOpt()"
-    #endif
+#ifndef OS_Q_POST_OPT_EN
+#error  "OS_CFG.H, Missing OS_Q_POST_OPT_EN: Include code for OSQPostOpt()"
+#endif
 
-    #ifndef OS_Q_QUERY_EN
-    #error  "OS_CFG.H, Missing OS_Q_QUERY_EN: Include code for OSQQuery()"
-    #endif
+#ifndef OS_Q_QUERY_EN
+#error  "OS_CFG.H, Missing OS_Q_QUERY_EN: Include code for OSQQuery()"
+#endif
 #endif
 
 /*
@@ -1026,17 +1042,17 @@ void          OSTickISR(void);
 #ifndef OS_SEM_EN
 #error  "OS_CFG.H, Missing OS_SEM_EN: Enable (1) or Disable (0) code generation for SEMAPHORES"
 #else
-    #ifndef OS_SEM_ACCEPT_EN
-    #error  "OS_CFG.H, Missing OS_SEM_ACCEPT_EN: Include code for OSSemAccept()"
-    #endif
+#ifndef OS_SEM_ACCEPT_EN
+#error  "OS_CFG.H, Missing OS_SEM_ACCEPT_EN: Include code for OSSemAccept()"
+#endif
 
-    #ifndef OS_SEM_DEL_EN
-    #error  "OS_CFG.H, Missing OS_SEM_DEL_EN: Include code for OSSemDel()"
-    #endif
+#ifndef OS_SEM_DEL_EN
+#error  "OS_CFG.H, Missing OS_SEM_DEL_EN: Include code for OSSemDel()"
+#endif
 
-    #ifndef OS_SEM_QUERY_EN
-    #error  "OS_CFG.H, Missing OS_SEM_QUERY_EN: Include code for OSSemQuery()"
-    #endif
+#ifndef OS_SEM_QUERY_EN
+#error  "OS_CFG.H, Missing OS_SEM_QUERY_EN: Include code for OSSemQuery()"
+#endif
 #endif
 
 /*
@@ -1048,12 +1064,12 @@ void          OSTickISR(void);
 #ifndef OS_MAX_TASKS
 #error  "OS_CFG.H, Missing OS_MAX_TASKS: Max. number of tasks in your application"
 #else
-    #if     OS_MAX_TASKS == 0
-    #error  "OS_CFG.H,         OS_MAX_TASKS must be >= 2"
-    #endif
-    #if     OS_MAX_TASKS > 63
-    #error  "OS_CFG.H,         OS_MAX_TASKS must be <= 63"
-    #endif
+#if     OS_MAX_TASKS == 0
+#error  "OS_CFG.H,         OS_MAX_TASKS must be >= 2"
+#endif
+#if     OS_MAX_TASKS > 63
+#error  "OS_CFG.H,         OS_MAX_TASKS must be <= 63"
+#endif
 #endif
 
 #ifndef OS_TASK_IDLE_STK_SIZE
@@ -1123,12 +1139,12 @@ void          OSTickISR(void);
 #ifndef OS_MAX_EVENTS
 #error  "OS_CFG.H, Missing OS_MAX_EVENTS: Max. number of event control blocks in your application"
 #else
-    #if     OS_MAX_EVENTS == 0
-    #error  "OS_CFG.H, OS_MAX_EVENTS must be > 0"
-    #endif
-    #if     OS_MAX_EVENTS > 255
-    #error  "OS_CFG.H, OS_MAX_EVENTS must be <= 255"
-    #endif
+#if     OS_MAX_EVENTS == 0
+#error  "OS_CFG.H, OS_MAX_EVENTS must be > 0"
+#endif
+#if     OS_MAX_EVENTS > 255
+#error  "OS_CFG.H, OS_MAX_EVENTS must be <= 255"
+#endif
 #endif
 
 #ifndef OS_LOWEST_PRIO

@@ -4,11 +4,12 @@ _device_control_s device_control;	//	¥”–æ∆¨√¸¡Ó ˝æ›≥ÿ£¨÷˜–æ∆¨ø…“‘Õ®π˝∂¡–¥∏√ ˝æ›ø
 _line_mess_s curr_line;
 
 
-void ChipCommInit(void) {
-	
+void ChipCommInit(void)
+{
+
 }
 
-char speak[]={"ª∂”≠ π”√ŒﬁŒ˝µ¬∑…ø∆ººµƒ≥µ‘ÿAFC"};
+char speak[] = {"ª∂”≠ π”√ŒﬁŒ˝µ¬∑…ø∆ººµƒ≥µ‘ÿAFC"};
 
 /*
 *	‘≠–Œ:	void TaskChipComm(void *pdata)
@@ -16,7 +17,8 @@ char speak[]={"ª∂”≠ π”√ŒﬁŒ˝µ¬∑…ø∆ººµƒ≥µ‘ÿAFC"};
 *
 *	Àµ√˜:	”…”⁄ π”√ƒ£ƒ‚Õ®–≈∑Ω Ω£¨Œ™±£÷§œÏ”¶ÀŸ∂»£¨–Ë“™∂®“ÂŒ™◊Ó∏ﬂ”≈œ»º∂
 */
-void TaskChipComm(void *pdata) {
+void TaskChipComm(void *pdata)
+{
 
 	//uint8 err,bcc,temp_8;
 	//uint8 rec_temp,*rec_p ;
@@ -25,7 +27,7 @@ void TaskChipComm(void *pdata) {
 	//uint8 chip_comm_state;
 	//_chip_comm_form_s ccf_temp;
 	//_ride_mess_s *node_temp;
-	
+
 	pdata = pdata;
 	ENABLESPI0();
 	while (1)			//	≥ı ºªØ
@@ -41,19 +43,19 @@ void TaskChipComm(void *pdata) {
 		if (spi0_tick > OS_TICKS_PER_SEC)
 		{
 #if (SPI0_MODE == 0)
-			S0PCR  =(0 << 2) |				//	√ø÷° ˝æ›8bit
-					(0 << 3) |				// CPHA = 0,  ˝æ›‘⁄SCK µƒµ⁄“ª∏ˆ ±÷”—ÿ≤…—˘
-		 			(1 << 4) |				// CPOL = 1, SCK Œ™µÕ”––ß
-		 			(0 << 5) |				// MSTR = 0, SPI ¥¶”⁄¥”ƒ£ Ω
-		 			(1 << 6) |				// LSBF = 1, SPI  ˝æ›¥´ ‰LSB (Œª0)‘⁄œ»
-		 			(1 << 7);				// SPIE = 1, SPI ÷–∂œ±ª πƒ‹
+			S0PCR  = (0 << 2) |				//	√ø÷° ˝æ›8bit
+			         (0 << 3) |				// CPHA = 0,  ˝æ›‘⁄SCK µƒµ⁄“ª∏ˆ ±÷”—ÿ≤…—˘
+			         (1 << 4) |				// CPOL = 1, SCK Œ™µÕ”––ß
+			         (0 << 5) |				// MSTR = 0, SPI ¥¶”⁄¥”ƒ£ Ω
+			         (1 << 6) |				// LSBF = 1, SPI  ˝æ›¥´ ‰LSB (Œª0)‘⁄œ»
+			         (1 << 7);				// SPIE = 1, SPI ÷–∂œ±ª πƒ‹
 			S0PSR |= 0x00;
 			S0PDR = 0x00;
 			VICIntEnable = 1 << 9;
 			spi0_tick = 0;
 #endif
 		}
-		if (memcmp(GetConfigVersion(),"cv",2) == 0)
+		if (memcmp(GetConfigVersion(), "cv", 2) == 0)
 		{
 			//	 ≈‰÷√œÓ∏¸–¬≥…π¶
 			//OSTaskResume(TaskTestPrio);
@@ -62,12 +64,13 @@ void TaskChipComm(void *pdata) {
 			OSTaskResume(TaskPTRExePrio);
 			OSTaskResume(TaskHopperExePrio);
 			OSTaskResume(TaskGPSPrio);
-				
+
 			break;
 		}
 	}
-	
-	while(1) {
+
+	while(1)
+	{
 		OSTimeDly(1);
 		device_control.time.year = YEAR;
 		device_control.time.month = MONTH;
@@ -78,12 +81,12 @@ void TaskChipComm(void *pdata) {
 		if (spi0_tick > OS_TICKS_PER_SEC)
 		{
 #if (SPI0_MODE == 0)
-			S0PCR  =(0 << 2) |				//	√ø÷° ˝æ›8bit
-					(0 << 3) |				// CPHA = 0,  ˝æ›‘⁄SCK µƒµ⁄“ª∏ˆ ±÷”—ÿ≤…—˘
-		 			(1 << 4) |				// CPOL = 1, SCK Œ™µÕ”––ß
-		 			(0 << 5) |				// MSTR = 0, SPI ¥¶”⁄¥”ƒ£ Ω
-		 			(1 << 6) |				// LSBF = 1, SPI  ˝æ›¥´ ‰LSB (Œª0)‘⁄œ»
-		 			(1 << 7);				// SPIE = 1, SPI ÷–∂œ±ª πƒ‹
+			S0PCR  = (0 << 2) |				//	√ø÷° ˝æ›8bit
+			         (0 << 3) |				// CPHA = 0,  ˝æ›‘⁄SCK µƒµ⁄“ª∏ˆ ±÷”—ÿ≤…—˘
+			         (1 << 4) |				// CPOL = 1, SCK Œ™µÕ”––ß
+			         (0 << 5) |				// MSTR = 0, SPI ¥¶”⁄¥”ƒ£ Ω
+			         (1 << 6) |				// LSBF = 1, SPI  ˝æ›¥´ ‰LSB (Œª0)‘⁄œ»
+			         (1 << 7);				// SPIE = 1, SPI ÷–∂œ±ª πƒ‹
 			S0PSR |= 0x00;
 			S0PDR = 0x00;
 			VICIntEnable = 1 << 9;
@@ -93,28 +96,32 @@ void TaskChipComm(void *pdata) {
 		if (device_control.cmd.changemoney.exe_st == CMD_NO_EXE)	//	’“¡„√¸¡Ó¥¶¿Ì
 		{
 			device_control.cmd.changemoney.exe_st = CMD_RUNNING;
-			memset(&device_control.trade.cr,0,sizeof(_change_result_s));	//	«Â¡„∑µªÿ÷µ
-			if (device_control.trade.ts.trade_exe == 0) 
+			memset(&device_control.trade.cr, 0, sizeof(_change_result_s));	//	«Â¡„∑µªÿ÷µ
+			if (device_control.trade.ts.trade_exe == 0)
 			{
-				if (device_control.trade.tm.changenum >= 100) {		//	≈–∂œ «∑Ò–Ë“™’“÷Ω±“
+				if (device_control.trade.tm.changenum >= 100)  		//	≈–∂œ «∑Ò–Ë“™’“÷Ω±“
+				{
 					note_machine_cmd.cass1 = device_control.trade.tm.changenum % 2000 / 100;
 					note_machine_cmd.cass2 = device_control.trade.tm.changenum / 2000;
 					note_machine_cmd.note.exe_st = CMD_NO_EXE;		//	÷¥––÷Ω±“’“¡„
 					device_control.trade.ts.change_note = 1;
-					OSTimeDly(OS_TICKS_PER_SEC*2);					//	µ»¥˝’“÷Ω±“÷¥––
+					OSTimeDly(OS_TICKS_PER_SEC * 2);					//	µ»¥˝’“÷Ω±“÷¥––
 				}
-				else {
+				else
+				{
 				}
-				if (device_control.trade.tm.changenum % 100) {		//	≈–∂œ «∑Ò–Ë“™’“”≤±“
+				if (device_control.trade.tm.changenum % 100)  		//	≈–∂œ «∑Ò–Ë“™’“”≤±“
+				{
 					coin_machine_cmd.changenum = device_control.trade.tm.changenum % 100;
 					coin_machine_cmd.coin.exe_st = CMD_NO_EXE;		//	÷¥––”≤±“’“¡„
 					device_control.trade.ts.change_coin = 1;
 				}
-				else {
+				else
+				{
 				}
 				device_control.trade.ts.trade_exe = 1;
 			}
-			
+
 		}
 		else if (device_control.cmd.changemoney.exe_st == CMD_RUNNING)
 		{
@@ -133,46 +140,47 @@ void TaskChipComm(void *pdata) {
 				device_control.cmd.changemoney.exe_st = CMD_EXE_END;
 #if 0
 				device_control.cmd.changemoney.exe_st = CMD_NO_EXE;
-				OSTimeDly(OS_TICKS_PER_SEC*4);
+				OSTimeDly(OS_TICKS_PER_SEC * 4);
 #endif
 			}
 		}
-		
+
 		if (device_control.cmd.speak.exe_st == CMD_NO_EXE)
 		{
 			device_control.cmd.speak.exe_st = CMD_EXE_END;
 		}
-		
+
 		if (device_control.cmd.power_down.exe_st == CMD_NO_EXE)
 		{
 			device_control.cmd.power_down.exe_st = CMD_EXE_END;
 		}
-		
+
 		if (device_control.trade.ts.trade_exe == 0)			//	Ωª“◊√¸¡Ó¥¶¿Ì
 		{
 			if ((device_control.trade.ts.change_coin) || (device_control.trade.ts.change_note)
-				|| (device_control.trade.ts.print_end))
+			        || (device_control.trade.ts.print_end))
 			{
 				device_control.trade.ts.trade_exe = 1;
 			}
 		}
-		else 
+		else
 		{
 			if ((device_control.trade.ts.change_coin == 0) && (device_control.trade.ts.change_note == 0)
-				&& (device_control.trade.ts.print_end== 0))
+			        && (device_control.trade.ts.print_end == 0))
 			{
 				device_control.trade.ts.trade_exe = 0;
 			}
 		}
-			
-		
+
+
 		//Syn6288Test();
 		//OSTimeDly(OS_TICKS_PER_SEC*3);
 	}
 }
 
 
-uint8 GetTradeSt(void) {
+uint8 GetTradeSt(void)
+{
 	return device_control.cmd.changemoney.exe_st;
 }
 

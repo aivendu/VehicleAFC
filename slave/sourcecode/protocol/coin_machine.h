@@ -2,7 +2,8 @@
 #define _COIN_MACHINE_H
 
 
-typedef struct {
+typedef struct
+{
 	_exe_s coin;
 	uint8 changenum;
 } _coin_machine_cmd_s;

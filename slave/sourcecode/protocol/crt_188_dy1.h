@@ -59,40 +59,45 @@
 #define CARD_TYPE_AT88SC1608		19
 
 
-typedef struct {
+typedef struct
+{
 	uint8  lenght_h;
 	uint8  lenght_l;
 	uint8  cmd;
 	uint8  arg;
 	uint8  dat_lenght;
 	uint8  dat[CRT188_MAX_DATA_LENGHT];
-}_crt188_cmd_s;
+} _crt188_cmd_s;
 
-typedef struct {
+typedef struct
+{
 	uint8  		stx;
 	_crt188_cmd_s	*data;
 	uint8		ext;
-	uint8		bcc;	
-}_crt188_s;
+	uint8		bcc;
+} _crt188_s;
 
-typedef struct {
+typedef struct
+{
 	uint8  stx;
 	uint16 lenght;
 	uint8  no;
 	uint8  cmd;
 	uint8  err_code;
 	uint8  ext;
-	uint8  bcc;	
-}_crt188_err_return_s;
+	uint8  bcc;
+} _crt188_err_return_s;
 
-typedef enum {
-	CRT188_CMD_ERR = 0x00,				//  命令字错误，发送的通讯包中有不符合通讯协议规定的命令字 CM 
-	CRT188_ARG_ERR = 0x01,				//  命令参数错误，发送的通讯包中有不符合通讯协议规定的命令参数 PM 
-	CRT188_NO_EXE_ERR = 0x02,			//  命令不能被执行，发送的命令受限制不能执行该命令。 
-	CRT188_DATA_ERR = 0x04				//  命令数据包错误，发送的通讯包中数据包部分有不符合通讯协议规定的数据。
-}_crt188_err_code_e;
+typedef enum
+{
+    CRT188_CMD_ERR = 0x00,				//  命令字错误，发送的通讯包中有不符合通讯协议规定的命令字 CM
+    CRT188_ARG_ERR = 0x01,				//  命令参数错误，发送的通讯包中有不符合通讯协议规定的命令参数 PM
+    CRT188_NO_EXE_ERR = 0x02,			//  命令不能被执行，发送的命令受限制不能执行该命令。
+    CRT188_DATA_ERR = 0x04				//  命令数据包错误，发送的通讯包中数据包部分有不符合通讯协议规定的数据。
+} _crt188_err_code_e;
 
-typedef struct {
+typedef struct
+{
 	uint8 crt188_state;
 	uint8 errcode;
 	_card_plaintxt_u df_card;

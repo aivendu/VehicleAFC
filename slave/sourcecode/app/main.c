@@ -57,19 +57,19 @@ OS_STK	TaskChipCommStk[TaskChipCommSize];
 */
 int main (void)
 {
-    OSInit();	
-    TargetInit();
-	
-    OSTaskCreate (TaskTest, (void *)0, &TaskTestStk[TaskTestSize - 1], TaskTestPrio);
+	OSInit();
+	TargetInit();
+
+	OSTaskCreate (TaskTest, (void *)0, &TaskTestStk[TaskTestSize - 1], TaskTestPrio);
 	OSTaskCreate(TaskICCard, (void *)0, &TaskCrt188Stk[TaskCrt188Size - 1], TaskCrt188Prio);
 	OSTaskCreate(TaskNoteMachine, (void *)0, &TaskNoteMachineStk[TaskNoteMachineSize - 1], TaskNoteMachinePrio);
-    OSTaskCreate (TaskPTRExe, (void *)0, &TaskPTRExeStk[TaskPTRExeSize - 1], TaskPTRExePrio);
+	OSTaskCreate (TaskPTRExe, (void *)0, &TaskPTRExeStk[TaskPTRExeSize - 1], TaskPTRExePrio);
 	OSTaskCreate (TaskHopperExe, (void *)0, &TaskHopperExeStk[TaskHopperExeSize - 1], TaskHopperExePrio);
-    OSTaskCreate (TaskGPS, (void *)0, &TaskGPSStk[TaskGPSSize - 1], TaskGPSPrio);
-    OSTaskCreate (TaskChipComm, (void *)0, &TaskChipCommStk[TaskChipCommSize - 1], TaskChipCommPrio);
-    //OSTaskCreate (TaskTest, (void *)0, &TaskTestStk[TaskTestSize - 1], TaskTestPrio);
+	OSTaskCreate (TaskGPS, (void *)0, &TaskGPSStk[TaskGPSSize - 1], TaskGPSPrio);
+	OSTaskCreate (TaskChipComm, (void *)0, &TaskChipCommStk[TaskChipCommSize - 1], TaskChipCommPrio);
+	//OSTaskCreate (TaskTest, (void *)0, &TaskTestStk[TaskTestSize - 1], TaskTestPrio);
 
-	
+
 
 
 	OSTaskSuspend(TaskTestPrio);
@@ -80,15 +80,15 @@ int main (void)
 	OSTaskSuspend(TaskGPSPrio);
 	//OSTaskSuspend(TaskChipCommPrio);
 
-	
-    OSStart();	
-    															//(6)
-    return 0;																//(7)
+
+	OSStart();
+	//(6)
+	return 0;																//(7)
 }
 
 
 
-   
+
 /*********************************************************************************************************
 **                            End Of File
 ********************************************************************************************************/

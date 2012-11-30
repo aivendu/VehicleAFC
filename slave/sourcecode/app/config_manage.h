@@ -10,21 +10,23 @@
 #define MIN_DEVICE_ADDR					0x1000
 
 #if 0
- 
-static _uart_config_s const uart0_config[] = {
- 	{0,	9600		},		//	0- init
- 	{3,	38400		},		//	1- print machine
-	{2,	9600		},		//	2- coin machine
- 	{1,	9600		},		//	3- note machine
- };
 
- 
-static _uart_config_s const uart1_config[] = {
- 	{0,	9600		},		//	0- init
+static _uart_config_s const uart0_config[] =
+{
+	{0,	9600		},		//	0- init
+	{3,	38400		},		//	1- print machine
+	{2,	9600		},		//	2- coin machine
+	{1,	9600		},		//	3- note machine
+};
+
+
+static _uart_config_s const uart1_config[] =
+{
+	{0,	9600		},		//	0- init
 	{1,	9600		},		//	1- speaker
- 	{2,	19200		},		//	2- IC Card machine
- 	{3,	9600		},		//	3- GPS module
- };
+	{2,	19200		},		//	2- IC Card machine
+	{3,	9600		},		//	3- GPS module
+};
 
 uc_rj45;
 uc_gprs;
@@ -40,23 +42,25 @@ unused2;
 #endif
 
 
-typedef enum {
-	UART_RJ45_CHANNEL,		//	RJ45 通道
-	UART_GPRS_CHANNEL,		//	gprs 通道
-	GPS_UART1,				//	GPS通道
-	NOTE_MACHINE_UART0,		//	纸币机通道
-	COINMACHINE_UART0,		//	硬币机通道
-	PRINTER_UART0,			//	打印通道
-	SPEAKER_UART1,			//	语音通道
-	IC_MACHINE_UART1,		//	IC 卡通道
-	UNUSED1,
-	UNUSED2,
+typedef enum
+{
+    UART_RJ45_CHANNEL,		//	RJ45 通道
+    UART_GPRS_CHANNEL,		//	gprs 通道
+    GPS_UART1,				//	GPS通道
+    NOTE_MACHINE_UART0,		//	纸币机通道
+    COINMACHINE_UART0,		//	硬币机通道
+    PRINTER_UART0,			//	打印通道
+    SPEAKER_UART1,			//	语音通道
+    IC_MACHINE_UART1,		//	IC 卡通道
+    UNUSED1,
+    UNUSED2,
 } _uart_fun;
 
 
 
 //	串口配置
-typedef struct {
+typedef struct
+{
 	uint8 channal;
 	uint32 bps;
 } _uart_config_s;
@@ -66,10 +70,10 @@ typedef struct {
 //	定义和控制系统功能
 typedef struct
 {
-	uint32	config_state			:2;		//	配置状态，0--未初始化，1--默认初始化，2--用户配置
-	uint32	login_mod				:2;		//	登录模式，0--卡登录，1--帐号登录，3--混合登录
-	uint32	trade_upload_state		:1;		//	交易数据上传完成，0--数据上传完成，1--还有没上传的数据
-	uint32	unused					:28;
+	uint32	config_state			: 2;		//	配置状态，0--未初始化，1--默认初始化，2--用户配置
+	uint32	login_mod				: 2;		//	登录模式，0--卡登录，1--帐号登录，3--混合登录
+	uint32	trade_upload_state		: 1;		//	交易数据上传完成，0--数据上传完成，1--还有没上传的数据
+	uint32	unused					: 28;
 } _function_config_s;
 
 typedef union
@@ -112,8 +116,8 @@ typedef struct
 	uint16	cashbox1_deposit;	//	硬币钱箱存入总额
 	uint16	cashbox2_deposit;	//	纸币钱箱一存入总额
 	uint16	cashbox3_deposit;	//	纸币钱箱二存入总额
-	uint8	unused[2];	//	
-}_cashbox_config_s;
+	uint8	unused[2];	//
+} _cashbox_config_s;
 
 typedef union
 {
@@ -123,7 +127,8 @@ typedef union
 
 
 //	串口配置
-typedef struct {
+typedef struct
+{
 	_uart_config_s uc_rj45;
 	_uart_config_s uc_gprs;
 	_uart_config_s uc_gps;
@@ -149,7 +154,7 @@ typedef struct
 {
 	char print_customer[16];		//	客户名称，提供打印
 	_function_config_u fc;			//	功能配置
-	_cashbox_config_u  cc;			//	
+	_cashbox_config_u  cc;			//
 	_uart_manage_u um;
 	_parameter_u pa;
 	char device_addr[4];			//	设备地址, ASCII 字符, 0000-FFFF
@@ -198,7 +203,7 @@ typedef struct
 #define GetCashbox3Value()				(config_ram.cc.cc.cashbox3_value)
 #define SetCashbox3Value(c)				(config_ram.cc.cc.cashbox3_value = c)
 #define GetCashbox1AlarmThreshold()		(config_ram.cc.cc.cashbox1_alarm_threshold)
-#define SetCashbox1AlarmThreshold(c)	(config_ram.cc.cc.cashbox1_alarm_threshold = c)	
+#define SetCashbox1AlarmThreshold(c)	(config_ram.cc.cc.cashbox1_alarm_threshold = c)
 #define GetCashbox2AlarmThreshold()		(config_ram.cc.cc.cashbox2_alarm_threshold)
 #define SetCashbox2AlarmThreshold(c)	(config_ram.cc.cc.cashbox2_alarm_threshold = c)
 #define GetCashbox3AlarmThreshold()		(config_ram.cc.cc.cashbox3_alarm_threshold)
@@ -257,11 +262,11 @@ typedef struct
 
 extern _config_s config_ram;
 
-extern char * GetDeviceAddr(void);
+extern char *GetDeviceAddr(void);
 extern uint8 SetDeviceAddr(char *arg);
 extern void TaskSysConfig(void *pdata);
 extern void ConfigInit(void);
-extern uint8 RequestUart(uint8 ch,uint16 t);
+extern uint8 RequestUart(uint8 ch, uint16 t);
 extern void FreeUart(uint8 ch);
 
 

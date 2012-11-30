@@ -2,17 +2,18 @@
 #define _HEAD_H
 
 
-typedef enum {
-	PRIOSTART=4,
-	
-	TaskChipCommPrio,
-	TaskTestPrio,		
-	TaskCrt188Prio,		
-	TaskNoteMachinePrio,
-	TaskPTRExePrio,
-	TaskGPSPrio,
-	TaskHopperExePrio,
-	PRIOEND
+typedef enum
+{
+    PRIOSTART = 4,
+
+    TaskChipCommPrio,
+    TaskTestPrio,
+    TaskCrt188Prio,
+    TaskNoteMachinePrio,
+    TaskPTRExePrio,
+    TaskGPSPrio,
+    TaskHopperExePrio,
+    PRIOEND
 } _task_prio_e;
 
 #define STATE_LED				(1<<30)

@@ -19,7 +19,8 @@
 #define DISABLESPI0()			(VICIntEnClr  = 1 << 16)
 #endif
 
-typedef struct {
+typedef struct
+{
 	void *fun_data_addr;
 	uint16 len;
 } _data_pond_s;
@@ -27,7 +28,7 @@ typedef struct {
 
 extern uint32 spi0_tick;
 
-extern uint8 spi0_send_data,spi0_rec_data;
+extern uint8 spi0_send_data, spi0_rec_data;
 extern uint8 spi0_state;
 extern OS_EVENT *spi0_mbox;
 

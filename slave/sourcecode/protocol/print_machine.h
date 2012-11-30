@@ -17,7 +17,7 @@
 #define P012RST			(1 << 23)
 
 #define P021BUSY		(1 << 21)
-	
+
 
 #define DB0		(1<<15)
 #define DB1		(1<<16)

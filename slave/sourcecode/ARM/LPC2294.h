@@ -7,7 +7,7 @@
 ** File name:			LPC2294.h
 ** Last modified Date:  2004-09-17
 ** Last Version:		1.0
-** Descriptions:		Defines the special registers and firmware programs for 
+** Descriptions:		Defines the special registers and firmware programs for
 **						lpc22xx\lpc212x\lpc211x\lpc210x
 **
 **------------------------------------------------------------------------------------------------------
@@ -181,7 +181,7 @@
 
 /* SPI (Serial Peripheral Interface) */
 /* SPI总线接口的特殊寄存器 */
-        /* only for lpc210x*/
+/* only for lpc210x*/
 #define SPI_SPCR        (*((volatile unsigned char *) 0xE0020000))
 #define SPI_SPSR        (*((volatile unsigned char *) 0xE0020004))
 #define SPI_SPDR        (*((volatile unsigned char *) 0xE0020008))

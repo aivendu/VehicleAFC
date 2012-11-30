@@ -1,7 +1,8 @@
 #ifndef _SYN6288_H
 #define _SYN6288_H
 
-typedef struct {
+typedef struct
+{
 	uint16 len;		//	命令数据长度，包括"命令字","参数","数据","校验"
 	uint8  cmd;		//	命令字，每条命令都有
 	uint8  arg;		//	参数，某些命令没有
@@ -24,7 +25,7 @@ typedef struct {
 #define BAUDRATE_38400_SYN6288				2
 
 extern void Syn6288Init(void);
-extern void Syn6288Speak(char *voice,uint8 flag);
+extern void Syn6288Speak(char *voice, uint8 flag);
 extern void ChangeBaudrate(uint8 bps_no);
 extern void Syn6288Stop(void);
 extern void Syn6288Pause(void);

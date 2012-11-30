@@ -1,7 +1,7 @@
 /****************************************Copyright (c)**************************************************
 **                               广州周立功单片机发展有限公司
 **                                     研    究    所
-**                                        产品一部 
+**                                        产品一部
 **
 **                                 http://www.zlgmcu.com
 **
@@ -10,7 +10,7 @@
 **创   建   人: 陈明计
 **最后修改日期: 2003年7月2日
 **描        述: 数据队列的中间件
-**              
+**
 **--------------历史版本信息----------------------------------------------------------------------------
 ** 创建人: 陈明计
 ** 版  本: v1.0
@@ -41,25 +41,26 @@
 #define QUEUE_DATA_TYPE     uint8
 #endif
 
-typedef struct {
-    QUEUE_DATA_TYPE     *Out;                   /* 指向数据输出位置         */
-    QUEUE_DATA_TYPE     *In;                    /* 指向数据输入位置         */
-    QUEUE_DATA_TYPE     *End;                   /* 指向Buf的结束位置        */
-    uint16              NData;                  /* 队列中数据个数           */
-    uint16              MaxData;                /* 队列中允许存储的数据个数 */
-    
-    uint8               (* ReadEmpty)();        /* 读空处理函数             */
-    uint8               (* WriteFull)();        /* 写满处理函数             */
-    QUEUE_DATA_TYPE     Buf[1];                 /* 存储数据的空间           */
+typedef struct
+{
+	QUEUE_DATA_TYPE     *Out;                   /* 指向数据输出位置         */
+	QUEUE_DATA_TYPE     *In;                    /* 指向数据输入位置         */
+	QUEUE_DATA_TYPE     *End;                   /* 指向Buf的结束位置        */
+	uint16              NData;                  /* 队列中数据个数           */
+	uint16              MaxData;                /* 队列中允许存储的数据个数 */
+
+	uint8               (* ReadEmpty)();        /* 读空处理函数             */
+	uint8               (* WriteFull)();        /* 写满处理函数             */
+	QUEUE_DATA_TYPE     Buf[1];                 /* 存储数据的空间           */
 } DataQueue;
 
 
 #ifndef IN_QUEUE
-        uint8 QueueCreate(void *Buf,
-                          uint32 SizeOfBuf,
-                          uint8 (* ReadEmpty)(),
-                          uint8 (* WriteFull)()
-                          );
+uint8 QueueCreate(void *Buf,
+                  uint32 SizeOfBuf,
+                  uint8 (* ReadEmpty)(),
+                  uint8 (* WriteFull)()
+                 );
 /*********************************************************************************************************
 ** 函数名称: QueueCreate
 ** 功能描述: 初始化数据队列

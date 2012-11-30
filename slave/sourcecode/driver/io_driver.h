@@ -1,7 +1,7 @@
 #ifndef _IO_DRIVER_H
 #define _IO_DRIVER_H
 
-/*	
+/*
 	P00	串口0发送
 	P01	串口0接收
 	P02	SCL
@@ -54,7 +54,7 @@
 #define SetUart1ChannalControlA(c)		(c?(IO0SET|=UART1_A):(IO0CLR|=UART1_A))
 #define SetUart1ChannalControlB(c)		(c?(IO0SET|=UART1_B):(IO0CLR|=UART1_B))
 
- 
+
 extern uint8  IoInit(void);
 extern void Io2Exception(void);
 

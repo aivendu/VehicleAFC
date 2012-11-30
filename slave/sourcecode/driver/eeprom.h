@@ -12,14 +12,16 @@
 
 #define MAX_RIDE_NUMBER_OF_PEOPLE	5			//	每笔交易，到达的站点不能大于的个数
 
-typedef struct {
-	uint32 login_mod				:2;
-	uint32 unused					:30;
+typedef struct
+{
+	uint32 login_mod				: 2;
+	uint32 unused					: 30;
 } _sys_config_flag_s;
 
 
 
-typedef struct {
+typedef struct
+{
 	_variable_flag_s vf_sc;
 	_sys_config_flag_s scf;
 	_uart_config_s uc_rj45;
@@ -36,25 +38,29 @@ typedef struct {
 	char license_plate[9];
 } _sys_config_s;
 
-typedef union {
+typedef union
+{
 	uint8 sc_b[sizeof(_sys_config_s)];
 	_sys_config_s sc;
 } _sys_config_u;
 
 
-typedef struct {
+typedef struct
+{
 	uint8 data[14];
 	uint8 flag;
 	uint8 crc;
 } _mem_eeprom_s;
 
-typedef union {
+typedef union
+{
 	uint8 mem_b[sizeof(_mem_eeprom_s)];
 	_mem_eeprom_s mem;
 } _mem_eeprom_u;
 
 
-typedef struct {
+typedef struct
+{
 	uint16 start;
 	uint16 end;
 	uint16 in;
