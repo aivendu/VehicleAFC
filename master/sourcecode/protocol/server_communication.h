@@ -123,7 +123,7 @@ extern uint8 ServerOnLine(void);
 extern uint8 ServerUploadTradeData(_trade_data_to_server_s *data);
 extern uint8 ServerTimeSync(void);
 extern uint8 ServerCashBoxBalance(uint16 cashbox1, uint16 cashbox2, uint16 cashbox3);
-extern uint8 ServerGPSData(uint8 flag,uint32 latitude, uint32 longitude, uint32 speed);
+extern uint8 ServerGPSData(uint8 flag, uint32 latitude, uint32 longitude, uint32 speed);
 extern uint8 ServerLogin(void *data);
 extern uint8 ServerLogout(void *data);
 

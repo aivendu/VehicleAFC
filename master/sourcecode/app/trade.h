@@ -30,7 +30,7 @@ extern _trade_data_to_server_s trade_data_temp;
 extern uint32	current_trade_index;
 
 extern void TaskTrade(void *pdata);
-extern uint8 SearchTradeData(uint16 year, uint8 month, uint8 day,_trade_manage_data_s *data);
+extern uint8 SearchTradeData(uint16 year, uint8 month, uint8 day, _trade_manage_data_s *data);
 
 
 #endif

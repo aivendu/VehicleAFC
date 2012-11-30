@@ -32,49 +32,49 @@
 /*      uC/OS-II的特殊代码       */
 /*      uC/OS-II specital code  */
 /********************************/
-#ifndef __INCLUDES_H 
+#ifndef __INCLUDES_H
 #define __INCLUDES_H
-	
-#include   "config.h" 
 
-	#ifdef __cplusplus
-	extern "C" {
-	#endif
+#include   "config.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include    "arm\os_cpu.h"
 #include    "os\os_cfg.h"
 #include    "os\ucos_ii.h"
-	#ifdef __cplusplus
-	}
-	#endif
+#ifdef __cplusplus
+}
+#endif
 
 #include    <string.h>
-   
-   /********************************/
-   /*	   ARM的特殊代码		   */
-   /*	   ARM specital code	   */
-   /********************************/
-   //这一段无需改动
-   //This segment should not be modify
-   
-#include    "LPC2294.h" 
-   
-   /********************************/
-   /*	  应用程序配置			   */
-   /*Application Program Configurations*/
-   /********************************/
-   //以下根据需要改动
-   //This segment could be modified as needed.
+
+/********************************/
+/*	   ARM的特殊代码		   */
+/*	   ARM specital code	   */
+/********************************/
+//这一段无需改动
+//This segment should not be modify
+
+#include    "LPC2294.h"
+
+/********************************/
+/*	  应用程序配置			   */
+/*Application Program Configurations*/
+/********************************/
+//以下根据需要改动
+//This segment could be modified as needed.
 #include    <stdio.h>
 #include    <ctype.h>
 #include    <stdlib.h>
 #include    <setjmp.h>
-#include    <rt_misc.h> 
-   
-   
-   /********************************/
-   /*	  本例子的配置			   */
-   /*Configuration of the example */
-   /********************************/
+#include    <rt_misc.h>
+
+
+/********************************/
+/*	  本例子的配置			   */
+/*Configuration of the example */
+/********************************/
 #include "queue.h"
 #include "head.h"
 #include "comm.h"
@@ -101,8 +101,8 @@
 #include "trade.h"
 
 
-   /* 由于不同情况中断OSIntExit()对堆栈的使用情况不同，必须加上这个宏定义    */
-   /* for any types of interrupt , OSIntExit() using the stacks is different , so ,must add this define*/
+/* 由于不同情况中断OSIntExit()对堆栈的使用情况不同，必须加上这个宏定义    */
+/* for any types of interrupt , OSIntExit() using the stacks is different , so ,must add this define*/
 #define OSIntCtxSw()    return
 
 #endif

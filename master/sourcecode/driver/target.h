@@ -19,69 +19,69 @@
 ** Modified by: 		Chenmingji
 ** Modified date:		2004-09-17
 ** Version:				1.01
-** Descriptions: 		Renewed the template, added codes to surport more compilers 
+** Descriptions: 		Renewed the template, added codes to surport more compilers
 **
 **------------------------------------------------------------------------------------------------------
-** Modified by: 
+** Modified by:
 ** Modified date:
-** Version:	
-** Descriptions: 
+** Version:
+** Descriptions:
 **
 ********************************************************************************************************/
-#ifndef __TARGET_H 
+#ifndef __TARGET_H
 #define __TARGET_H
 
-    #ifdef __cplusplus
-    extern "C" {
-    #endif
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
-    #ifndef IN_TARGET 
+#ifndef IN_TARGET
 
-extern void Reset(void);
-/*********************************************************************************************************
-** Function name:			Reset
-** Descriptions:			resets the target board.
-** input parameters:		None
-**
-** Returned value:			None
-**         
-** Used global variables:	None
-** Calling modules:			None
-**
-** Created by:				Chenmingji
-** Created Date:			2004/02/02
-**-------------------------------------------------------------------------------------------------------
-** Modified by:
-** Modified date:
-**------------------------------------------------------------------------------------------------------
-********************************************************************************************************/
+	extern void Reset(void);
+	/*********************************************************************************************************
+	** Function name:			Reset
+	** Descriptions:			resets the target board.
+	** input parameters:		None
+	**
+	** Returned value:			None
+	**
+	** Used global variables:	None
+	** Calling modules:			None
+	**
+	** Created by:				Chenmingji
+	** Created Date:			2004/02/02
+	**-------------------------------------------------------------------------------------------------------
+	** Modified by:
+	** Modified date:
+	**------------------------------------------------------------------------------------------------------
+	********************************************************************************************************/
 
-extern void TargetInit(void);
-/*********************************************************************************************************
-** Function name:			TargetInit
-**
-** Descriptions:			Initialize the target board; it is called in a necessary place, change it as 
-**							needed
-**
-** input parameters:		None
-** Returned value:			None
-**         
-** Used global variables:	None
-** Calling modules:			None
-**
-** Created by:				Chenmingji
-** Created Date:			2004/02/02
-**-------------------------------------------------------------------------------------------------------
-** Modified by:
-** Modified date:
-**------------------------------------------------------------------------------------------------------
-********************************************************************************************************/
-    #endif
+	extern void TargetInit(void);
+	/*********************************************************************************************************
+	** Function name:			TargetInit
+	**
+	** Descriptions:			Initialize the target board; it is called in a necessary place, change it as
+	**							needed
+	**
+	** input parameters:		None
+	** Returned value:			None
+	**
+	** Used global variables:	None
+	** Calling modules:			None
+	**
+	** Created by:				Chenmingji
+	** Created Date:			2004/02/02
+	**-------------------------------------------------------------------------------------------------------
+	** Modified by:
+	** Modified date:
+	**------------------------------------------------------------------------------------------------------
+	********************************************************************************************************/
+#endif
 
-    #ifdef __cplusplus
-    }
-    #endif
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /*********************************************************************************************************

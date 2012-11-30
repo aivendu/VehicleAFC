@@ -12,33 +12,33 @@
 #define WCOL						(1<<6) 		//	写冲突
 
 // io中断
-uint8 spi0_send_data,spi0_rec_data;
-uint8 spi0_ctr_var,spi0_state;
+uint8 spi0_send_data, spi0_rec_data;
+uint8 spi0_ctr_var, spi0_state;
 OS_EVENT *spi0_mbox;
 
 uint8  IoInit(void)
 {
-/*	P00 与GPRS通信串口0发送
-	P01 与GPRS通信串口0接收
-	P02 SCL
-	P03 SDA
-	P04 SCK
-	P05 MISO
-	P06 MOSI
-	P07 CS
-	P08 与PAD通信串口1发送
-	P09 与PAD通信串口1接收
-	P014	下载
-	　	　
-	P015	RJ45 CTS
-	P016	RJ45 RTS
-	P017	RJ45 复位
-	P030	状态灯
-*/
+	/*	P00 与GPRS通信串口0发送
+		P01 与GPRS通信串口0接收
+		P02 SCL
+		P03 SDA
+		P04 SCK
+		P05 MISO
+		P06 MOSI
+		P07 CS
+		P08 与PAD通信串口1发送
+		P09 与PAD通信串口1接收
+		P014	下载
+		　	　
+		P015	RJ45 CTS
+		P016	RJ45 RTS
+		P017	RJ45 复位
+		P030	状态灯
+	*/
 	PINSEL0 = 0x00000000;
 	PINSEL1 = 0x00000000;
-	PINSEL2=PINSEL2&(~(0x01<<3));
-	
+	PINSEL2 = PINSEL2 & (~(0x01 << 3));
+
 	PINSEL0 |= 0x00000005;	//	配置UART0 功能
 	PINSEL0 |= 0x00000050;	//	配置I2C0 功能
 	PINSEL0 |= 0x00005500;	//	配置SPI0 口功能
@@ -62,7 +62,7 @@ uint8  IoInit(void)
 #endif
 
 	return 1;
-	
+
 }
 
 

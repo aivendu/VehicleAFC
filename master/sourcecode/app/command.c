@@ -21,12 +21,12 @@ _Command_S *CurrentCommand(void)
 }
 
 //	发送一个命令
-uint8 PostCommand(_Command_S *cmd,uint8 *err)
+uint8 PostCommand(_Command_S *cmd, uint8 *err)
 {
 }
 
 //	等待一个命令
-uint8 PendCommand(_Command_S *cmd,uint32 time,uint8 *err)
+uint8 PendCommand(_Command_S *cmd, uint32 time, uint8 *err)
 {
 }
 

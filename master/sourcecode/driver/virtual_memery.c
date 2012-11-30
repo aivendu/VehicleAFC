@@ -24,7 +24,7 @@ const _Memery_chip_manage_s	memery_chip[] =
 uint16 ReadExternMemery(void *data, uint32 addr, uint32 len)
 {
 	uint8 i;
-	uint32 len_temp,addr_temp;
+	uint32 len_temp, addr_temp;
 	for (i = 0; i <= EXTERN_CHIP_WITH_IO_NUM; i++)
 	{
 		if (addr < memery_chip[i].virtual_start_addr)
@@ -46,14 +46,14 @@ uint16 ReadExternMemery(void *data, uint32 addr, uint32 len)
 		{
 			//	数据不是存储在单一存储器里
 			len_temp = memery_chip[i].memery_size - addr_temp;
-			I2c0ReadMemery(memery_chip[i].io_addr,(uint8 *)&addr,memery_chip[i].memery_addr_len,data,len_temp);
+			I2c0ReadMemery(memery_chip[i].io_addr, (uint8 *)&addr, memery_chip[i].memery_addr_len, data, len_temp);
 			//i++;
 		}
 		else
 		{
 			//	数据可以在当前存储器里全部存储
 			len_temp = len;
-			I2c0ReadMemery(memery_chip[i].io_addr,(uint8 *)&addr_temp,memery_chip[i].memery_addr_len,data,len_temp);
+			I2c0ReadMemery(memery_chip[i].io_addr, (uint8 *)&addr_temp, memery_chip[i].memery_addr_len, data, len_temp);
 			return 0;
 		}
 		data = (void *)((uint32)data + len_temp);
@@ -66,7 +66,7 @@ uint16 ReadExternMemery(void *data, uint32 addr, uint32 len)
 uint16 WriteExternMemery(void *data, uint32 addr, uint32 len)
 {
 	uint8 i;
-	uint32 len_temp,addr_temp;
+	uint32 len_temp, addr_temp;
 	for (i = 0; i <= EXTERN_CHIP_WITH_IO_NUM; i++)
 	{
 		if (addr < memery_chip[i].virtual_start_addr)
@@ -86,14 +86,14 @@ uint16 WriteExternMemery(void *data, uint32 addr, uint32 len)
 		{
 			//	数据不是存储在单一存储器里
 			len_temp = memery_chip[i].memery_size - addr_temp;
-			I2c0WriteMemery(memery_chip[i].io_addr,(uint8 *)&addr_temp,memery_chip[i].memery_addr_len,data,len_temp);
+			I2c0WriteMemery(memery_chip[i].io_addr, (uint8 *)&addr_temp, memery_chip[i].memery_addr_len, data, len_temp);
 			//i++;
 		}
 		else
 		{
 			//	数据可以在当前存储器里全部存储
 			len_temp = len;
-			I2c0WriteMemery(memery_chip[i].io_addr,(uint8 *)&addr_temp,memery_chip[i].memery_addr_len,data,len_temp);
+			I2c0WriteMemery(memery_chip[i].io_addr, (uint8 *)&addr_temp, memery_chip[i].memery_addr_len, data, len_temp);
 			return 0;
 		}
 		data = (void *)((uint32)data + len_temp);
@@ -104,11 +104,12 @@ uint16 WriteExternMemery(void *data, uint32 addr, uint32 len)
 }
 
 
-void InitConfigData (void) {
+void InitConfigData (void)
+{
 	return;
 }
 
- 
+
 
 
 

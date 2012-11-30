@@ -36,7 +36,7 @@
 #define TaskSysConfigSize		256
 
 
-const char completeversion[16]={VERSION};
+const char completeversion[16] = {VERSION};
 OS_STK TaskTestStk[TaskTestSize];
 OS_STK TaskPADRecHandleStk[TaskPADRecHandleSize];
 OS_STK TaskDeviceCommandStk[TaskDeviceCommandSize];
@@ -58,11 +58,11 @@ OS_STK TaskSysConfigStk[TaskSysConfigSize];
 */
 int main (void)
 {
-    OSInit();	
-    
-    TargetInit();
-	
-    OSTaskCreate (TaskTest, (void *)0, &TaskTestStk[TaskTestSize - 1], TaskTestPrio);
+	OSInit();
+
+	TargetInit();
+
+	OSTaskCreate (TaskTest, (void *)0, &TaskTestStk[TaskTestSize - 1], TaskTestPrio);
 	OSTaskCreate (TaskPADRecHandle, (void *)0, &TaskPADRecHandleStk[TaskPADRecHandleSize - 1], TaskPADRecHandlePrio);
 	OSTaskCreate (TaskDeviceCommand, (void *)0, &TaskDeviceCommandStk[TaskDeviceCommandSize - 1], TaskDeviceCommandPrio);
 	OSTaskCreate (TaskChipComm, (void *)0, &TaskChipCommStk[TaskChipCommSize - 1], TaskChipCommPrio);
@@ -80,15 +80,15 @@ int main (void)
 	//OSTaskSuspend(TaskTradePrio);
 	//OSTaskSuspend(TaskDataUploadPrio);
 
-	
-    OSStart();	
-    															//(6)
-    return 0;																//(7)
+
+	OSStart();
+	//(6)
+	return 0;																//(7)
 }
 
 
 
-   
+
 /*********************************************************************************************************
 **                            End Of File
 ********************************************************************************************************/

@@ -9,15 +9,15 @@ void TaskDataUpload(void *pdata)
 	_trade_manage_data_s upload_manage_temp;
 	_trade_data_to_server_s upload_data_temp;
 	_log_s *upload_log_temp;
-		
+
 	pdata = pdata;
 	OSTimeDly(OS_TICKS_PER_SEC);
-	memset(&upload_manage_temp,0,sizeof(_trade_manage_data_s));
-	memset(&upload_data_temp,0,sizeof(_trade_data_to_server_s));
+	memset(&upload_manage_temp, 0, sizeof(_trade_manage_data_s));
+	memset(&upload_data_temp, 0, sizeof(_trade_data_to_server_s));
 	while (1)
 	{
 		GetNextPackage();
-		err = ServerGPSData((device_control.gps.gps_state == 3),device_control.gps.gps_latitude,device_control.gps.gps_longitude,device_control.gps.gps_movingspeed);
+		err = ServerGPSData((device_control.gps.gps_state == 3), device_control.gps.gps_latitude, device_control.gps.gps_longitude, device_control.gps.gps_movingspeed);
 		if (err == GPRS_DATA_NO_ERR)
 		{
 			if (GetTradeUploadState() == 1)
@@ -28,7 +28,7 @@ void TaskDataUpload(void *pdata)
 					if (trade_manage_data_temp.out != trade_manage_data_temp.in)
 					{
 						//	有数据没有上传
-						ReadExternMemery(&upload_data_temp,upload_manage_temp.out,sizeof(_trade_data_to_server_s));
+						ReadExternMemery(&upload_data_temp, upload_manage_temp.out, sizeof(_trade_data_to_server_s));
 						GetNextPackage();
 						if (ServerUploadTradeData(&upload_data_temp) == GPRS_DATA_NO_ERR)
 						{
@@ -47,7 +47,7 @@ void TaskDataUpload(void *pdata)
 				{
 					//	上传以前的数据
 					upload_index = trade_manage_data_temp.last_day_addr;
-					ReadExternMemery(&upload_manage_temp,upload_index,sizeof(_trade_manage_data_s));
+					ReadExternMemery(&upload_manage_temp, upload_index, sizeof(_trade_manage_data_s));
 					while (upload_manage_temp.in != upload_manage_temp.out)
 					{
 						if (upload_manage_temp.last_day_addr == TRADE_DATA_START_ADDR)
@@ -55,7 +55,7 @@ void TaskDataUpload(void *pdata)
 							//	当前是最早的交易数据
 							break;
 						}
-						
+
 						if (trade_manage_data_temp.in > current_trade_index)		//	判断当天的日志存储区域是否经过越界点
 						{
 							//	没有经过越界点
@@ -75,13 +75,13 @@ void TaskDataUpload(void *pdata)
 							}
 						}
 						upload_index = upload_manage_temp.last_day_addr;		//	修改索引，读取上一天数据
-						ReadExternMemery(&upload_manage_temp,upload_index,sizeof(_trade_manage_data_s));
+						ReadExternMemery(&upload_manage_temp, upload_index, sizeof(_trade_manage_data_s));
 					}
-					
+
 					while ((upload_manage_temp.in == upload_manage_temp.out) && (upload_index != current_trade_index))
 					{
 						upload_index = upload_manage_temp.in;
-						ReadExternMemery(&upload_manage_temp,upload_index,sizeof(_trade_manage_data_s));
+						ReadExternMemery(&upload_manage_temp, upload_index, sizeof(_trade_manage_data_s));
 					}
 
 					if (upload_index == current_trade_index)
@@ -90,23 +90,23 @@ void TaskDataUpload(void *pdata)
 						continue;
 					}
 					//	读取和上传数据
-					ReadExternMemery(&upload_data_temp,upload_manage_temp.out,sizeof(_trade_data_to_server_s));
+					ReadExternMemery(&upload_data_temp, upload_manage_temp.out, sizeof(_trade_data_to_server_s));
 					GetNextPackage();
 					if (ServerUploadTradeData(&upload_data_temp) == GPRS_DATA_NO_ERR)
 					{
 						//	更新数据管理数据
 						upload_manage_temp.out += sizeof(_trade_data_to_server_s);
-						if ((upload_index >= (TRADE_DATA_START_ADDR + sizeof(current_trade_index))) 
-							|| ((upload_index + sizeof(_trade_manage_data_s)) < (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE)))
+						if ((upload_index >= (TRADE_DATA_START_ADDR + sizeof(current_trade_index)))
+						        || ((upload_index + sizeof(_trade_manage_data_s)) < (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE)))
 						{
-							WriteExternMemery(&upload_manage_temp,upload_index,sizeof(_trade_manage_data_s));
+							WriteExternMemery(&upload_manage_temp, upload_index, sizeof(_trade_manage_data_s));
 							if ((upload_manage_temp.out == upload_manage_temp.in) && (upload_index != current_trade_index))
 							{
 								//	读下一天的数据
 								upload_index = upload_manage_temp.in;
-								ReadExternMemery(&upload_manage_temp,upload_index,sizeof(_trade_manage_data_s));
+								ReadExternMemery(&upload_manage_temp, upload_index, sizeof(_trade_manage_data_s));
 							}
-							
+
 						}
 						else
 						{
@@ -128,17 +128,17 @@ void TaskDataUpload(void *pdata)
 			}
 			else
 			{
-				
+
 			}
-			OSTimeDly(OS_TICKS_PER_SEC*5);
+			OSTimeDly(OS_TICKS_PER_SEC * 5);
 			//OSTaskSuspend(OS_PRIO_SELF);
 		}
 		else
 		{
-			OSTimeDly(OS_TICKS_PER_SEC*10);
-			
+			OSTimeDly(OS_TICKS_PER_SEC * 10);
+
 		}
-		
+
 	}
 }
 

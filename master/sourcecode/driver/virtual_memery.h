@@ -53,21 +53,23 @@ typedef struct
 
 typedef struct
 {
-	uint8 failure			:1;			//	0 -- 存储器正常，1 -- 存储器已损坏
-	uint8 memeryused		:1;			//	0 -- 存储器可以使用，1 -- 存储器已被使用
-	uint8 prohibitread		:1;			//	0 -- 存储器可以读，1 -- 存储器不能被读
-	uint8 prohibitwrite		:1;			//	0 -- 存储器可以写，1 -- 存储器不能被写
-	uint8 unused			:4;
+	uint8 failure			: 1;			//	0 -- 存储器正常，1 -- 存储器已损坏
+	uint8 memeryused		: 1;			//	0 -- 存储器可以使用，1 -- 存储器已被使用
+	uint8 prohibitread		: 1;			//	0 -- 存储器可以读，1 -- 存储器不能被读
+	uint8 prohibitwrite		: 1;			//	0 -- 存储器可以写，1 -- 存储器不能被写
+	uint8 unused			: 4;
 } _mem_state_s;
 
 
-typedef struct {
+typedef struct
+{
 	uint8 state;
 	uint8 crc;
 	uint8 data[14];
 } _mem_eeprom_s;
 
-typedef union {
+typedef union
+{
 	uint8 mem_b[sizeof(_mem_eeprom_s)];
 	_mem_eeprom_s mem;
 } _mem_eeprom_u;
@@ -75,12 +77,13 @@ typedef union {
 
 /*
 typedef struct {
-	
+
 } _log_to_pad_s;
 */
 
 
-typedef struct {
+typedef struct
+{
 	uint16 start;
 	uint16 end;
 	uint16 in;

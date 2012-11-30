@@ -18,17 +18,19 @@ typedef union {
 } _sys_exe_st_u;
 */
 
-typedef struct {
+typedef struct
+{
 	uint8 len;				//	发送数据的长度, 包括"包号","错误号","命令字","参数","数据"
 	uint8 backage_num;		//	发送数据的包号
 	uint16 err_no;			//	返回PAD 数据时的错误号
 	uint8 cmd;				//	发送的命令字
 	uint8 arg;				//	发送的参数
 	uint8 *dat;				//	发送的数据，从参数后一个字节记起
-}_df_device_and_pad_comm;
+} _df_device_and_pad_comm;
 
 
-typedef struct {
+typedef struct
+{
 	_variable_flag_s change_flag;	//	命令改变过的标记
 	uint8 old_package_num;	//	上一条数据的包号
 	uint8 package_num;		//	收到的数据的包号
@@ -41,7 +43,8 @@ typedef struct {
 } _pad_com_task;
 
 
-typedef struct {
+typedef struct
+{
 	uint8 cmd;			//	命令字
 	_pfunc *func;		//	对于命令字的处理函数
 } _rj45_command_s;
@@ -107,7 +110,7 @@ extern uint16 Login(void *arg);
 extern uint16 TimeSync(void *arg);
 extern uint16 GetStationMess(void *arg);
 extern uint16 StationSync(void *arg);
-extern void * GetPADCommandData(void);
+extern void *GetPADCommandData(void);
 
 
 

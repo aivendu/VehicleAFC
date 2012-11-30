@@ -2,12 +2,12 @@
 #define _COMMAND_H
 
 
-typedef struct 
+typedef struct
 {
-	uint8 command_flag		:1;
-	uint8 use_flag			:1;
-	uint8 unused			:2;
-	uint8 state				:4;
+	uint8 command_flag		: 1;
+	uint8 use_flag			: 1;
+	uint8 unused			: 2;
+	uint8 state				: 4;
 	/*	状态说明
 	*	0--该命令未使用，
 	*	1--有命令还未执行，
@@ -31,10 +31,10 @@ typedef struct
 extern _Command_S *CurrentCommand(void);
 
 //	发送一个命令
-extern uint8 PostCommand(_Command_S *cmd,uint8 *err);
+extern uint8 PostCommand(_Command_S *cmd, uint8 *err);
 
 //	等待一个命令
-extern uint8 PendCommand(_Command_S *cmd,uint32 time,uint8 *err);
+extern uint8 PendCommand(_Command_S *cmd, uint32 time, uint8 *err);
 
 //	读命令状态
 extern uint8 ReadCommandState(_Command_S *cmd);

@@ -12,11 +12,11 @@
 //	定义和控制系统功能
 typedef struct
 {
-	uint32	config_state			:2;		//	配置状态，0--未初始化，1--默认初始化，2--用户配置
-	uint32	login_mod				:2;		//	登录模式，0--卡登录，1--帐号登录，3--混合登录
-	uint32	trade_upload_state		:1;		//	交易数据上传完成，0--数据上传完成，1--还有没上传的数据
-	uint32	intelligent_change		:1;		//	智能找零功能，可以根据钱箱余额分配找零张数，0--禁止，1--使能
-	uint32	unused					:27;
+	uint32	config_state			: 2;		//	配置状态，0--未初始化，1--默认初始化，2--用户配置
+	uint32	login_mod				: 2;		//	登录模式，0--卡登录，1--帐号登录，3--混合登录
+	uint32	trade_upload_state		: 1;		//	交易数据上传完成，0--数据上传完成，1--还有没上传的数据
+	uint32	intelligent_change		: 1;		//	智能找零功能，可以根据钱箱余额分配找零张数，0--禁止，1--使能
+	uint32	unused					: 27;
 } _function_config_s;
 
 typedef union
@@ -59,8 +59,8 @@ typedef struct
 	uint16	cashbox1_deposit;	//	硬币钱箱存入总额
 	uint16	cashbox2_deposit;	//	纸币钱箱一存入总额
 	uint16	cashbox3_deposit;	//	纸币钱箱二存入总额
-	uint8	unused[2];	//	
-}_cashbox_config_s;
+	uint8	unused[2];	//
+} _cashbox_config_s;
 
 typedef union
 {
@@ -70,7 +70,8 @@ typedef union
 
 
 //	串口配置
-typedef struct {
+typedef struct
+{
 	_uart_config_s uc_rj45;
 	_uart_config_s uc_gprs;
 	_uart_config_s uc_gps;
@@ -95,7 +96,7 @@ typedef struct
 {
 	char print_customer[16];		//	客户名称，提供打印
 	_function_config_u fc;			//	功能配置
-	_cashbox_config_u  cc;			//	
+	_cashbox_config_u  cc;			//
 	_uart_manage_u um;
 	_parameter_u pa;
 	char device_addr[4];			//	设备地址, ASCII 字符, 0000-FFFF
@@ -147,7 +148,7 @@ typedef struct
 #define GetCashbox3Value()				(config_ram.cc.cc.cashbox3_value)
 #define SetCashbox3Value(c)				(config_ram.cc.cc.cashbox3_value = c)
 #define GetCashbox1AlarmThreshold()		(config_ram.cc.cc.cashbox1_alarm_threshold)
-#define SetCashbox1AlarmThreshold(c)	(config_ram.cc.cc.cashbox1_alarm_threshold = c)	
+#define SetCashbox1AlarmThreshold(c)	(config_ram.cc.cc.cashbox1_alarm_threshold = c)
 #define GetCashbox2AlarmThreshold()		(config_ram.cc.cc.cashbox2_alarm_threshold)
 #define SetCashbox2AlarmThreshold(c)	(config_ram.cc.cc.cashbox2_alarm_threshold = c)
 #define GetCashbox3AlarmThreshold()		(config_ram.cc.cc.cashbox3_alarm_threshold)
@@ -206,7 +207,7 @@ typedef struct
 
 extern _config_s config_ram;
 
-extern char * GetDeviceAddr(void);
+extern char *GetDeviceAddr(void);
 extern uint8 SetDeviceAddr(char *arg);
 extern void TaskSysConfig(void *pdata);
 extern void ConfigInit(void);

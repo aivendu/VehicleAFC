@@ -1,13 +1,15 @@
 #ifndef _IC_CARD_H
 #define _IC_CARD_H
 
-typedef struct {
+typedef struct
+{
 	uint8 company_code;			//	恒为0xDF
 	uint8 card_id[7];
 	uint8 unused[8];
 } _company_flag_s;
 
-typedef struct {
+typedef struct
+{
 	_company_flag_s company_flag;
 	char staffid[8];			//	工号
 	char driver_name[8];		//	司机名字
@@ -16,7 +18,8 @@ typedef struct {
 	uint16 routenum;			//	路线编号
 } _ic_data_s;
 
-typedef union {
+typedef union
+{
 	uint8 icdata_b[sizeof(_ic_data_s)];
 	_ic_data_s icdata;
 } _ic_data_u;
