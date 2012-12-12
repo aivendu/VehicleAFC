@@ -62,6 +62,7 @@ typedef enum
 typedef struct
 {
 	uint8 channal;
+	uint8 device_addr;
 	uint32 bps;
 } _uart_config_s;
 
@@ -223,34 +224,50 @@ typedef struct
 
 #define GetRj45UartChannal()			(config_ram.um.um.uc_rj45.channal)
 #define SetRj45UartChannal(c)			(config_ram.um.um.uc_rj45.channal = c)
+#define GetRj45UartDeviceAddr()			(config_ram.um.um.uc_rj45.device_addr)
+#define SetRj45UartDeviceAddr(c)		(config_ram.um.um.uc_rj45.device_addr = c)
 #define GetRj45UartBps()				(config_ram.um.um.uc_rj45.bps)
 #define SetRj45UartBps(c)				(config_ram.um.um.uc_rj45.bps = c)
 #define GetGprsUartChannal()			(config_ram.um.um.uc_gprs.channal)
 #define SetGprsUartChannal(c)			(config_ram.um.um.uc_gprs.channal = c)
+#define GetGprsUartDeviceAddr()			(config_ram.um.um.uc_gprs.device_addr)
+#define SetGprsUartDeviceAddr(c)		(config_ram.um.um.uc_gprs.device_addr = c)
 #define GetGprsUartBps()				(config_ram.um.um.uc_gprs.bps)
 #define SetGprsUartBps(c)				(config_ram.um.um.uc_gprs.bps = c)
 #define GetGpsUartChannal()				(config_ram.um.um.uc_gps.channal)
 #define SetGpsUartChannal(c)			(config_ram.um.um.uc_gps.channal = c)
+#define GetGpsUartDeviceAddr()			(config_ram.um.um.uc_gps.device_addr)
+#define SetGpsUartDeviceAddr(c)			(config_ram.um.um.uc_gps.device_addr = c)
 #define GetGpsUartBps()					(config_ram.um.um.uc_gps.bps)
 #define SetGpsUartBps(c)				(config_ram.um.um.uc_gps.bps = c)
 #define GetBillUartChannal()			(config_ram.um.um.uc_bill.channal)
 #define SetBillUartChannal(c)			(config_ram.um.um.uc_bill.channal = c)
+#define GetBillUartDeviceAddr()			(config_ram.um.um.uc_bill.device_addr)
+#define SetBillUartDeviceAddr(c)		(config_ram.um.um.uc_bill.device_addr = c)
 #define GetBillUartBps()				(config_ram.um.um.uc_bill.bps)
 #define SetBillUartBps(c)				(config_ram.um.um.uc_bill.bps = c)
 #define GetCoinUartChannal()			(config_ram.um.um.uc_coin.channal)
 #define SetCoinUartChannal(c)			(config_ram.um.um.uc_coin.channal = c)
+#define GetCoinUartDeviceAddr()			(config_ram.um.um.uc_coin.device_addr)
+#define SetCoinUartDeviceAddr(c)		(config_ram.um.um.uc_coin.device_addr = c)
 #define GetCoinUartBps()				(config_ram.um.um.uc_coin.bps)
 #define SetCoinUartBps(c)				(config_ram.um.um.uc_coin.bps = c)
 #define GetPrintUartChannal()			(config_ram.um.um.uc_print.channal)
 #define SetPrintUartChannal(c)			(config_ram.um.um.uc_print.channal = c)
+#define GetPrintUartDeviceAddr()		(config_ram.um.um.uc_print.device_addr)
+#define SetPrintUartDeviceAddr(c)		(config_ram.um.um.uc_print.device_addr = c)
 #define GetPrintUartBps()				(config_ram.um.um.uc_print.bps)
 #define SetPrintUartBps(c)				(config_ram.um.um.uc_print.bps = c)
 #define GetVoiceUartChannal()			(config_ram.um.um.uc_voice.channal)
 #define SetVoiceUartChannal(c)			(config_ram.um.um.uc_voice.channal = c)
+#define GetVoiceUartDeviceAddr()		(config_ram.um.um.uc_voice.device_addr)
+#define SetVoiceUartDeviceAddr(c)		(config_ram.um.um.uc_voice.device_addr = c)
 #define GetVoiceUartBps()				(config_ram.um.um.uc_voice.bps)
 #define SetVoiceUartBps(c)				(config_ram.um.um.uc_voice.bps = c)
 #define GetICMachineUartChannal()		(config_ram.um.um.uc_icmachine.channal)
 #define SetICMachineUartChannal(c)		(config_ram.um.um.uc_icmachine.channal = c)
+#define GetICMachineUartDeviceAddr()	(config_ram.um.um.uc_icmachine.device_addr)
+#define SetICMachineUartDeviceAddr(c)	(config_ram.um.um.uc_icmachine.device_addr = c)
 #define GetICMachineUartBps()			(config_ram.um.um.uc_icmachine.bps)
 #define SetICMachineUartBps(c)			(config_ram.um.um.uc_icmachine.bps = c)
 

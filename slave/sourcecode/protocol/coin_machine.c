@@ -1021,7 +1021,7 @@ void  TaskHopperExe(void *pdata)
 			device_control.sys_device.coin_machine_state = COIN_MACHINE_CHANGE_RUNNING;
 			RequestHardResource();
 			DISABLESPI0();
-			dispenseCoin(0, &temp);
+			dispenseCoin(GetCoinUartDeviceAddr(), &temp);
 			ENABLESPI0();
 			FreeHardResource();
 			//device_control.trade.cr.coin_reject = temp;

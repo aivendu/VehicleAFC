@@ -35,7 +35,7 @@ void TaskTest(void *pdata)
 	uint32 test_result = 0;;
 	pdata = pdata;
 
-	testitem = 1;
+	testitem = 5;
 	while (1)
 	{
 		while (run_flag)
@@ -122,23 +122,9 @@ void TaskTest(void *pdata)
 				testitem++;
 				break;
 			case 5:
-				RequestUart(SPEAKER_UART1, 0);
-				memset(rec_data, 0, sizeof(rec_data));
-				Uart1SendString(textdata, 1);
-				for (i = 0; i < sizeof(rec_data); i++)
-				{
-					if (Uart1RecByte((uint8 *)&rec_data[i], 1, OS_TICKS_PER_SEC / 20) == FALSE)
-					{
-						break;
-					}
-
-				}
-				if (strncmp(textdata, rec_data, sizeof(textdata)) == 0)
-				{
-					test_result |= (1 << 5);
-				}
-				FreeUart(SPEAKER_UART1);
-				testitem++;
+				//	²âÊÔÓïÒô
+				Syn6288Speak("ABCDEFG",0);
+				//testitem++;
 				break;
 			case 6:
 				RequestUart(IC_MACHINE_UART1, 0);
