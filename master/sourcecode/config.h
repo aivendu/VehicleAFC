@@ -26,7 +26,8 @@
 #define __CONFIG_H
 
 //	软件版本号
-#define	VERSION	"AQ01-L0.0.3"
+#define	VERSION			"AQ01-L0.0.4"
+#define MINORVERSION	"1213.01"
 
 //这一段无需改动
 //This segment should not be modified

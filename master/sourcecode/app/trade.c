@@ -95,8 +95,8 @@ void TaskTrade(void *pdata)
 			}*/
 			else
 			{
-				if ((GetTimeUploadState() != 0) && (YEAR >= 2012)
-				        && (trade_manage_data_temp.year >= 2012)
+				if (((GetTimeUploadState() != 0) && (YEAR >= 2012))
+				   //     && (trade_manage_data_temp.year >= 2012)
 				   )
 				{
 					//	时间已更新
@@ -124,47 +124,66 @@ void TaskTrade(void *pdata)
 							SetCashbox2Balance(20);
 							SetCashbox3Balance(40);
 						}
-						trade_manage_data_temp.last_day_addr = current_trade_index;
-						trade_manage_data_temp.year = YEAR;
-						trade_manage_data_temp.month = MONTH;
-						trade_manage_data_temp.day = DOM;
-						trade_manage_data_temp.needpay_amount = 0;
-						trade_manage_data_temp.realpay_amount = 0;
-						trade_manage_data_temp.coin_dis_amount = 0;
-						trade_manage_data_temp.note_1_dis_amount = 0;
-						trade_manage_data_temp.note_2_dis_amount = 0;
-						trade_manage_data_temp.trade_num = 0;
-						trade_manage_data_temp.people_amount = 0;
-						memcpy(trade_manage_data_temp.driver_id, device_control.user.uinfo.staffid, 7);
-						if (current_trade_index == TRADE_DATA_START_ADDR)		//	是否有交易数据存储
+						if ((current_trade_index + sizeof(_trade_manage_data_s)) == trade_manage_data_temp.in)
 						{
-							//	第一天交易，交易数据接着current_trade_index 存储
-							current_trade_index = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
-							//	交易日志存储接着trade_manage_data_temp 存储
-							trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
+							//	上一天没有交易数据，继续存储在当前位置
+							trade_manage_data_temp.year = YEAR;
+							trade_manage_data_temp.month = MONTH;
+							trade_manage_data_temp.day = DOM;
+							trade_manage_data_temp.needpay_amount = 0;
+							trade_manage_data_temp.realpay_amount = 0;
+							trade_manage_data_temp.coin_dis_amount = 0;
+							trade_manage_data_temp.note_1_dis_amount = 0;
+							trade_manage_data_temp.note_2_dis_amount = 0;
+							trade_manage_data_temp.trade_num = 0;
+							trade_manage_data_temp.people_amount = 0;
+							memcpy(trade_manage_data_temp.driver_id, device_control.user.uinfo.staffid, 7);
+							//break;
 						}
 						else
 						{
-							if ((trade_manage_data_temp.in + sizeof(_trade_manage_data_s)) 		//	下一天的交易是否会超出存储区域
-							        >= (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
+							trade_manage_data_temp.last_day_addr = current_trade_index;
+							trade_manage_data_temp.year = YEAR;
+							trade_manage_data_temp.month = MONTH;
+							trade_manage_data_temp.day = DOM;
+							trade_manage_data_temp.needpay_amount = 0;
+							trade_manage_data_temp.realpay_amount = 0;
+							trade_manage_data_temp.coin_dis_amount = 0;
+							trade_manage_data_temp.note_1_dis_amount = 0;
+							trade_manage_data_temp.note_2_dis_amount = 0;
+							trade_manage_data_temp.trade_num = 0;
+							trade_manage_data_temp.people_amount = 0;
+							memcpy(trade_manage_data_temp.driver_id, device_control.user.uinfo.staffid, 7);
+							if (current_trade_index == TRADE_DATA_START_ADDR)		//	是否有交易数据存储
 							{
-								//	超出了，接着current_trade_index 开始存储
+								//	第一天交易，交易数据接着current_trade_index 存储
 								current_trade_index = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
+								//	交易日志存储接着trade_manage_data_temp 存储
 								trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
 							}
 							else
 							{
-								//	修改当前日期的交易数据索引地址
-								current_trade_index = trade_manage_data_temp.in;
-								trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
-								if ((trade_manage_data_temp.in + sizeof(_trade_data_to_server_s)) 	//	下一笔交易是否会超出存储区域
-								        >= (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
+								if ((trade_manage_data_temp.in + sizeof(_trade_manage_data_s)) 		//	下一天的交易是否会超出存储区域
+								        > (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
 								{
 									//	超出了，接着current_trade_index 开始存储
-									trade_manage_data_temp.in = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
+									current_trade_index = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
+									trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
 								}
-							}
+								else
+								{
+									//	修改当前日期的交易数据索引地址
+									current_trade_index = trade_manage_data_temp.in;
+									trade_manage_data_temp.in = current_trade_index + sizeof(_trade_manage_data_s);
 
+									if (trade_manage_data_temp.in == (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
+									{
+										//	如果剩下空间刚好存下管理数据，下一条交易数据存在开头
+										trade_manage_data_temp.in = TRADE_DATA_START_ADDR + sizeof(current_trade_index);
+									}
+								}
+
+							}
 						}
 						trade_manage_data_temp.out = trade_manage_data_temp.in;
 						//	存储数据
@@ -340,6 +359,12 @@ void TaskTrade(void *pdata)
 			        device_control.trade.cr.coin_dis, GetCashbox2Value(), device_control.trade.cr.cass1_dis, GetCashbox3Value(), device_control.trade.cr.cass2_dis);
 			i = 0x33;
 			DisplayMessage(&i);
+			
+			//	更新余额
+			SetCashbox1Balance(GetCashbox1Balance() - device_control.trade.cr.coin_dis);
+			SetCashbox2Balance(GetCashbox2Balance() - device_control.trade.cr.cass1_dis);
+			SetCashbox3Balance(GetCashbox3Balance() - device_control.trade.cr.cass2_dis);
+			
 			//	存储交易信息
 			trade_data_temp.year = device_control.trade.tm.year + 2000;
 			trade_data_temp.month = device_control.trade.tm.month;
@@ -353,6 +378,9 @@ void TaskTrade(void *pdata)
 			trade_data_temp.change_cashbox_1 = device_control.trade.cr.coin_dis;
 			trade_data_temp.change_cashbox_2 = device_control.trade.cr.cass1_dis;
 			trade_data_temp.change_cashbox_3 = device_control.trade.cr.cass2_dis;
+			trade_data_temp.cashbox_1_balance = GetCashbox1Balance();
+			trade_data_temp.cashbox_2_balance = GetCashbox2Balance();
+			trade_data_temp.cashbox_3_balance = GetCashbox3Balance();
 			trade_data_temp.current_station = device_control.trade.rm[0].trade_start_st;
 			trade_data_temp.destination_num = device_control.trade.tm.des_num;
 			trade_data_temp.people_amount = 0;
@@ -391,10 +419,6 @@ void TaskTrade(void *pdata)
 			trade_manage_data_temp.people_amount += trade_data_temp.people_amount;
 			WriteExternMemery(&trade_manage_data_temp, current_trade_index, sizeof(_trade_manage_data_s));
 
-			//	更新余额
-			SetCashbox1Balance(GetCashbox1Balance() - device_control.trade.cr.coin_dis);
-			SetCashbox2Balance(GetCashbox2Balance() - device_control.trade.cr.cass1_dis);
-			SetCashbox3Balance(GetCashbox3Balance() - device_control.trade.cr.cass2_dis);
 			sys_state.ss.st_cmd.se.store_trade_data.exe_st = EXE_WAIT;
 			if (GetTradeUploadState() == 0)
 			{

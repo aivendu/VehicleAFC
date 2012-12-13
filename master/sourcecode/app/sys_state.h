@@ -11,6 +11,7 @@ typedef struct
 	uint32 st_allow_trade		: 1;
 	uint32 st_device_abort		: 1;
 	uint32 st_sys_time_upload	: 2;		//	0--未更新，1--通过gps 更新，2--通过服务器更新，3 -- 通过设备内部时钟更新
+	
 	uint32 unused				: 19;
 } _sys_st_major_s;
 
@@ -132,6 +133,9 @@ extern _sys_st_u sys_state;
 
 #define SetUploadTime(c)					(sys_state.ss.st_cmd.se.upload_time.exe_st = c)
 #define GetUploadTime()					(sys_state.ss.st_cmd.se.upload_time.exe_st)
+
+#define SetMotherBoardSt(c)				(sys_state.ss.st_other.sso.st_motherboard = c)
+#define GetMotherBoardSt()				(sys_state.ss.st_other.sso.st_motherboard)
 
 
 #define GetCommandState()

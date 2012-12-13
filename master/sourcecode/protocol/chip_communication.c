@@ -300,6 +300,7 @@ void TaskChipComm(void *pdata)
 				        && ((device_control.cmd.power_off.exe_st == EXE_WAIT) || (device_control.cmd.power_off.exe_st == EXE_RUN_END)))
 				{
 					device_control.cmd.power_off.exe_st = EXE_WRITED;
+					sys_state.ss.st_major.ssm.st_pad_online = 4;
 					sys_state.ss.st_cmd.se.shutdown.exe_st = EXE_RUNNING;
 					while (ChipDataUpload(CHIP_WRITE, 0x00, CONTROL_CMD_POWEROFF_INDEX_ADDR, CONTROL_CMD_POWEROFF_LENGHT, CONTROL_CMD_POWEROFF_ADDR) != TRUE)
 					{

@@ -29,9 +29,9 @@ typedef union
 //	定义和控制系统参数
 typedef struct
 {
-	uint16	gprs_answer_response_time;	//	GPRS 最迟响应时间
+	uint16	server_answer_response_time;	//	SERVER 最迟响应时间
 	uint16	gps_sampling_time;			//	GPS 采样时间
-	uint16	gprs_offline_response_time;	//	GPRS 脱机响应时间
+	uint16	server_offline_response_time;	//	SERVER 脱机响应时间
 	uint16	login_remain_time;			//	登录保持时间
 	uint16	server_port;				//	服务器端口号
 	uint8	server_ip[4];				//	服务器IP 地址
@@ -106,12 +106,12 @@ typedef struct
 } _config_s;
 
 
-#define GetGprsAnswerResponseTime()		(config_ram.pa.pa.gprs_answer_response_time)
-#define SetGprsAnswerResponseTime(c)	(config_ram.pa.pa.gprs_answer_response_time = c)
+#define GetServerAnswerResponseTime()	(config_ram.pa.pa.server_answer_response_time)
+#define SetServerAnswerResponseTime(c)	(config_ram.pa.pa.server_answer_response_time = c)
 #define GetGpsSamplingTime()			(config_ram.pa.pa.gps_sampling_time)
 #define SetGpsSamplingTime(c)			(config_ram.pa.pa.gps_sampling_time = c)
-#define GetGprsOfflineResponseTime()	(config_ram.pa.pa.gprs_offline_response_time)
-#define SetGprsOfflineResponseTime(c)	(config_ram.pa.pa.gprs_offline_response_time = c)
+#define GetServerOfflineResponseTime()	(config_ram.pa.pa.server_offline_response_time)
+#define SetServerOfflineResponseTime(c)	(config_ram.pa.pa.server_offline_response_time = c)
 #define GetLoginRemainTime()			(config_ram.pa.pa.login_remain_time)
 #define SetLoginRemainTime(c)			(config_ram.pa.pa.login_remain_time = c)
 #define GetServerPort()					(config_ram.pa.pa.server_port)
@@ -168,42 +168,57 @@ typedef struct
 
 #define GetRj45UartChannal()			(config_ram.um.um.uc_rj45.channal)
 #define SetRj45UartChannal(c)			(config_ram.um.um.uc_rj45.channal = c)
+#define GetRj45UartDeviceAddr()			(config_ram.um.um.uc_rj45.device_addr)
+#define SetRj45UartDeviceAddr(c)		(config_ram.um.um.uc_rj45.device_addr = c)
 #define GetRj45UartBps()				(config_ram.um.um.uc_rj45.bps)
 #define SetRj45UartBps(c)				(config_ram.um.um.uc_rj45.bps = c)
 #define GetGprsUartChannal()			(config_ram.um.um.uc_gprs.channal)
 #define SetGprsUartChannal(c)			(config_ram.um.um.uc_gprs.channal = c)
+#define GetGprsUartDeviceAddr()			(config_ram.um.um.uc_gprs.device_addr)
+#define SetGprsUartDeviceAddr(c)		(config_ram.um.um.uc_gprs.device_addr = c)
 #define GetGprsUartBps()				(config_ram.um.um.uc_gprs.bps)
 #define SetGprsUartBps(c)				(config_ram.um.um.uc_gprs.bps = c)
 #define GetGpsUartChannal()				(config_ram.um.um.uc_gps.channal)
 #define SetGpsUartChannal(c)			(config_ram.um.um.uc_gps.channal = c)
+#define GetGpsUartDeviceAddr()			(config_ram.um.um.uc_gps.device_addr)
+#define SetGpsUartDeviceAddr(c)			(config_ram.um.um.uc_gps.device_addr = c)
 #define GetGpsUartBps()					(config_ram.um.um.uc_gps.bps)
 #define SetGpsUartBps(c)				(config_ram.um.um.uc_gps.bps = c)
 #define GetBillUartChannal()			(config_ram.um.um.uc_bill.channal)
 #define SetBillUartChannal(c)			(config_ram.um.um.uc_bill.channal = c)
+#define GetBillUartDeviceAddr()			(config_ram.um.um.uc_bill.device_addr)
+#define SetBillUartDeviceAddr(c)		(config_ram.um.um.uc_bill.device_addr = c)
 #define GetBillUartBps()				(config_ram.um.um.uc_bill.bps)
 #define SetBillUartBps(c)				(config_ram.um.um.uc_bill.bps = c)
 #define GetCoinUartChannal()			(config_ram.um.um.uc_coin.channal)
 #define SetCoinUartChannal(c)			(config_ram.um.um.uc_coin.channal = c)
+#define GetCoinUartDeviceAddr()			(config_ram.um.um.uc_coin.device_addr)
+#define SetCoinUartDeviceAddr(c)		(config_ram.um.um.uc_coin.device_addr = c)
 #define GetCoinUartBps()				(config_ram.um.um.uc_coin.bps)
 #define SetCoinUartBps(c)				(config_ram.um.um.uc_coin.bps = c)
 #define GetPrintUartChannal()			(config_ram.um.um.uc_print.channal)
 #define SetPrintUartChannal(c)			(config_ram.um.um.uc_print.channal = c)
+#define GetPrintUartDeviceAddr()		(config_ram.um.um.uc_print.device_addr)
+#define SetPrintUartDeviceAddr(c)		(config_ram.um.um.uc_print.device_addr = c)
 #define GetPrintUartBps()				(config_ram.um.um.uc_print.bps)
 #define SetPrintUartBps(c)				(config_ram.um.um.uc_print.bps = c)
 #define GetVoiceUartChannal()			(config_ram.um.um.uc_voice.channal)
 #define SetVoiceUartChannal(c)			(config_ram.um.um.uc_voice.channal = c)
+#define GetVoiceUartDeviceAddr()		(config_ram.um.um.uc_voice.device_addr)
+#define SetVoiceUartDeviceAddr(c)		(config_ram.um.um.uc_voice.device_addr = c)
 #define GetVoiceUartBps()				(config_ram.um.um.uc_voice.bps)
 #define SetVoiceUartBps(c)				(config_ram.um.um.uc_voice.bps = c)
 #define GetICMachineUartChannal()		(config_ram.um.um.uc_icmachine.channal)
 #define SetICMachineUartChannal(c)		(config_ram.um.um.uc_icmachine.channal = c)
+#define GetICMachineUartDeviceAddr()	(config_ram.um.um.uc_icmachine.device_addr)
+#define SetICMachineUartDeviceAddr(c)	(config_ram.um.um.uc_icmachine.device_addr = c)
 #define GetICMachineUartBps()			(config_ram.um.um.uc_icmachine.bps)
 #define SetICMachineUartBps(c)			(config_ram.um.um.uc_icmachine.bps = c)
 
 
 
-#define CONFIG_VERSION_INDEX_ADDR		((uint32)config_ram.config_version - (uint32)&config_ram)
-#define ComputerExternalMemoryAddr(a,head)			((uint32)a-(uint32)head)
 
+#define CONFIG_VERSION_INDEX_ADDR		((uint32)config_ram.config_version - (uint32)&config_ram)
 
 extern _config_s config_ram;
 

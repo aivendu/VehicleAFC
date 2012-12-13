@@ -1464,10 +1464,15 @@ void TaskDeviceCommand(void *pdata)
 			err = Online(&arg);		//	联机，获取版本号
 			if (err == SYS_NO_ERR)
 			{
+				sys_state.ss.st_major.ssm.st_pad_online = 1;
 			}
 			else
 			{
 				OSTimeDly(OS_TICKS_PER_SEC);	//	通信失败，等1S 再发
+				if (sys_state.ss.st_major.ssm.st_pad_online != 4)
+				{
+					sys_state.ss.st_major.ssm.st_pad_online = 0 ;
+				}
 				break;
 			}
 

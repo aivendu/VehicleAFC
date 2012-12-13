@@ -2,24 +2,24 @@
 
 #define PowerOffGdtu()			(/*asm("NOP")*/0x00 == 0x00)
 #define PowerOnGdtu()			(/*asm("")*/0x00 == 0x00)
-#define GprsSendByte(a)			Uart0SendByte(a,0)
-#define GprsSendString(a)		Uart0SendString(a,0)
-#define GprsReceiveByte(a)		Uart0RecByte(a,0,0)
+#define ServerSendByte(a)			Uart0SendByte(a,0)
+#define ServerSendString(a)		Uart0SendString(a,0)
+#define ServerReceiveByte(a)		Uart0RecByte(a,0,0)
 
-#define GPRS_HEAD				0		//	GPRS 接收头
-#define	GPRS_ADDR				1		//	GPRS 地址接收
-#define	GPRS_PACKAGE			2		//	GPRS 包号接收
-#define	GPRS_LENGHT				3		//	GPRS 长度接收
-#define	GPRS_COMMAND			4		//	GPRS 命令接收
-#define	GPRS_ARGU				5		//	GPRS 参数接收
-#define	GPRS_DATA				6		//	GPRS 数据接收
-#define	GPRS_CHECK				7		//	GPRS 校验字接收
-#define	GPRS_END				8		//	GPRS 尾接收
-#define GPRS_HANDLE				9		//	GPRS 数据处理
+#define SERVER_HEAD				0		//	SERVER 接收头
+#define	SERVER_ADDR				1		//	SERVER 地址接收
+#define	SERVER_PACKAGE			2		//	SERVER 包号接收
+#define	SERVER_LENGHT				3		//	SERVER 长度接收
+#define	SERVER_COMMAND			4		//	SERVER 命令接收
+#define	SERVER_ARGU				5		//	SERVER 参数接收
+#define	SERVER_DATA				6		//	SERVER 数据接收
+#define	SERVER_CHECK				7		//	SERVER 校验字接收
+#define	SERVER_END				8		//	SERVER 尾接收
+#define SERVER_HANDLE				9		//	SERVER 数据处理
 
 
 static OS_EVENT *server_communication_sem, *server_return_sem;
-_server_communication_s gprs_rec_buffer, gprs_send_buffer;
+_server_communication_s server_rec_buffer, server_send_buffer;
 static uint8 server_package;
 const char dtuinfo[] = "AT*DtuInfo";
 const char heartbeat[] = "AT#Heartbeat:";
@@ -76,7 +76,7 @@ uint16 CrcString(uint16 crc_r, char *str)
 	return crc_r;
 }
 
-uint8 GprsSendFrameToServer(_server_communication_s *command)
+uint8 ServerSendFrameToServer(_server_communication_s *command)
 {
 	char temp[6];
 	uint8 i = 0;
@@ -91,47 +91,55 @@ uint8 GprsSendFrameToServer(_server_communication_s *command)
 	{
 		return FALSE;
 	}
-	GprsSendByte(SERVER_COMMUNICATION_HEAD);	//	发送头
+	ServerSendByte(SERVER_COMMUNICATION_HEAD);	//	发送头
 	memset(temp, 0, sizeof(temp));
 	memcpy(temp, GetDeviceAddr(), 4);					//	取设备地址
-	GprsSendString(temp);							//	发送设备地址
+	ServerSendString(temp);							//	发送设备地址
 	command->check = CrcString(command->check, temp);	//	校验设备地址
 
 	memset(temp, 0, sizeof(temp));
 	sprintf(temp, "%02d", command->package_no);
-	GprsSendString(temp);							//	发送包号
+	ServerSendString(temp);							//	发送包号
 	command->check = CrcString(command->check, temp);	//	校验
 
 	memset(temp, 0, sizeof(temp));
 	sprintf(temp, "%02d", command->data_lenght);
-	GprsSendString(temp);
+	ServerSendString(temp);
 	command->check = CrcString(command->check, temp);
 
-	GprsSendByte(command->command[0]);
+	ServerSendByte(command->command[0]);
 	command->check = CRCByte(command->check, command->command[0]);
 	command->data_lenght--;
-	GprsSendByte(command->command[1]);
+	ServerSendByte(command->command[1]);
 	command->check = CRCByte(command->check, command->command[1]);
 	command->data_lenght--;
-	GprsSendByte(command->argument[0]);
+	ServerSendByte(command->argument[0]);
 	command->check = CRCByte(command->check, command->argument[0]);
 	command->data_lenght--;
-	GprsSendByte(command->argument[1]);
+	ServerSendByte(command->argument[1]);
 	command->check = CRCByte(command->check, command->argument[1]);
 	command->data_lenght--;
 
 	for (i = 0; i < command->data_lenght; i++)
 	{
-		GprsSendByte((uint8)command->data[i]);
-		command->check = CRCByte(command->check, (uint8)command->data[i]);
+		if (command->data[i] == 0)
+		{
+			ServerSendByte(0x20);
+			command->check = CRCByte(command->check, 0x20);
+		}
+		else
+		{
+			ServerSendByte((uint8)command->data[i]);
+			command->check = CRCByte(command->check, (uint8)command->data[i]);
+		}
 	}
-	//GprsSendByte((uint8)(command->check >> 8));		//	发送校验
-	//GprsSendByte((uint8)command->check);
+	//ServerSendByte((uint8)(command->check >> 8));		//	发送校验
+	//ServerSendByte((uint8)command->check);
 	memset(temp, 0, sizeof(temp));
 	sprintf(temp, "%04X", command->check);
-	GprsSendString(temp);
+	ServerSendString(temp);
 
-	GprsSendByte(SERVER_COMMUNICATION_END);			//	发送尾
+	ServerSendByte(SERVER_COMMUNICATION_END);			//	发送尾
 	return TRUE;
 }
 
@@ -141,23 +149,23 @@ uint8 ServerOnLine(void)
 {
 	uint8 err;
 	RequestServerCommunication();
-	gprs_send_buffer.package_no = server_package;
-	memcpy(gprs_send_buffer.command, "00", 2);
-	memcpy(gprs_send_buffer.argument, "00", 2);
-	gprs_send_buffer.data_lenght = 4;
-	GprsSendFrameToServer(&gprs_send_buffer);
+	server_send_buffer.package_no = server_package;
+	memcpy(server_send_buffer.command, "00", 2);
+	memcpy(server_send_buffer.argument, "00", 2);
+	server_send_buffer.data_lenght = 4;
+	ServerSendFrameToServer(&server_send_buffer);
 
-	OSSemPend(server_return_sem, GPRS_MAX_TIME_DELAY * 2, &err);
-	if (err == GPRS_DATA_NO_ERR)
+	OSSemPend(server_return_sem, SERVER_MAX_TIME_DELAY * 2, &err);
+	if (err == SERVER_DATA_NO_ERR)
 	{
-		if ((memcmp(gprs_rec_buffer.command, "00", 2) == 0)
-		        && (memcmp(gprs_rec_buffer.data, "OK", 2) == 0))
+		if ((memcmp(server_rec_buffer.command, "00", 2) == 0)
+		        && (memcmp(server_rec_buffer.data, "OK", 2) == 0))
 		{
-			err = GPRS_DATA_NO_ERR;
+			err = SERVER_DATA_NO_ERR;
 		}
 		else
 		{
-			err = GPRS_DATA_RETURN_ERR;
+			err = SERVER_DATA_RETURN_ERR;
 		}
 	}
 	FreeServerCommunication();
@@ -170,10 +178,10 @@ uint8 ServerUploadTradeData(_trade_data_to_server_s *data)
 	uint8 err;
 
 	RequestServerCommunication();
-	gprs_send_buffer.package_no = server_package;
-	memcpy(gprs_send_buffer.command, "TD", 2);
-	memcpy(gprs_send_buffer.argument, "00", 2);
-	sprintf(gprs_send_buffer.data, "%04d%02d%02d%02d%02d%02d%05d%05d%05d%02d%02d%02d%01d%02d",
+	server_send_buffer.package_no = server_package;
+	memcpy(server_send_buffer.command, "TD", 2);
+	memcpy(server_send_buffer.argument, "00", 2);
+	sprintf(server_send_buffer.data, "%04d%02d%02d%02d%02d%02d%05d%05d%05d%02d%02d%02d%01d%02d",
 	        data->year,
 	        data->month,
 	        data->day,
@@ -190,26 +198,28 @@ uint8 ServerUploadTradeData(_trade_data_to_server_s *data)
 	        data->current_station);
 	for (err = 0; ((err < data->destination_num) && (err < 6)); err++)
 	{
-		sprintf(&gprs_send_buffer.data[38 + (err * 7)], "%02d%03d%02d",
+		sprintf(&server_send_buffer.data[38 + (err * 7)], "%02d%03d%02d",
 		        data->destination[err].destination_station,
 		        data->destination[err].price,
 		        data->destination[err].people_num);
 	}
+	sprintf(server_send_buffer.data,"%s%05d%05d%05d",server_send_buffer.data,
+		data->cashbox_1_balance,data->cashbox_2_balance,data->cashbox_3_balance);
+	
+	server_send_buffer.data_lenght = 4 + strlen(server_send_buffer.data);
+	ServerSendFrameToServer(&server_send_buffer);
 
-	gprs_send_buffer.data_lenght = 4 + strlen(gprs_send_buffer.data);
-	GprsSendFrameToServer(&gprs_send_buffer);
-
-	OSSemPend(server_return_sem, GPRS_MAX_TIME_DELAY * 2, &err);
-	if (err == GPRS_DATA_NO_ERR)
+	OSSemPend(server_return_sem, SERVER_MAX_TIME_DELAY * 2, &err);
+	if (err == SERVER_DATA_NO_ERR)
 	{
-		if ((memcmp(gprs_rec_buffer.command, "TD", 2) == 0)
-		        && (memcmp(gprs_rec_buffer.data, "OK", 2) == 0))
+		if ((memcmp(server_rec_buffer.command, "TD", 2) == 0)
+		        && (memcmp(server_rec_buffer.data, "OK", 2) == 0))
 		{
-			err = GPRS_DATA_NO_ERR;
+			err = SERVER_DATA_NO_ERR;
 		}
 		else
 		{
-			err = GPRS_DATA_RETURN_ERR;
+			err = SERVER_DATA_RETURN_ERR;
 		}
 	}
 	FreeServerCommunication();
@@ -222,23 +232,23 @@ uint8 ServerTimeSync(void)
 	uint8 err;
 
 	RequestServerCommunication();
-	gprs_send_buffer.package_no = server_package;
-	memcpy(gprs_send_buffer.command, "TS", 2);
-	memcpy(gprs_send_buffer.argument, "00", 2);
-	gprs_send_buffer.data_lenght = 4;
-	GprsSendFrameToServer(&gprs_send_buffer);
+	server_send_buffer.package_no = server_package;
+	memcpy(server_send_buffer.command, "TS", 2);
+	memcpy(server_send_buffer.argument, "00", 2);
+	server_send_buffer.data_lenght = 4;
+	ServerSendFrameToServer(&server_send_buffer);
 
-	OSSemPend(server_return_sem, GPRS_MAX_TIME_DELAY * 2, &err);
-	if (err == GPRS_DATA_NO_ERR)
+	OSSemPend(server_return_sem, SERVER_MAX_TIME_DELAY * 2, &err);
+	if (err == SERVER_DATA_NO_ERR)
 	{
-		if ((memcmp(gprs_rec_buffer.command, "TS", 2) == 0)
-		        && (memcmp(gprs_rec_buffer.data, "OK", 2) == 0))
+		if ((memcmp(server_rec_buffer.command, "TS", 2) == 0)
+		        && (memcmp(server_rec_buffer.data, "OK", 2) == 0))
 		{
-			err = GPRS_DATA_NO_ERR;
+			err = SERVER_DATA_NO_ERR;
 		}
 		else
 		{
-			err = GPRS_DATA_RETURN_ERR;
+			err = SERVER_DATA_RETURN_ERR;
 		}
 	}
 	FreeServerCommunication();
@@ -246,29 +256,31 @@ uint8 ServerTimeSync(void)
 }
 
 //	钱箱存币
-uint8 ServerCashBoxBalance(uint16 cashbox1, uint16 cashbox2, uint16 cashbox3)
+uint8 ServerCashBoxBalance(_log_deposit_cmd_s *data)
 {
 	uint8 err;
 
 	RequestServerCommunication();
-	gprs_send_buffer.package_no = server_package;
-	memcpy(gprs_send_buffer.command, "MB", 2);
-	memcpy(gprs_send_buffer.argument, "00", 2);
-	sprintf(gprs_send_buffer.data, "%05d%05d%05d", cashbox1, cashbox2, cashbox3);
-	gprs_send_buffer.data_lenght = 4 + 15;
-	GprsSendFrameToServer(&gprs_send_buffer);
+	server_send_buffer.package_no = server_package;
+	memcpy(server_send_buffer.command, "MB", 2);
+	memcpy(server_send_buffer.argument, "00", 2);
+	sprintf(server_send_buffer.data, "%08d%04d%02d%02d%02d%02d%02d%05d%05d%05d", 0, data->year, data->month,
+		data->day, data->hour, data->min, data->sec, data->cashbox1_amount, data->cashbox2_amount, data->cashbox3_amount);
+	memcpy(server_send_buffer.data,data->staffid,8);
+	server_send_buffer.data_lenght = 4 + 37;
+	ServerSendFrameToServer(&server_send_buffer);
 
-	OSSemPend(server_return_sem, GPRS_MAX_TIME_DELAY * 2, &err);
-	if (err == GPRS_DATA_NO_ERR)
+	OSSemPend(server_return_sem, SERVER_MAX_TIME_DELAY * 2, &err);
+	if (err == SERVER_DATA_NO_ERR)
 	{
-		if ((memcmp(gprs_rec_buffer.command, "MB", 2) == 0)
-		        && (memcmp(gprs_rec_buffer.data, "OK", 2) == 0))
+		if ((memcmp(server_rec_buffer.command, "MB", 2) == 0)
+		        && (memcmp(server_rec_buffer.data, "OK", 2) == 0))
 		{
-			err = GPRS_DATA_NO_ERR;
+			err = SERVER_DATA_NO_ERR;
 		}
 		else
 		{
-			err = GPRS_DATA_RETURN_ERR;
+			err = SERVER_DATA_RETURN_ERR;
 		}
 	}
 	FreeServerCommunication();
@@ -280,32 +292,32 @@ uint8 ServerGPSData(uint8 flag, uint32 latitude, uint32 longitude, uint32 speed)
 	uint8 err;
 
 	RequestServerCommunication();
-	gprs_send_buffer.package_no = server_package;
-	memcpy(gprs_send_buffer.command, "GD", 2);
+	server_send_buffer.package_no = server_package;
+	memcpy(server_send_buffer.command, "GD", 2);
 	if (flag)
 	{
-		memcpy(gprs_send_buffer.argument, "01", 2);
-		sprintf(gprs_send_buffer.data, "%010d%010d%03d.%02d", longitude, latitude, speed / 1000, (speed % 1000) / 10);
-		gprs_send_buffer.data_lenght = 4 + 26;
+		memcpy(server_send_buffer.argument, "01", 2);
+		sprintf(server_send_buffer.data, "%010d%010d%03d.%02d", longitude, latitude, speed / 1000, (speed % 1000) / 10);
+		server_send_buffer.data_lenght = 4 + 26;
 	}
 	else
 	{
-		memcpy(gprs_send_buffer.argument, "00", 2);
-		gprs_send_buffer.data_lenght = 4;
+		memcpy(server_send_buffer.argument, "00", 2);
+		server_send_buffer.data_lenght = 4;
 	}
-	GprsSendFrameToServer(&gprs_send_buffer);
+	ServerSendFrameToServer(&server_send_buffer);
 
-	OSSemPend(server_return_sem, GPRS_MAX_TIME_DELAY * 2, &err);
-	if (err == GPRS_DATA_NO_ERR)
+	OSSemPend(server_return_sem, SERVER_MAX_TIME_DELAY * 2, &err);
+	if (err == SERVER_DATA_NO_ERR)
 	{
-		if ((memcmp(gprs_rec_buffer.command, "GD", 2) == 0)
-		        && (memcmp(gprs_rec_buffer.data, "OK", 2) == 0))
+		if ((memcmp(server_rec_buffer.command, "GD", 2) == 0)
+		        && (memcmp(server_rec_buffer.data, "OK", 2) == 0))
 		{
-			err = GPRS_DATA_NO_ERR;
+			err = SERVER_DATA_NO_ERR;
 		}
 		else
 		{
-			err = GPRS_DATA_RETURN_ERR;
+			err = SERVER_DATA_RETURN_ERR;
 		}
 	}
 	FreeServerCommunication();
@@ -317,29 +329,29 @@ uint8 ServerLogin(void *data)
 	uint8 err;
 
 	RequestServerCommunication();
-	gprs_send_buffer.package_no = server_package;
-	memcpy(gprs_send_buffer.command, "LI", 2);
-	memcpy(gprs_send_buffer.argument, "00", 2);
-	memset(gprs_send_buffer.data, 0, 9);
-	memcpy(gprs_send_buffer.data, ((_log_device_use_cmd_s *)data)->staffid, 8);
-	sprintf(gprs_send_buffer.data, "%s%04d%02d%02d%02d%02d%02d",
+	server_send_buffer.package_no = server_package;
+	memcpy(server_send_buffer.command, "LI", 2);
+	memcpy(server_send_buffer.argument, "00", 2);
+	memset(server_send_buffer.data, 0, 9);
+	memcpy(server_send_buffer.data, ((_log_device_use_cmd_s *)data)->staffid, 8);
+	sprintf(server_send_buffer.data, "%s%04d%02d%02d%02d%02d%02d",
 	        ((_log_device_use_cmd_s *)data)->staffid, ((_log_device_use_cmd_s *)data)->year, ((_log_device_use_cmd_s *)data)->month,
 	        ((_log_device_use_cmd_s *)data)->day, ((_log_device_use_cmd_s *)data)->hour, ((_log_device_use_cmd_s *)data)->min, ((_log_device_use_cmd_s *)data)->sec);
-	gprs_send_buffer.data_lenght = 4 + 8;
-	GprsSendFrameToServer(&gprs_send_buffer);
+	server_send_buffer.data_lenght = 4 + 8;
+	ServerSendFrameToServer(&server_send_buffer);
 
-	OSSemPend(server_return_sem, GPRS_MAX_TIME_DELAY * 2, &err);
-	if (err == GPRS_DATA_NO_ERR)
+	OSSemPend(server_return_sem, SERVER_MAX_TIME_DELAY * 2, &err);
+	if (err == SERVER_DATA_NO_ERR)
 	{
-		if ((memcmp(gprs_rec_buffer.command, "LI", 2) == 0)
-		        && (memcmp(gprs_rec_buffer.data, "OK", 2) == 0)
+		if ((memcmp(server_rec_buffer.command, "LI", 2) == 0)
+		        && (memcmp(server_rec_buffer.data, "OK", 2) == 0)
 		   )
 		{
-			err = GPRS_DATA_NO_ERR;
+			err = SERVER_DATA_NO_ERR;
 		}
 		else
 		{
-			err = GPRS_DATA_RETURN_ERR;
+			err = SERVER_DATA_RETURN_ERR;
 		}
 	}
 	FreeServerCommunication();
@@ -351,28 +363,28 @@ uint8 ServerLogout(void *data)
 	uint8 err;
 
 	RequestServerCommunication();
-	gprs_send_buffer.package_no = server_package;
-	memcpy(gprs_send_buffer.command, "LO", 2);
-	memcpy(gprs_send_buffer.argument, "00", 2);
-	memset(gprs_send_buffer.data, 0, 9);
-	memcpy(gprs_send_buffer.data, ((_log_device_use_cmd_s *)data)->staffid, 8);
-	sprintf(gprs_send_buffer.data, "%s%04d%02d%02d%02d%02d%02d",
+	server_send_buffer.package_no = server_package;
+	memcpy(server_send_buffer.command, "LO", 2);
+	memcpy(server_send_buffer.argument, "00", 2);
+	memset(server_send_buffer.data, 0, 9);
+	memcpy(server_send_buffer.data, ((_log_device_use_cmd_s *)data)->staffid, 8);
+	sprintf(server_send_buffer.data, "%s%04d%02d%02d%02d%02d%02d",
 	        ((_log_device_use_cmd_s *)data)->staffid, ((_log_device_use_cmd_s *)data)->year, ((_log_device_use_cmd_s *)data)->month,
 	        ((_log_device_use_cmd_s *)data)->day, ((_log_device_use_cmd_s *)data)->hour, ((_log_device_use_cmd_s *)data)->min, ((_log_device_use_cmd_s *)data)->sec);
-	gprs_send_buffer.data_lenght = 4 + 8;
-	GprsSendFrameToServer(&gprs_send_buffer);
+	server_send_buffer.data_lenght = 4 + 8;
+	ServerSendFrameToServer(&server_send_buffer);
 
-	OSSemPend(server_return_sem, GPRS_MAX_TIME_DELAY * 2, &err);
-	if (err == GPRS_DATA_NO_ERR)
+	OSSemPend(server_return_sem, SERVER_MAX_TIME_DELAY * 2, &err);
+	if (err == SERVER_DATA_NO_ERR)
 	{
-		if ((memcmp(gprs_rec_buffer.command, "LO", 2) == 0)
-		        && (memcmp(gprs_rec_buffer.data, "OK", 2) == 0))
+		if ((memcmp(server_rec_buffer.command, "LO", 2) == 0)
+		        && (memcmp(server_rec_buffer.data, "OK", 2) == 0))
 		{
-			err =  GPRS_DATA_NO_ERR;
+			err =  SERVER_DATA_NO_ERR;
 		}
 		else
 		{
-			err = GPRS_DATA_RETURN_ERR;
+			err = SERVER_DATA_RETURN_ERR;
 		}
 	}
 	FreeServerCommunication();
@@ -383,7 +395,14 @@ uint8 ServerLogout(void *data)
 
 uint16 GetVersion(void *arg)
 {
-	sprintf(arg, "%s;%s;0", VERSION, PAD_version);
+	if (strlen(PAD_version) == 0)
+	{
+		sprintf(arg, "%s;0;0", VERSION);
+	}
+	else
+	{
+		sprintf(arg, "%s;%0s;0", VERSION, PAD_version);
+	}
 	return strlen(arg);
 }
 
@@ -564,9 +583,9 @@ uint16 GetSysPerformanceConfig(void *arg)
 {
 	sprintf(arg, "%04d%05d%05d%05d%05d",
 	        0x00,
-	        GetGprsAnswerResponseTime(),
+	        GetServerAnswerResponseTime(),
 	        GetGpsSamplingTime(),
-	        GetGprsOfflineResponseTime(),
+	        GetServerOfflineResponseTime(),
 	        GetLoginRemainTime()
 	       );
 	memcpy(arg, GetDeviceAddr(), 4);
@@ -583,7 +602,7 @@ uint16 SysPerformanceConfig(void *arg)
 	{
 		return FALSE;
 	}
-	SetGprsAnswerResponseTime((uint16)stoi(10, 5, temp->gprs_response_time, &err));
+	SetServerAnswerResponseTime((uint16)stoi(10, 5, temp->server_response_time, &err));
 	if (err == FALSE)
 	{
 		return FALSE;
@@ -593,7 +612,7 @@ uint16 SysPerformanceConfig(void *arg)
 	{
 		return FALSE;
 	}
-	SetGprsOfflineResponseTime((uint16)stoi(10, 5, temp->gprs_off_line_delay_time, &err));
+	SetServerOfflineResponseTime((uint16)stoi(10, 5, temp->server_off_line_delay_time, &err));
 	if (err == FALSE)
 	{
 		return FALSE;
@@ -732,9 +751,9 @@ uint8 ServerDownloadConfigData(void)
 	uint8 i = 0;
 	while (1)
 	{
-		if (memcmp(gprs_rec_buffer.argument, config_corresponding_table[i].command, 2) == 0)
+		if (memcmp(server_rec_buffer.argument, config_corresponding_table[i].command, 2) == 0)
 		{
-			if (config_corresponding_table[i].funcset(gprs_rec_buffer.data) == TRUE)
+			if (config_corresponding_table[i].funcset(server_rec_buffer.data) == TRUE)
 			{
 				SetConfigState(2);			//	改变配置状态为用户配置
 				SetSaveConfig(EXE_WRITED);	//	保存配置
@@ -758,7 +777,7 @@ uint8 ServerGetConfigData(void *arg)
 	uint8 i = 0;
 	while (1)
 	{
-		if (memcmp(gprs_rec_buffer.argument, config_corresponding_table[i].command, 2) == 0)
+		if (memcmp(server_rec_buffer.argument, config_corresponding_table[i].command, 2) == 0)
 		{
 			return config_corresponding_table[i].funcget(arg);
 
@@ -782,8 +801,8 @@ uint8 ReturnWriteConfig(char *arg, uint8 package_no)
 	server_communication_temp.data_lenght = 4 + 2;
 	server_communication_temp.package_no = package_no;
 	memcpy(server_communication_temp.data, "OK", 2);
-	GprsSendFrameToServer(&server_communication_temp);
-	return GPRS_DATA_NO_ERR;
+	ServerSendFrameToServer(&server_communication_temp);
+	return SERVER_DATA_NO_ERR;
 }
 
 //
@@ -794,8 +813,8 @@ uint8 ReturnReadConfig(char *arg, uint8 package_no)
 	memcpy(server_communication_temp.argument, arg, 2);
 	server_communication_temp.data_lenght = ServerGetConfigData(server_communication_temp.data) + 4;
 	server_communication_temp.package_no = package_no;
-	GprsSendFrameToServer(&server_communication_temp);
-	return GPRS_DATA_NO_ERR;
+	ServerSendFrameToServer(&server_communication_temp);
+	return SERVER_DATA_NO_ERR;
 }
 
 // 命令
@@ -810,17 +829,17 @@ uint8 ReturnMS(uint8 flag, uint16 err_no, char *arg, uint8 package_no)
 	switch (flag)
 	{
 	case 0:			//	回复ERROR
-		server_communication_temp.data_lenght = 4;
 		sprintf(server_communication_temp.data, "ER%04d", err_no);
+		server_communication_temp.data_lenght = 4+strlen(server_communication_temp.data);
 		break;
 
 	case 1:			//	回复OK
-		server_communication_temp.data_lenght = 4;
 		memcpy(server_communication_temp.data, "OK", 2);
+		server_communication_temp.data_lenght = 4+2;
 		break;
 	}
-	GprsSendFrameToServer(&server_communication_temp);
-	return GPRS_DATA_NO_ERR;
+	ServerSendFrameToServer(&server_communication_temp);
+	return SERVER_DATA_NO_ERR;
 }
 
 
@@ -834,17 +853,17 @@ void StartGdtu(void)
 	PowerOnGdtu();
 	while (1)
 	{
-		if ((GprsReceiveByte((uint8 *)temp) == TRUE) && (temp == ':'))	//	判断是否进入配置模式
+		if ((ServerReceiveByte((uint8 *)temp) == TRUE) && (temp == ':'))	//	判断是否进入配置模式
 		{
 			break;
 		}
 	}
-	GprsSendString("12345678\r\n");		//	输入密码进入配置模式
+	ServerSendString("12345678\r\n");		//	输入密码进入配置模式
 	OSTimeDly(OS_TICKS_PER_SEC);
 	//	发送F4 退出配置模式
-	GprsSendByte(0x1b);
-	GprsSendByte(0x4f);
-	GprsSendByte(0x53);
+	ServerSendByte(0x1b);
+	ServerSendByte(0x4f);
+	ServerSendByte(0x53);
 	OSTimeDly(OS_TICKS_PER_SEC / 20);
 }
 
@@ -860,18 +879,18 @@ void DetectedAndConfigGdtu(void)
 	Uart0SendByte('\'', 2);		//	发送
 	while (1)
 	{
-		if ((GprsReceiveByte(temp) == TRUE) && (temp[0] == '*'))	//	判断是否进入AT 命令模式
+		if ((ServerReceiveByte(temp) == TRUE) && (temp[0] == '*'))	//	判断是否进入AT 命令模式
 		{
 			break;
 		}
 	}
 	OSTimeDly(OS_TICKS_PER_SEC);
 	memset(temp, 0, 32);
-	GprsSendString("AT*DtuInfo\r\n");
+	ServerSendString("AT*DtuInfo\r\n");
 	i = 0;
 	while (1)
 	{
-		if (GprsReceiveByte((uint8 *)(temp + i)) == TRUE)
+		if (ServerReceiveByte((uint8 *)(temp + i)) == TRUE)
 		{
 			if ((temp[i] == '\n') && (temp[i - 1] == '\r'))
 			{
@@ -896,11 +915,11 @@ void DetectedAndConfigGdtu(void)
 		}
 	}
 	memset(temp, 0, 32);
-	GprsSendString("AT*DscInfo:0\r\n");
+	ServerSendString("AT*DscInfo:0\r\n");
 	i = 0;
 	while (1)
 	{
-		if (GprsReceiveByte((uint8 *)(temp + i)) == TRUE)
+		if (ServerReceiveByte((uint8 *)(temp + i)) == TRUE)
 		{
 			if ((temp[i] == '\n') && (temp[i - 1] == '\r'))
 			{
@@ -928,9 +947,9 @@ void DetectedAndConfigGdtu(void)
 	}
 }
 
-uint8 GprsReceiveFrameFromServer(void)
+uint8 ServerReceiveFrameFromServer(void)
 {
-	uint8 state = GPRS_HEAD, err;
+	uint8 state = SERVER_HEAD, err;
 	char device_addr[4];
 	char check_temp[4];
 	uint8 data_temp, data_num = 0, data_amount = 0;
@@ -938,33 +957,33 @@ uint8 GprsReceiveFrameFromServer(void)
 
 	while (1)
 	{
-		if (GprsReceiveByte(&data_temp) == FALSE)
+		if (ServerReceiveByte(&data_temp) == FALSE)
 		{
 			OSTimeDly(2);
-			if ((++timer_num) > GPRS_MAX_TIME_DELAY)	return GPRS_TIME_OUT;		//	超时退出，返回错误
+			if ((++timer_num) > SERVER_MAX_TIME_DELAY)	return SERVER_TIME_OUT;		//	超时退出，返回错误
 			else										continue;			//	继续下一次接收
 		}
 		else
 		{
 			timer_num = 0;			//	有数据，清零延时
 		}
-		if ((++data_amount) > GPRS_FRAME_MAX_LENGHT)		//	线路上是否有很多杂乱数据
+		if ((++data_amount) > SERVER_FRAME_MAX_LENGHT)		//	线路上是否有很多杂乱数据
 		{
-			return GPRS_UART_FAULT;
+			return SERVER_UART_FAULT;
 		}
 		switch (state)
 		{
-		case GPRS_HEAD:
+		case SERVER_HEAD:
 			if (data_temp == SERVER_COMMUNICATION_HEAD)
 			{
 				//	接收到头，准备接受地址数据
-				state = GPRS_ADDR;
+				state = SERVER_ADDR;
 				data_num = 0;
 				check_sun = 0;
 			}
 			break;
 
-		case GPRS_ADDR:
+		case SERVER_ADDR:
 			if (((data_temp >= '0') && (data_temp <= '9')) || ((data_temp >= 'A') && (data_temp <= 'F'))
 			        || ((data_temp >= 'a') && (data_temp <= 'f')))
 			{
@@ -974,204 +993,204 @@ uint8 GprsReceiveFrameFromServer(void)
 			}
 			else
 			{
-				state = GPRS_HEAD;			//	重新接收
+				state = SERVER_HEAD;			//	重新接收
 				data_num = 0;
 			}
 			if ((++data_num) >= 4)
 			{
 				//	地址接收完成
-				state = GPRS_PACKAGE;
-				gprs_rec_buffer.package_no = 0;
+				state = SERVER_PACKAGE;
+				server_rec_buffer.package_no = 0;
 				data_num = 0;
 			}
 			break;
 
-		case GPRS_PACKAGE:
+		case SERVER_PACKAGE:
 			if ((data_temp >= '0') && (data_temp <= '9'))
 			{
 				//	包号转换为整数
-				gprs_rec_buffer.package_no = gprs_rec_buffer.package_no * 10 + (data_temp - '0');
+				server_rec_buffer.package_no = server_rec_buffer.package_no * 10 + (data_temp - '0');
 				check_sun = CRCByte(check_sun, data_temp);
 			}
 			else
 			{
-				state = GPRS_HEAD;			//	重新接收
+				state = SERVER_HEAD;			//	重新接收
 				data_num = 0;
 			}
 			if ((++data_num) >= 2)
 			{
 				//	包号接收完成
-				state = GPRS_LENGHT;			//	准备接收长度
-				gprs_rec_buffer.data_lenght = 0;
+				state = SERVER_LENGHT;			//	准备接收长度
+				server_rec_buffer.data_lenght = 0;
 				data_num = 0;
 			}
 			break;
 
-		case GPRS_LENGHT:
+		case SERVER_LENGHT:
 			if ((data_temp >= '0') && (data_temp <= '9'))
 			{
 				//	计算长度，转换为整数
-				gprs_rec_buffer.data_lenght = gprs_rec_buffer.data_lenght * 10 + (data_temp - '0');
+				server_rec_buffer.data_lenght = server_rec_buffer.data_lenght * 10 + (data_temp - '0');
 				check_sun = CRCByte(check_sun, data_temp);		//	计算校验
 			}
 			else
 			{
-				state = GPRS_HEAD;			//	重新接收
+				state = SERVER_HEAD;			//	重新接收
 				data_num = 0;
 			}
 			if ((++data_num) >= 2)
 			{
 				//	长度接收完成
-				if ((gprs_rec_buffer.data_lenght > (86 + 2 + 2)) || (gprs_rec_buffer.data_lenght < 4))
+				if ((server_rec_buffer.data_lenght > (86 + 2 + 2)) || (server_rec_buffer.data_lenght < 4))
 				{
 					//	长度错误，重新接收
-					state = GPRS_HEAD;			//	重新接收
+					state = SERVER_HEAD;			//	重新接收
 					data_num = 0;
 				}
 				else
 				{
-					state = GPRS_COMMAND;		//	准备接收命令
+					state = SERVER_COMMAND;		//	准备接收命令
 					data_num = 0;
 				}
 			}
 			break;
 
-		case GPRS_COMMAND:
-			gprs_rec_buffer.command[data_num] = data_temp;
+		case SERVER_COMMAND:
+			server_rec_buffer.command[data_num] = data_temp;
 			check_sun = CRCByte(check_sun, data_temp);		//	计算校验
 			if ((++data_num) >= 2)
 			{
 				//	命令字接收完成
-				state = GPRS_ARGU;		//	准备接收命令
+				state = SERVER_ARGU;		//	准备接收命令
 				data_num = 0;
 			}
 			break;
 
-		case GPRS_ARGU:
-			gprs_rec_buffer.argument[data_num] = data_temp;
+		case SERVER_ARGU:
+			server_rec_buffer.argument[data_num] = data_temp;
 			check_sun = CRCByte(check_sun, data_temp);		//	计算校验
 			if ((++data_num) >= 2)
 			{
 				//	接收完参数
-				if (gprs_rec_buffer.data_lenght == 4)
+				if (server_rec_buffer.data_lenght == 4)
 				{
 					//	不带数据
-					gprs_rec_buffer.data[0] = 0;
-					state = GPRS_CHECK;
-					gprs_rec_buffer.check = 0;
+					server_rec_buffer.data[0] = 0;
+					state = SERVER_CHECK;
+					server_rec_buffer.check = 0;
 					data_num = 0;
 				}
 				else
 				{
-					state = GPRS_DATA;		//	准备接收命令
+					state = SERVER_DATA;		//	准备接收命令
 					data_num = 0;
 				}
 			}
 			break;
 
-		case GPRS_DATA:
-			gprs_rec_buffer.data[data_num] = data_temp;
+		case SERVER_DATA:
+			server_rec_buffer.data[data_num] = data_temp;
 			check_sun = CRCByte(check_sun, data_temp);		//	计算校验
-			if ((gprs_rec_buffer.data_lenght - 4) <= (++data_num))
+			if ((server_rec_buffer.data_lenght - 4) <= (++data_num))
 			{
 				//	接收完成数据
-				gprs_rec_buffer.data[data_num] = 0;
-				state = GPRS_CHECK;
+				server_rec_buffer.data[data_num] = 0;
+				state = SERVER_CHECK;
 				data_num = 0;
-				gprs_rec_buffer.check = 0;
+				server_rec_buffer.check = 0;
 			}
 			break;
 
-		case GPRS_CHECK:
-			//gprs_rec_buffer.check = gprs_rec_buffer.check * 16 + data_temp - '0';
+		case SERVER_CHECK:
+			//server_rec_buffer.check = server_rec_buffer.check * 16 + data_temp - '0';
 			check_temp[data_num] = data_temp;
 			if ((++data_num) >= 4)
 			{
 				//	接收完整check 数据，进行校验
 				//	转换为整数
-				gprs_rec_buffer.check = (uint16)stoi(16, 4, check_temp, &err);
-				if (gprs_rec_buffer.check == check_sun)
+				server_rec_buffer.check = (uint16)stoi(16, 4, check_temp, &err);
+				if (server_rec_buffer.check == check_sun)
 				{
-					state = GPRS_END;
+					state = SERVER_END;
 					data_num = 0;
 				}
 				else
 				{
-					return GPRS_CHECKE_ERR;
+					return SERVER_CHECKE_ERR;
 				}
 			}
 			break;
 
-		case GPRS_END:
+		case SERVER_END:
 			if (data_temp == SERVER_COMMUNICATION_END)		//	包尾是否正确
 			{
-				state = GPRS_HANDLE;
+				state = SERVER_HANDLE;
 			}
 			else
 			{
-				state = GPRS_HEAD;
+				state = SERVER_HEAD;
 			}
 			break;
 
 		default:
-			state = GPRS_HEAD;
+			state = SERVER_HEAD;
 			break;
 		}
-		if (state == GPRS_HANDLE)
+		if (state == SERVER_HANDLE)
 		{
 			if (memcmp(GetDeviceAddr(), device_addr, 4) != 0)
 			{
 				//	不是当前设备地址的数据，回复错误号"99"
-				//ReturnER("99",gprs_rec_buffer.package_no);
+				//ReturnER("99",server_rec_buffer.package_no);
 			}
-			else if (memcmp(gprs_rec_buffer.command, "MS", 2) == 0)
+			else if (memcmp(server_rec_buffer.command, "MS", 2) == 0)
 			{
 				//	处理消息命令
-				if (DisplayMessage(gprs_rec_buffer.data) == SYS_NO_ERR)
+				if (DisplayMessage(server_rec_buffer.data) == SYS_NO_ERR)
 				{
 					//	消息发送成功，返回OK
-					ReturnMS(1, 0, gprs_rec_buffer.argument, gprs_rec_buffer.package_no);
+					ReturnMS(1, 0, server_rec_buffer.argument, server_rec_buffer.package_no);
 				}
 				else
 				{
 					//	消息命令发送失败，返回ER
-					ReturnMS(0, 1, gprs_rec_buffer.argument, gprs_rec_buffer.package_no);
+					ReturnMS(0, 1, server_rec_buffer.argument, server_rec_buffer.package_no);
 				}
 			}
-			else if (memcmp(gprs_rec_buffer.command, "WS", 2) == 0)
+			else if (memcmp(server_rec_buffer.command, "WS", 2) == 0)
 			{
 				//	处理写配置命令
 				ServerDownloadConfigData();
-				ReturnWriteConfig(gprs_rec_buffer.argument, gprs_rec_buffer.package_no);
+				ReturnWriteConfig(server_rec_buffer.argument, server_rec_buffer.package_no);
 			}
-			else if (memcmp(gprs_rec_buffer.command, "RS", 2) == 0)
+			else if (memcmp(server_rec_buffer.command, "RS", 2) == 0)
 			{
 				//	处理读配置命令
-				ReturnReadConfig(gprs_rec_buffer.argument, gprs_rec_buffer.package_no);
+				ReturnReadConfig(server_rec_buffer.argument, server_rec_buffer.package_no);
 			}
-			else if (memcmp(gprs_rec_buffer.command, "RM", 2) == 0)
+			else if (memcmp(server_rec_buffer.command, "RM", 2) == 0)
 			{
 				//	读铁电数据
 
 
 			}
-			else if (gprs_rec_buffer.package_no != gprs_send_buffer.package_no)
+			else if (server_rec_buffer.package_no != server_send_buffer.package_no)
 			{
 				//	该条回复不是当前命令的回复，丢掉
 			}
-			else if ((memcmp(gprs_rec_buffer.command, "TD", 2) == 0)
-			         || (memcmp(gprs_rec_buffer.command, "TS", 2) == 0)
-			         || (memcmp(gprs_rec_buffer.command, "MB", 2) == 0)
-			         || (memcmp(gprs_rec_buffer.command, "GD", 2) == 0)
-			         || (memcmp(gprs_rec_buffer.command, "LI", 2) == 0)
-			         || (memcmp(gprs_rec_buffer.command, "LO", 2) == 0)
-			         || (memcmp(gprs_rec_buffer.command, "LG", 2) == 0)
+			else if ((memcmp(server_rec_buffer.command, "TD", 2) == 0)
+			         || (memcmp(server_rec_buffer.command, "TS", 2) == 0)
+			         || (memcmp(server_rec_buffer.command, "MB", 2) == 0)
+			         || (memcmp(server_rec_buffer.command, "GD", 2) == 0)
+			         || (memcmp(server_rec_buffer.command, "LI", 2) == 0)
+			         || (memcmp(server_rec_buffer.command, "LO", 2) == 0)
+			         || (memcmp(server_rec_buffer.command, "LG", 2) == 0)
 			        )
 			{
 				//	处理回复 的命令
 				OSSemPost(server_return_sem);
 			}
-			state = GPRS_HEAD;
+			state = SERVER_HEAD;
 		}
 	}
 }
@@ -1193,7 +1212,7 @@ void TaskServerHandle(void *pdata)
 
 		//	读数据
 		//OSTimeDly(200);
-		if (GprsReceiveFrameFromServer() == GPRS_DATA_NO_ERR)
+		if (ServerReceiveFrameFromServer() == SERVER_DATA_NO_ERR)
 		{
 		}
 		//ServerGPSData(1,device_control.gps.gps_latitude,device_control.gps.gps_longitude,device_control.gps.gps_movingspeed);
@@ -1232,7 +1251,7 @@ void TaskServerHandle(void *pdata)
 			ServerTimeSync();
 			break;
 		case 4:
-			ServerCashBoxBalance(10, 20, 30);
+			//ServerCashBoxBalance(10, 20, 30);
 			break;
 		case 5:
 			ServerGPSData(1, 1234567890, 123456789, 60000);

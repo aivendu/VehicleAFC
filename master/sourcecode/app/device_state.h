@@ -138,7 +138,10 @@ GPS 设置状态
 0--正常未初始化；
 1--正常状态；
 */
-
+#define MOTHERBOARD_NO_INIT						0
+#define MOTHERBOARD_NORMAL						1
+#define MOTHERBOARD_FRAM_ERROR					2
+#define MOTHERBOARD_MEMERY_DATA_ERROR			3
 
 #endif
 

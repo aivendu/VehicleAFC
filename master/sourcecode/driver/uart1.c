@@ -47,10 +47,10 @@ static uint8 uart1_channel_ic_flag;
 
 static _uart_config_s const uart1_config[] =
 {
-	{0,	115200		},		//	0- init
-	{0,	9600		},		//	1- speaker
-	{1,	9600		},		//	2- printer
-	{2,	9600		},		//	3- coin machine
+	{0,0,	115200		},		//	0- init
+	{0,0,	9600		},		//	1- speaker
+	{1,0,	9600		},		//	2- printer
+	{2,0,	9600		},		//	3- coin machine
 };
 
 /*********************************************************************************************************

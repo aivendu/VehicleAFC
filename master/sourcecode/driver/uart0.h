@@ -52,7 +52,7 @@ typedef enum
 typedef struct
 {
 	uint8 channal;
-	//uint8 unused[3];
+	uint8 device_addr;
 	uint32 bps;
 } _uart_config_s;
 

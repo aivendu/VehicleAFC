@@ -45,21 +45,21 @@ const _config_s config_init_from_rom =
 	{1, 0, 0, 0},
 	{1, 5, 10, 10, 10, 5, 0, 0, 0, 200, 20, 50, 0, 0},
 	{
-		8, 9600,		//	rj45;
-		9, 9600,		//	gprs;
-		7, 9600,		//	gps;
-		1, 9600,		//	bill;
-		2, 9600,		//	coin;
-		3, 38400,	//	print;
-		5, 9600,		//	voice;
-		6, 19200,		//	icmachine;
-		0, 9600,		//	未使用
-		4, 9600,		//	未使用
+		8,0, 9600,		//	rj45;
+		9,0, 9600,		//	gprs;
+		7,0, 9600,		//	gps;
+		1,0, 9600,		//	bill;
+		2,0, 9600,		//	coin;
+		3,0, 38400,	//	print;
+		5,0, 9600,		//	voice;
+		6,0, 19200,		//	icmachine;
+		0,0, 9600,		//	未使用
+		4,0, 9600,		//	未使用
 	},
 	{5, 3, 30, 10, 22301, 120, 195, 217, 32},
 	{"FFFF"},
 	{"苏BU2956"},
-	{"tv-10"},
+	{"tv-11"},
 	{"cv-101"},
 };
 
@@ -69,17 +69,18 @@ void ConfigInit(void)
 	ReadExternMemery(&config_ram, CONFIG_SAVE_START_ADDR, sizeof(_config_s));		//	上电初始化配置参数
 	//	初始化交易数据
 	if ((GetConfigState() == 0)
-	        || (memcmp(GetTradeDataVersion(), config_init_from_rom.trade_form_version, strlen(config_init_from_rom.trade_form_version) != 0)))
+	        || (memcmp(GetTradeDataVersion(), config_init_from_rom.trade_form_version, strlen(config_init_from_rom.trade_form_version)) != 0))
 	{
 		current_trade_index = TRADE_DATA_START_ADDR;
 		log_index.log_start = LOG_START_ADDR;
 		log_index.log_end = LOG_START_ADDR;
+		memcpy(GetTradeDataVersion(), config_init_from_rom.trade_form_version,6);
 		WriteExternMemery(&current_trade_index, TRADE_DATA_START_ADDR, sizeof(current_trade_index));
 		WriteExternMemery(&log_index, LOG_START_ADDR, sizeof(_log_manage_s));
 	}
 	//	判断是否有初始化过配置数据
 	if ((GetConfigState() == 0)
-	        || (memcmp(GetConfigVersion(), config_init_from_rom.config_version, strlen(config_init_from_rom.config_version) != 0)))
+	        || (memcmp(GetConfigVersion(), config_init_from_rom.config_version, strlen(config_init_from_rom.config_version)) != 0))
 	{
 		config_ram = config_init_from_rom;
 		WriteExternMemery(&config_ram, CONFIG_SAVE_START_ADDR, sizeof(_config_s));		//	重新初始化

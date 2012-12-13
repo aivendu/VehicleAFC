@@ -1,20 +1,21 @@
 #ifndef _SERVER_COMMUNICATION_H
 #define _SERVER_COMMUNICATION_H
 #include "sys_config.h"
+#include "log_data_handle.h"
 
-#define GPRS_FRAME_MAX_LENGHT				(sizeof(_server_communication_s) + 2 + 5)
+#define SERVER_FRAME_MAX_LENGHT				(sizeof(_server_communication_s) + 2 + 5)
 #define SERVER_COMMUNICATION_HEAD			'<'
 #define SERVER_COMMUNICATION_END			'>'
 
-#define GPRS_MAX_TIME_DELAY					500			//	单位10 ms
+#define SERVER_MAX_TIME_DELAY					500			//	单位10 ms
 
-//	GPRS错误定义
-#define GPRS_DATA_NO_ERR					0
-#define GPRS_TIME_OUT						1
-#define GPRS_UART_FAULT						2
-#define GPRS_CHECKE_ERR						3
-#define GPRS_END_DATA_ERR					4
-#define GPRS_DATA_RETURN_ERR				5
+//	SERVER错误定义
+#define SERVER_DATA_NO_ERR					0
+#define SERVER_TIME_OUT						1
+#define SERVER_UART_FAULT						2
+#define SERVER_CHECKE_ERR						3
+#define SERVER_END_DATA_ERR					4
+#define SERVER_DATA_RETURN_ERR				5
 
 
 typedef struct
@@ -54,6 +55,10 @@ typedef struct
 	uint8	destination_num;		//	目的地站点数量
 	uint8	people_amount;
 	uint8	unused;
+	uint16	cashbox_1_balance;		//	钱箱1 余额
+	uint16	cashbox_2_balance;		//	钱箱2 余额
+	uint16	cashbox_3_balance;		//	钱箱3 余额
+	uint8	unused1[2];
 	_destination_s	destination[MAX_DESTINATION_NUM];		//	目的地详情
 } _trade_data_to_server_s;
 
@@ -92,9 +97,9 @@ typedef struct
 typedef struct
 {
 	char device_addr[4];
-	char gprs_response_time[5];
+	char server_response_time[5];
 	char gps_sampling_time[5];
-	char gprs_off_line_delay_time[5];
+	char server_off_line_delay_time[5];
 	char user_logout_delay_time[5];
 } _sys_performance_config_from_server_s;
 
@@ -122,7 +127,7 @@ extern void TaskServerHandle(void *pdata);
 extern uint8 ServerOnLine(void);
 extern uint8 ServerUploadTradeData(_trade_data_to_server_s *data);
 extern uint8 ServerTimeSync(void);
-extern uint8 ServerCashBoxBalance(uint16 cashbox1, uint16 cashbox2, uint16 cashbox3);
+extern uint8 ServerCashBoxBalance(_log_deposit_cmd_s *data);
 extern uint8 ServerGPSData(uint8 flag, uint32 latitude, uint32 longitude, uint32 speed);
 extern uint8 ServerLogin(void *data);
 extern uint8 ServerLogout(void *data);

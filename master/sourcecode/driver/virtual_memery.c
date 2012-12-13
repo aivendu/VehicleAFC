@@ -25,7 +25,7 @@ uint16 ReadExternMemery(void *data, uint32 addr, uint32 len)
 {
 	uint8 i;
 	uint32 len_temp, addr_temp;
-	for (i = 0; i <= EXTERN_CHIP_WITH_IO_NUM; i++)
+	for (i = 0; i < EXTERN_CHIP_WITH_IO_NUM; i++)
 	{
 		if (addr < memery_chip[i].virtual_start_addr)
 		{
@@ -67,7 +67,7 @@ uint16 WriteExternMemery(void *data, uint32 addr, uint32 len)
 {
 	uint8 i;
 	uint32 len_temp, addr_temp;
-	for (i = 0; i <= EXTERN_CHIP_WITH_IO_NUM; i++)
+	for (i = 0; i < EXTERN_CHIP_WITH_IO_NUM; i++)
 	{
 		if (addr < memery_chip[i].virtual_start_addr)
 		{

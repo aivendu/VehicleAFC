@@ -7,12 +7,12 @@
 #define LOG_MEMERY_LENGHT			(0x40000)
 
 
-#define PAD_COMMAND					1	//	PAD 命令日志
-#define SERVER_COMMAND				2	//	服务器命令日志
-#define DEVICE_COMMAND				3	//	设备命令日志
-#define LOGIN_COMMAND				4	//	用户登录
-#define LOGOUT_COMMAND				5	//	退出登录命令
-#define DEPOSIT_COMMAND				6	//	存钱命令
+#define PAD_COMMAND_LOG					1	//	PAD 命令日志
+#define SERVER_COMMAND_LOG				2	//	服务器命令日志
+#define DEVICE_COMMAND_LOG				3	//	设备命令日志
+#define LOGIN_COMMAND_LOG				4	//	用户登录
+#define LOGOUT_COMMAND_LOG				5	//	退出登录命令
+#define DEPOSIT_COMMAND_LOG				6	//	存钱命令
 
 typedef struct
 {
