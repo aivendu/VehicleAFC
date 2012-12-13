@@ -455,6 +455,7 @@ void TaskTrade(void *pdata)
 //	搜索指定日期的交易总帐
 uint8 SearchTradeData(uint16 year, uint8 month, uint8 day, _trade_manage_data_s *data)
 {
+	uint32 index;
 	*data = trade_manage_data_temp;
 	while ((data->year != year) || (data->month != month) || (data->day != day))
 	{
@@ -463,24 +464,13 @@ uint8 SearchTradeData(uint16 year, uint8 month, uint8 day, _trade_manage_data_s 
 			//	当前交易是第一天交易，没有搜索到数据
 			return FALSE;
 		}
-		if (trade_manage_data_temp.in > current_trade_index)		//	判断当天的日志存储区域是否经过越界点
+		
+		if ((trade_manage_data_temp.in > data->last_day_addr) && (trade_manage_data_temp.in < index))
 		{
-			//	没有经过越界点
-			if ((data->last_day_addr < trade_manage_data_temp.in) && (data->last_day_addr > current_trade_index))
-			{
-				//	上一日的日志已被覆盖，没有搜索到数据
-				return FALSE;
-			}
+			//	上一日的日志已被覆盖，没有搜索到数据
+			return FALSE;
 		}
-		else
-		{
-			//	经过越界点
-			if ((data->last_day_addr < trade_manage_data_temp.in) || (data->last_day_addr > current_trade_index))
-			{
-				//	上一日的日志已被覆盖，没有搜索到数据
-				return FALSE;
-			}
-		}
+		index = data->last_day_addr;		//	保存当天的索引
 		ReadExternMemery(data, data->last_day_addr, sizeof(_trade_manage_data_s));
 	}
 	return TRUE;

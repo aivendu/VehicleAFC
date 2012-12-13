@@ -89,25 +89,13 @@ void TaskDataUpload(void *pdata)
 								//	当前是最早的交易数据
 								break;
 							}
-
-							if (trade_manage_data_temp.in > current_trade_index)		//	判断当天的日志存储区域是否经过越界点
+							
+							if ((trade_manage_data_temp.in > upload_manage_temp.last_day_addr) && (trade_manage_data_temp.in < upload_index))
 							{
-								//	没有经过越界点
-								if ((upload_manage_temp.last_day_addr < trade_manage_data_temp.in) && (upload_manage_temp.last_day_addr > current_trade_index))
-								{
-									//	上一日的日志已被覆盖
-									break;
-								}
+								//	上一日的日志已被覆盖
+								break;
 							}
-							else
-							{
-								//	经过越界点
-								if ((upload_manage_temp.last_day_addr < trade_manage_data_temp.in) || (upload_manage_temp.last_day_addr > current_trade_index))
-								{
-									//	上一日的日志已被覆盖
-									break;
-								}
-							}
+							
 							upload_index = upload_manage_temp.last_day_addr;		//	修改索引，读取下一天数据
 							ReadExternMemery(&upload_manage_temp, upload_index, sizeof(_trade_manage_data_s));
 						}
