@@ -57,7 +57,18 @@ void TaskDataUpload(void *pdata)
 						GetNextPackage();
 						if (ServerUploadTradeData(&upload_data_temp) == SERVER_DATA_NO_ERR)
 						{
-							upload_manage_temp.out += sizeof(_trade_data_to_server_s);
+							//upload_manage_temp.out += sizeof(_trade_data_to_server_s);
+							//	计算下一条数据的起始地址
+							if ((upload_manage_temp.out + sizeof(_trade_data_to_server_s)) >= (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE))
+							{
+								//	下一条数据已经超出界限
+								upload_manage_temp.out = upload_manage_temp.out + sizeof(_trade_data_to_server_s) - TRADE_DATA_SIZE + sizeof(current_trade_index);
+							}
+							else
+							{
+								//	下一条数据没有超出界限
+								upload_manage_temp.out += sizeof(_trade_data_to_server_s);
+							}
 							trade_manage_data_temp.out = upload_manage_temp.out;
 						}
 					}

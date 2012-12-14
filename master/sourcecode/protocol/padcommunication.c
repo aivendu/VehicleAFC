@@ -914,13 +914,13 @@ uint16 TimeSync(void *arg)
 	temp.backage_num = GetPackageNum() & (~0x80);
 	temp.cmd = 0x33;
 	temp.arg = 0x31;
-	data_temp[6] = device_control.time.sec;
-	data_temp[5] = device_control.time.min;
-	data_temp[4] = device_control.time.hour;
-	data_temp[3] = device_control.time.day;
-	data_temp[2] = device_control.time.month;
-	data_temp[1] = (uint8)(device_control.time.year % 100);
-	data_temp[0] = (uint8)(device_control.time.year / 100);
+	data_temp[6] = SEC;
+	data_temp[5] = MIN;
+	data_temp[4] = HOUR;
+	data_temp[3] = DOM;
+	data_temp[2] = MONTH;
+	data_temp[1] = (uint8)(YEAR % 100);
+	data_temp[0] = (uint8)(YEAR / 100);
 	temp.dat = (uint8 *)&data_temp;
 	temp.len = 2 + 7;
 	while(1)

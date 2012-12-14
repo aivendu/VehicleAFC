@@ -398,7 +398,7 @@ void TaskTrade(void *pdata)
 				trade_manage_data_temp.in = sizeof(_trade_data_to_server_s)
 				                            - (TRADE_DATA_START_ADDR + TRADE_DATA_SIZE - trade_manage_data_temp.in);
 				//	第二部分存在最开始
-				WriteExternMemery((uint8 *)((uint32)&trade_data_temp + trade_manage_data_temp.in),
+				WriteExternMemery((uint8 *)((uint32)&trade_data_temp + sizeof(_trade_data_to_server_s) - trade_manage_data_temp.in),
 				                  TRADE_DATA_START_ADDR + sizeof(current_trade_index), trade_manage_data_temp.in);
 				//	修改索引地址
 				trade_manage_data_temp.in += TRADE_DATA_START_ADDR + sizeof(current_trade_index);
