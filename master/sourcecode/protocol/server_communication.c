@@ -1,7 +1,6 @@
 #include "includes.h"
 
-#define PowerOffGdtu()			(/*asm("NOP")*/0x00 == 0x00)
-#define PowerOnGdtu()			(/*asm("")*/0x00 == 0x00)
+
 #define ServerSendByte(a)			Uart0SendByte(a,0)
 #define ServerSendString(a)		Uart0SendString(a,0)
 #define ServerReceiveByte(a)		Uart0RecByte(a,0,0)
@@ -21,16 +20,6 @@
 static OS_EVENT *server_communication_sem, *server_return_sem;
 _server_communication_s server_rec_buffer, server_send_buffer;
 static uint8 server_package;
-const char dtuinfo[] = "AT*DtuInfo";
-const char heartbeat[] = "AT#Heartbeat:";
-const char DSC_IP[] = "AT#IP:0,120.195.217.32";
-const char protocol[] = "AT^Protocol:0";
-const char DSC_port[] = "AT^DSC_Port:0,22301";
-const char DNS_EN[] = "AT^DNS_EN:0,0";
-
-
-
-
 
 #define GetServerPackage()			server_package
 #define ClearServerPackage()		(server_package = 0)
@@ -65,16 +54,6 @@ void FreeServerCommunication(void)
 	OSSemPost(server_communication_sem);
 }
 
-
-uint16 CrcString(uint16 crc_r, char *str)
-{
-	while (*str)
-	{
-		crc_r = CRCByte(crc_r, *(uint8 *)str);
-		str++;
-	}
-	return crc_r;
-}
 
 uint8 ServerSendFrameToServer(_server_communication_s *command)
 {
@@ -756,7 +735,7 @@ uint8 ServerDownloadConfigData(void)
 			if (config_corresponding_table[i].funcset(server_rec_buffer.data) == TRUE)
 			{
 				SetConfigState(2);			//	改变配置状态为用户配置
-				SetSaveConfig(EXE_WRITED);	//	保存配置
+				SetCmdSaveConfig(EXE_WRITED);	//	保存配置
 				return TRUE;
 			}
 			else
@@ -842,110 +821,6 @@ uint8 ReturnMS(uint8 flag, uint16 err_no, char *arg, uint8 package_no)
 	return SERVER_DATA_NO_ERR;
 }
 
-
-
-//	用于启动GDTU
-void StartGdtu(void)
-{
-	uint8 temp;
-	PowerOffGdtu();
-	OSTimeDly(OS_TICKS_PER_SEC);
-	PowerOnGdtu();
-	while (1)
-	{
-		if ((ServerReceiveByte((uint8 *)temp) == TRUE) && (temp == ':'))	//	判断是否进入配置模式
-		{
-			break;
-		}
-	}
-	ServerSendString("12345678\r\n");		//	输入密码进入配置模式
-	OSTimeDly(OS_TICKS_PER_SEC);
-	//	发送F4 退出配置模式
-	ServerSendByte(0x1b);
-	ServerSendByte(0x4f);
-	ServerSendByte(0x53);
-	OSTimeDly(OS_TICKS_PER_SEC / 20);
-}
-
-//	用于检测GDTU 配置是否正确，若不正确，重新配置
-void DetectedAndConfigGdtu(void)
-{
-	uint8 temp[32], i, flag = 0;
-	PowerOffGdtu();
-	OSTimeDly(OS_TICKS_PER_SEC);
-	PowerOnGdtu();
-	// 	一直发'U' 初始化GDTU
-	//	一直发''' 进入AT 命令模式
-	Uart0SendByte('\'', 2);		//	发送
-	while (1)
-	{
-		if ((ServerReceiveByte(temp) == TRUE) && (temp[0] == '*'))	//	判断是否进入AT 命令模式
-		{
-			break;
-		}
-	}
-	OSTimeDly(OS_TICKS_PER_SEC);
-	memset(temp, 0, 32);
-	ServerSendString("AT*DtuInfo\r\n");
-	i = 0;
-	while (1)
-	{
-		if (ServerReceiveByte((uint8 *)(temp + i)) == TRUE)
-		{
-			if ((temp[i] == '\n') && (temp[i - 1] == '\r'))
-			{
-				temp[i - 1] = 0;
-				if (strstr((char *)temp, "Protocol") != NULL)
-				{
-					flag |= 0x01;
-				}
-				else if (strstr((char *)temp, "Max_DscNum") != NULL)
-				{
-					flag |= 0x02;
-				}
-			}
-			else if (temp[0] == 'A')
-			{
-
-			}
-		}
-		else
-		{
-			OSTimeDly(2);
-		}
-	}
-	memset(temp, 0, 32);
-	ServerSendString("AT*DscInfo:0\r\n");
-	i = 0;
-	while (1)
-	{
-		if (ServerReceiveByte((uint8 *)(temp + i)) == TRUE)
-		{
-			if ((temp[i] == '\n') && (temp[i - 1] == '\r'))
-			{
-				if (strstr((char *)temp, "IP") != NULL)
-				{
-					flag |= 0x04;
-				}
-				else if (strstr((char *)temp, "DSC Port") != NULL)
-				{
-					flag |= 0x08;
-				}
-			}
-			else
-			{
-				if ((++i) >= 32)
-				{
-					i--;
-				}
-			}
-		}
-		else
-		{
-			OSTimeDly(2);
-		}
-	}
-}
 
 uint8 ServerReceiveFrameFromServer(void)
 {
@@ -1146,7 +1021,7 @@ uint8 ServerReceiveFrameFromServer(void)
 			else if (memcmp(server_rec_buffer.command, "MS", 2) == 0)
 			{
 				//	处理消息命令
-				if (DisplayMessage(server_rec_buffer.data) == SYS_NO_ERR)
+				if (DisplayMessageUsePAD(server_rec_buffer.data) == SYS_NO_ERR)
 				{
 					//	消息发送成功，返回OK
 					ReturnMS(1, 0, server_rec_buffer.argument, server_rec_buffer.package_no);

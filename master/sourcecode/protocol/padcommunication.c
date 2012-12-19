@@ -8,14 +8,13 @@
 #define MAX_COMM_DELAY				30		//	n*5ms
 #define SHELL_LENGTH				5		//	头
 #define MAX_STATION_NUM				30
-#define PAD_COMM_WAIT_TIME			delay_time
+#define PAD_COMM_WAIT_TIME			60
 
 #define	AllowRJ45RecAndSend()		(IO0CLR |= RJ45_CTS)
 #define DisableRJ45RecAndSend()		(IO0SET |= RJ45_CTS)
 
 static _pad_com_task rec_com, send_com;
 static OS_EVENT *pad_event_sem, *pad_mess_mbox;
-uint32 delay_time = 60;			//	调试代码
 
 uint8 station_quantity;
 char promptmess[100] = {"欢迎光临! welcome to here!"};
@@ -297,7 +296,7 @@ uint16 RideMess(void *arg)
 			if ((++device_control.trade.tm.des_num) > MAX_RIDE_NUMBER_OF_PEOPLE) break;
 
 		}
-		sys_state.ss.st_cmd.se.change_ride_mess.exe_st = EXE_WRITED;
+		SetCmdChangeRideMess(EXE_WRITED);
 	}
 	/*field_temp = (char *)(&rec_com.data[0]);			//	准备乘车信息
 	next_field = field_temp;
@@ -349,13 +348,15 @@ uint16 RideMess(void *arg)
 	//	准备回复数据
 	temp.len = 2 + 2 + 1;
 	temp.backage_num = rec_com.package_num;
-	if (device_control.trade.tm.des_num > MAX_RIDE_NUMBER_OF_PEOPLE)
+	if ((device_control.trade.tm.des_num > MAX_RIDE_NUMBER_OF_PEOPLE)
+		|| (GetCmdChangeRideMess() != EXE_RUN_END))
 	{
-		temp.err_no = 0x0101;		//	没有错误
+		temp.err_no = 0x0101;		//	有错误
 		data_temp = PAD_NACK;
 	}
 	else
 	{
+		SetCmdChangeRideMess(EXE_WAIT);
 		temp.err_no = 0x0000;		//	没有错误
 		data_temp = PAD_ACK;
 		sys_state.ss.st_cmd.se.speak.exe_st = EXE_WRITED;
@@ -380,7 +381,7 @@ uint16 MakeChange(void *arg)
 	{
 		if ((rec_com.old_package_num != rec_com.package_num) && (sys_state.ss.st_cmd.se.makechange.exe_flag == EXE_WAIT))
 		{
-			sys_state.ss.st_cmd.se.makechange.exe_st = EXE_WRITED;			//	执行找零命令
+			SetCmdMakechange(EXE_WRITED);			//	执行找零命令
 			device_control.trade.tm.serail_num = rec_com.data[0] * 256 + rec_com.data[1];	//	存储此次交易的流水号
 			memcpy(&device_control.trade.tm, &rec_com.data[2], 6);						//	存储交易时间
 			device_control.trade.tm.realpay = rec_com.data[8] * 256 + rec_com.data[9];
@@ -424,11 +425,11 @@ uint16 MakeChange(void *arg)
 	}
 	else if (rec_com.arg == 0x32)
 	{
-		if (((sys_state.ss.st_cmd.se.makechange.exe_st == EXE_RUN_END) || (sys_state.ss.st_cmd.se.makechange.exe_st == EXE_WAIT))
+		if (((GetCmdMakechange() == EXE_RUN_END) || (GetCmdMakechange() == EXE_WAIT))
 		        && (device_control.trade.ts.change_note == 0)
 		        && (device_control.trade.ts.change_coin == 0))
 		{
-			sys_state.ss.st_cmd.se.makechange.exe_st = EXE_WAIT;
+			SetCmdMakechange(EXE_WAIT);
 			temp.len = 2 + 2 + 6;
 			temp.backage_num = rec_com.package_num;
 			temp.err_no = 0x0000;
@@ -480,12 +481,12 @@ uint16 Print(void *arg)
 	{
 		if ((rec_com.old_package_num != rec_com.package_num))
 		{
-			sys_state.ss.st_cmd.se.print.exe_st = EXE_WRITED;
+			SetCmdPrint(EXE_WRITED);
 			RequestUpload();
 			temp.err_no = 0x0000;
 			err = PAD_ACK;
 		}
-		else if (sys_state.ss.st_cmd.se.print.exe_flag != 0)
+		else if ((GetCmdPrint() != EXE_RUN_END) && (GetCmdPrint() != EXE_WAIT))
 		{
 			err = PAD_NACK;
 			temp.err_no = 0x0101;
@@ -512,7 +513,7 @@ uint16 Print(void *arg)
 		temp.dat = &err;
 		if ((device_control.cmd.print.exe_st == EXE_RUN_END) || (device_control.cmd.print.exe_st == EXE_WAIT))
 		{
-			sys_state.ss.st_cmd.se.print.exe_st = EXE_WAIT;
+			SetCmdPrint(EXE_WAIT);
 			err = (uint8)device_control.sys_device.print_machine_state;
 		}
 		else
@@ -665,7 +666,7 @@ uint16 CashboxInit(void *arg)
 			SetCashbox1Balance(GetCashbox1Deposit());
 			SetCashbox2Balance(GetCashbox1Deposit());
 			SetCashbox3Balance(GetCashbox1Deposit());
-			SetSaveConfig(EXE_WRITED);		//	保存配置信息
+			SetCmdSaveConfig(EXE_WRITED);		//	保存配置信息
 			LogStoreDeposit();				//	保存日志
 
 			//	准备回复数据
@@ -696,8 +697,9 @@ uint16 CashboxInit(void *arg)
 	return TRUE;
 }
 
-//	在PAD 上显示提示信息
-uint16 DisplayMessage(void *arg)
+
+//	在PAD 上播报语音
+uint16 PlaySoundUsePAD(char *str)
 {
 	uint8 err, i = 1;
 	_df_device_and_pad_comm temp;
@@ -705,19 +707,10 @@ uint16 DisplayMessage(void *arg)
 	err = 0;
 
 	temp.backage_num = GetPackageNum() & (~0x80);
-	temp.cmd = 0x31;
+	temp.cmd = 0x31;			//	语音命令为31 33
 	temp.arg = 0x33;
-	//temp.dat = data_temp;
-	switch (*(uint8 *)arg)
-	{
-	case 0x33:
-		temp.len = 2 + strlen(promptmess);
-		temp.dat = (uint8 *)promptmess;				//	发送提示信息
-		break;
-
-	default:
-		return PARAMITER_ERR;
-	}
+	temp.len = 2 + strlen(str);
+	temp.dat = (uint8 *)str;				//	发送提示信息
 	i = 0;
 	while(1)
 	{
@@ -730,20 +723,66 @@ uint16 DisplayMessage(void *arg)
 		while (err != OS_TIMEOUT);
 		SendToPadCom(&temp, 0);
 		FreeUart1();
-		OSSemPend(pad_ack_sem, delay_time, &err);		//	等待100ms
+		OSSemPend(pad_ack_sem, PAD_COMM_WAIT_TIME, &err);		//	等待100ms
 		FreePADCommunication();
 		if (err == OS_NO_ERR)
 		{
 			if ((send_com.package_num == temp.backage_num) && (send_com.err_no == 0x0000))
 			{
-				if (*(uint8 *)arg == 0x33)
-				{
+				return SYS_NO_ERR;
+			}
+			else
+			{
+				return send_com.err_no;
+			}
+		}
+		else
+		{
 
-				}
-				else
-				{
-					return PAD_COMMUNICATION_DATA_ERR;
-				}
+		}
+		if (i < RETRY_TIME)  		//	重发三次
+		{
+			i++;
+		}
+		else
+		{
+			return COMMUNICATION_TIMEOUT;
+		}
+	}
+}
+
+
+//	在PAD 上显示提示信息
+uint16 DisplayMessageUsePAD(char *str)
+{
+	uint8 err, i = 1;
+	_df_device_and_pad_comm temp;
+	//uint8 *point_temp;
+	err = 0;
+
+	temp.backage_num = GetPackageNum() & (~0x80);
+	temp.cmd = 0x31;				//	显示命令是31 34
+	temp.arg = 0x33;
+	temp.len = 2 + strlen(str);
+	temp.dat = (uint8 *)str;				//	发送提示信息
+	i = 0;
+	while(1)
+	{
+		RequestPADCommunication();
+		RequestUart1(1, 0);
+		do
+		{
+			OSSemPend(pad_ack_sem, 1, &err);
+		}
+		while (err != OS_TIMEOUT);
+		SendToPadCom(&temp, 0);
+		FreeUart1();
+		OSSemPend(pad_ack_sem, PAD_COMM_WAIT_TIME, &err);		//	等待100ms
+		FreePADCommunication();
+		if (err == OS_NO_ERR)
+		{
+			if ((send_com.package_num == temp.backage_num) && (send_com.err_no == 0x0000))
+			{
 				return SYS_NO_ERR;
 			}
 			else
@@ -804,7 +843,7 @@ uint16 Online(void *arg)
 		while (err != OS_TIMEOUT);
 		SendToPadCom(&temp, 0);
 		FreeUart1();
-		OSSemPend(pad_ack_sem, delay_time, &err);		//	等待100ms
+		OSSemPend(pad_ack_sem, PAD_COMM_WAIT_TIME, &err);		//	等待100ms
 		FreePADCommunication();
 		if (err == OS_NO_ERR)
 		{
@@ -1149,6 +1188,7 @@ const _rj45_command_s rj45_device[] =
 	{0x40,	StationSync},
 };
 
+
 #define RJ45_HEAD				1
 #define RJ45_LENGTH				2
 #define RJ45_PACKAGENUM			3
@@ -1442,12 +1482,12 @@ void TaskDeviceCommand(void *pdata)
 			sys_state.ss.st_major.ssm.st_pad_online = PAD_COMMUNICATION_DEVICE_OUTAGE;
 			run_state = OUT_LINE;
 		}
-		if (GetUploadTime() == EXE_WRITED)
+		if (GetCmdUploadTime() == EXE_WRITED)
 		{
 			err = TimeSync(NULL);	//	同步时间
 			if (err == SYS_NO_ERR)
 			{
-				SetUploadTime(EXE_RUN_END);
+				SetCmdUploadTime(EXE_RUN_END);
 			}
 			else
 			{
@@ -1487,7 +1527,7 @@ void TaskDeviceCommand(void *pdata)
 				OSTimeDly(OS_TICKS_PER_SEC);	//	通信失败，等1S 再发
 				break;
 			}
-			if (GetUploadTime() == EXE_RUN_END)
+			if (GetCmdUploadTime() == EXE_RUN_END)
 			{
 				run_state = NO_LOGIN;
 			}
@@ -1512,10 +1552,7 @@ void TaskDeviceCommand(void *pdata)
 						}
 						else if (err == PAD_COMMUNICATION_FILE_FORM_ERROR)	//	文件格式错误
 						{
-							arg[0] = 0x33;
-							memset(promptmess, 0, sizeof(promptmess));
-							sprintf(promptmess, "SD卡中文件格式错误! 请持PAD到管理处更新路线文件。");
-							DisplayMessage(arg);					//	PAD 上显示提示信息
+							DisplayMessageUsePAD("SD卡中文件格式错误! 请持PAD到管理处更新路线文件。");					//	PAD 上显示提示信息
 							break;
 						}
 						else if (err == COMMUNICATION_TIMEOUT)
@@ -1528,10 +1565,7 @@ void TaskDeviceCommand(void *pdata)
 				}
 				else if (err == PAD_COMMUNICATION_NO_FILE_WITH_GUID)	//	没有GUID 对应的文件
 				{
-					arg[0] = 0x33;
-					memset(promptmess, 0, sizeof(promptmess));
-					sprintf(promptmess, "SD卡中没有对应的路线文件! 请持PAD到管理处更新路线文件。");
-					DisplayMessage(arg);					//	PAD 上显示提示信息
+					DisplayMessageUsePAD("SD卡中没有对应的路线文件! 请持PAD到管理处更新路线文件。");					//	PAD 上显示提示信息
 					break;
 				}
 				else if (err == PAD_COMMUNICATION_SAME_GUID)	//	已经有相同的GUID 登录
@@ -1597,7 +1631,7 @@ void TaskDeviceCommand(void *pdata)
 				{
 					run_state = RUNNING;
 					time_delay_num = 26;
-					sys_state.ss.st_cmd.se.upload_line_data.exe_st = EXE_WRITED;
+					sys_state.ss.st_cmd.se.upload_route_data.exe_st = EXE_WRITED;
 					sys_state.ss.st_cmd.se.change_site.exe_st = EXE_WRITED;
 					RequestUpload();
 				}
@@ -1626,14 +1660,14 @@ void TaskDeviceCommand(void *pdata)
 			sys_state.ss.st_cmd.se.config_match.exe_st = EXE_WAIT;
 			sys_state.ss.st_cmd.se.login.exe_st = EXE_WAIT;
 			sys_state.ss.st_cmd.se.logout.exe_st = EXE_WAIT;
-			sys_state.ss.st_cmd.se.makechange.exe_st = EXE_WAIT;
-			sys_state.ss.st_cmd.se.print.exe_st = EXE_WAIT;
+			SetCmdMakechange(EXE_WAIT);
+			SetCmdPrint(EXE_WAIT);
 			sys_state.ss.st_cmd.se.shutdown.exe_st = EXE_WAIT;
 			sys_state.ss.st_cmd.se.speak.exe_st = EXE_WAIT;
-			sys_state.ss.st_cmd.se.upload_line_data.exe_st = EXE_WAIT;
+			sys_state.ss.st_cmd.se.upload_route_data.exe_st = EXE_WAIT;
 
 			if ((sys_state.ss.st_major.ssm.st_user == USER_VALIDATED)
-			        || (sys_state.ss.st_major.ssm.st_user == USER_VALIDATED)
+			        || (sys_state.ss.st_major.ssm.st_user == USER_SUPERUSER)
 			   )
 			{
 				arg[0] = sys_state.ss.st_major.ssm.st_user;

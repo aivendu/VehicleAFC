@@ -188,7 +188,7 @@ uint8 SysCommandHandle(uint8 state, uint8 cmd)
 
 	case EXE_RUN_END:
 		device_control.cmd.changemoney.exe_st = EXE_WAIT;
-		sys_state.ss.st_cmd.se.makechange.exe_st = EXE_RUN_END;
+		SetCmdMakechange(EXE_RUN_END);
 		state = EXE_WAIT;
 		break;
 
@@ -208,7 +208,7 @@ uint8 TradeHandle(uint8 state)
 	switch (state)
 	{
 	case EXE_WAIT:
-		if (sys_state.ss.st_cmd.se.makechange.exe_st == EXE_WRITED)
+		if (GetCmdMakechange() == EXE_WRITED)
 		{
 			device_control.cmd.changemoney.exe_st = EXE_WRITED;
 			state = EXE_WRITED;
@@ -224,7 +224,7 @@ uint8 TradeHandle(uint8 state)
 		break;
 	case EXE_RUN_END:
 		device_control.cmd.changemoney.exe_st = EXE_WAIT;
-		sys_state.ss.st_cmd.se.makechange.exe_st = EXE_RUN_END;
+		SetCmdMakechange(EXE_RUN_END);
 		state = EXE_WAIT;
 		break;
 	case EXE_RUN_ABORT:
@@ -354,13 +354,14 @@ void TaskChipComm(void *pdata)
 					OSSemPost(data_upload_sem);
 				}
 
-				if (sys_state.ss.st_cmd.se.upload_line_data.exe_st == EXE_WRITED)
+				if (sys_state.ss.st_cmd.se.upload_route_data.exe_st == EXE_WRITED)
 				{
 					while (ChipDataUpload(CHIP_WRITE, 0x07, 0, sizeof(_line_mess_s), &curr_line) != TRUE)
 					{
 						OSTimeDly(2);
 					}
-					sys_state.ss.st_cmd.se.upload_line_data.exe_st = EXE_WAIT;
+					SetStAllowTrade(1);
+					sys_state.ss.st_cmd.se.upload_route_data.exe_st = EXE_WAIT;
 				}
 			}
 			else
@@ -401,18 +402,18 @@ void TaskChipComm(void *pdata)
 				SEC = device_control.time.sec;
 				if (sys_state.ss.st_other.sso.st_gps_machine == GPS_MODE_NORMAL)	//	gps 是否定位成功
 				{
-					if (GetTimeUploadState() != 1)
+					if (GetStTimeUploadState() != 1)
 					{
-						SetTimeUploadState(1);		//	时间通过GPS 更新
-						SetUploadTime(EXE_WRITED);
+						SetStTimeUploadState(1);		//	时间通过GPS 更新
+						SetCmdUploadTime(EXE_WRITED);
 					}
 				}
 				else
 				{
-					if (GetTimeUploadState() != 3)
+					if (GetStTimeUploadState() != 3)
 					{
-						SetTimeUploadState(3);		//	时间通过从芯片更新
-						SetUploadTime(EXE_WRITED);
+						SetStTimeUploadState(3);		//	时间通过从芯片更新
+						SetCmdUploadTime(EXE_WRITED);
 					}
 				}
 			}
@@ -473,7 +474,8 @@ void TaskChipComm(void *pdata)
 					sys_state.ss.st_major.ssm.st_user = USER_SUPERUSER;
 				}
 				else if ((strncmp(device_control.user.rinfo.vehicle_plate, GetLisencePlateNum(), 8) == 0)
-				         && (sys_state.ss.st_major.ssm.st_user != USER_VALIDATED))
+				         && (sys_state.ss.st_major.ssm.st_user != USER_VALIDATED)
+				         && (device_control.user.uinfo.user_role != 1))
 				{
 					//	司机登录
 					LogStoreLogin();

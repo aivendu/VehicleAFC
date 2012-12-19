@@ -61,7 +61,7 @@ typedef struct
 	_exe_s config_match;		//	Ö´ÐÐÅäÖÃÆ¥Åä
 	_exe_s logout;				//	Ö´ÐÐ×¢Ïú
 	_exe_s login;
-	_exe_s upload_line_data;
+	_exe_s upload_route_data;
 	_exe_s change_site;
 	_exe_s store_trade_data;
 	_exe_s printamount;
@@ -123,22 +123,66 @@ typedef union
 
 extern _sys_st_u sys_state;
 
-#define GetChangeMoneyCommand()			(sys_state.ss.st_cmd.se.makechange.exe_st)
-#define SetChangeMoneyCommand(c)		(sys_state.ss.st_cmd.se.makechange.exe_st = c)
-#define GetTimeUploadState()			(sys_state.ss.st_major.ssm.st_sys_time_upload)
-#define SetTimeUploadState(c)			(sys_state.ss.st_major.ssm.st_sys_time_upload = c)
-
-#define SetSaveConfig(c)					(sys_state.ss.st_cmd.se.saveconfig.exe_st = c)
-#define GetSaveConfig()					(sys_state.ss.st_cmd.se.saveconfig.exe_st)
-
-#define SetUploadTime(c)					(sys_state.ss.st_cmd.se.upload_time.exe_st = c)
-#define GetUploadTime()					(sys_state.ss.st_cmd.se.upload_time.exe_st)
 
 #define SetMotherBoardSt(c)				(sys_state.ss.st_other.sso.st_motherboard = c)
 #define GetMotherBoardSt()				(sys_state.ss.st_other.sso.st_motherboard)
 
+#define SetStUser(c)					(sys_state.ss.st_major.ssm.st_user = c)
+#define GetStUser()						(sys_state.ss.st_major.ssm.st_user)
+#define SetStServerOnline(c)			(sys_state.ss.st_major.ssm.st_server_online = c)
+#define GetStServerOnline()				(sys_state.ss.st_major.ssm.st_server_online)
+#define SetStPADOnline(c)				(sys_state.ss.st_major.ssm.st_pad_online = c)
+#define GetStPADOnline()				(sys_state.ss.st_major.ssm.st_pad_online)
+#define SetStSysInit(c)					(sys_state.ss.st_major.ssm.st_init = c)
+#define GetStSysInit()					(sys_state.ss.st_major.ssm.st_init)
+#define SetStAllowTrade(c)				(sys_state.ss.st_major.ssm.st_allow_trade = c)
+#define GetStAllowTrade()				(sys_state.ss.st_major.ssm.st_allow_trade)
+#define SetStDeveiceAbort(c)			(sys_state.ss.st_major.ssm.st_device_abort = c)
+#define GetStDeveiceAbort()				(sys_state.ss.st_major.ssm.st_device_abort)
+#define GetStTimeUploadState()			(sys_state.ss.st_major.ssm.st_sys_time_upload)
+#define SetStTimeUploadState(c)			(sys_state.ss.st_major.ssm.st_sys_time_upload = c)
 
-#define GetCommandState()
+#define SetCmdShutdown(c)				(sys_state.ss.st_cmd.se.shutdown.exe_st = c)
+#define GetCmdShutdown()				(sys_state.ss.st_cmd.se.shutdown.exe_st)
+#define SetCmdMakechange(c)				(sys_state.ss.st_cmd.se.makechange.exe_st = c)
+#define GetCmdMakechange()				(sys_state.ss.st_cmd.se.makechange.exe_st)
+#define SetCmdPrint(c)					(sys_state.ss.st_cmd.se.print.exe_st = c)
+#define GetCmdPrint()					(sys_state.ss.st_cmd.se.print.exe_st)
+#define SetCmdSpeak(c)					(sys_state.ss.st_cmd.se.speak.exe_st = c)
+#define GetCmdSpeak()					(sys_state.ss.st_cmd.se.speak.exe_st)
+#define SetCmdConfigMatch(c)			(sys_state.ss.st_cmd.se.config_match.exe_st = c)
+#define GetCmdConfigMatch()				(sys_state.ss.st_cmd.se.config_match.exe_st)
+#define SetCmdLogout(c)					(sys_state.ss.st_cmd.se.logout.exe_st = c)
+#define GetCmdLogout()					(sys_state.ss.st_cmd.se.logout.exe_st)
+#define SetCmdLogin(c)					(sys_state.ss.st_cmd.se.login.exe_st = c)
+#define GetCmdLogin()					(sys_state.ss.st_cmd.se.login.exe_st)
+#define SetCmdUploadRouteData(c)		(sys_state.ss.st_cmd.se.upload_route_data.exe_st = c)
+#define GetCmdUploadRouteData()			(sys_state.ss.st_cmd.se.upload_route_data.exe_st)
+#define SetCmdChangeSite(c)				(sys_state.ss.st_cmd.se.change_site.exe_st = c)
+#define GetCmdChangeSite()				(sys_state.ss.st_cmd.se.change_site.exe_st)
+#define SetCmdStoreTradeData(c)			(sys_state.ss.st_cmd.se.store_trade_data.exe_st = c)
+#define GetCmdStoreTradeData()			(sys_state.ss.st_cmd.se.store_trade_data.exe_st)
+#define SetCmdPrintAmount(c)			(sys_state.ss.st_cmd.se.printamount.exe_st = c)
+#define GetCmdPrintAmount()				(sys_state.ss.st_cmd.se.printamount.exe_st)
+#define SetCmdSaveConfig(c)				(sys_state.ss.st_cmd.se.saveconfig.exe_st = c)
+#define GetCmdSaveConfig()				(sys_state.ss.st_cmd.se.saveconfig.exe_st)
+#define SetCmdUploadMemery(c)			(sys_state.ss.st_cmd.se.uploadmemery.exe_st = c)
+#define GetCmdUploadMemery()			(sys_state.ss.st_cmd.se.uploadmemery.exe_st)
+#define SetCmdChangeRideMess(c)			(sys_state.ss.st_cmd.se.change_ride_mess.exe_st = c)
+#define GetCmdChangeRideMess()			(sys_state.ss.st_cmd.se.change_ride_mess.exe_st)
+#define SetCmdUploadTime(c)				(sys_state.ss.st_cmd.se.upload_time.exe_st = c)
+#define GetCmdUploadTime()				(sys_state.ss.st_cmd.se.upload_time.exe_st)
+
+
+
+
+
+
+
+
+
+
+
 
 
 #endif

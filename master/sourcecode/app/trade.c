@@ -78,14 +78,14 @@ void TaskTrade(void *pdata)
 		switch (trade_state)
 		{
 		case IDLE:
-			if (sys_state.ss.st_cmd.se.change_ride_mess.exe_st == EXE_WRITED)
+			if (GetCmdChangeRideMess() == EXE_WRITED)
 			{
-				sys_state.ss.st_cmd.se.change_ride_mess.exe_st = EXE_RUNNING;
+				SetCmdChangeRideMess(EXE_RUNNING);
 				trade_state = OBTAIN_RIDE_MESS;
 			}
-			else if (sys_state.ss.st_cmd.se.makechange.exe_st == EXE_WRITED)
+			else if (GetCmdMakechange() == EXE_WRITED)
 			{
-				sys_state.ss.st_cmd.se.makechange.exe_st = EXE_RUNNING;
+				SetCmdMakechange(EXE_RUNNING);
 				trade_state = CHANGE_MONEY;
 			}
 			/*else if (sys_state.ss.st_cmd.se.store_trade_data.exe_st == EXE_WRITED)
@@ -95,7 +95,7 @@ void TaskTrade(void *pdata)
 			}*/
 			else
 			{
-				if (((GetTimeUploadState() != 0) && (YEAR >= 2012))
+				if (((GetStTimeUploadState() != 0) && (YEAR >= 2012))
 				   //     && (trade_manage_data_temp.year >= 2012)
 				   )
 				{
@@ -105,7 +105,7 @@ void TaskTrade(void *pdata)
 					        ||	(DOM != trade_manage_data_temp.day)
 					   )
 					{
-						if ((GetTimeUploadState() == 1)
+						if ((GetStTimeUploadState() == 1)
 						        && (	(YEAR < trade_manage_data_temp.year)
 						                ||	((YEAR == trade_manage_data_temp.year)
 						                     && ((MONTH < trade_manage_data_temp.month)
@@ -197,12 +197,17 @@ void TaskTrade(void *pdata)
 			break;
 
 		case OBTAIN_RIDE_MESS:
+			if (GetStAllowTrade() == 0)
+			{
+				OSTimeDly(2);
+				break;
+			}
 			//	更新交易数据
 			while (ChipDataUpload(CHIP_WRITE, 0x00, CONTROL_TRADE_INDEX_ADDR, CONTROL_TRADE_LENGHT, CONTROL_TRADE_ADDR) != TRUE)
 			{
 				OSTimeDly(2);
 			}
-			sys_state.ss.st_cmd.se.change_ride_mess.exe_st = EXE_WAIT;
+			SetCmdChangeRideMess(EXE_RUN_END);
 
 			if (sys_state.ss.st_cmd.se.speak.exe_st == EXE_WRITED)
 			{
@@ -223,11 +228,8 @@ void TaskTrade(void *pdata)
 			   )
 			{
 				//	找零数据不正确
-				memset(promptmess, 0, sizeof(promptmess));
-				sprintf(promptmess, "找零数据错误，只能找零0元到99元，请重新操作");
-				i = 0x33;
-				DisplayMessage(&i);
-				sys_state.ss.st_cmd.se.makechange.exe_st = EXE_WAIT;
+				DisplayMessageUsePAD("找零数据错误，只能找零0元到99元，请重新操作");
+				SetCmdMakechange(EXE_WAIT);
 				trade_state = IDLE;
 				break;
 			}
@@ -267,11 +269,8 @@ void TaskTrade(void *pdata)
 					if ((device_control.trade.tm.changemoney / GetCashbox1Value()) > GetCashbox1Balance())
 					{
 						//	第一钱箱的钱不够
-						memset(promptmess, 0, sizeof(promptmess));
-						sprintf(promptmess, "钱箱金额不够，不能找零");
-						i = 0x33;
-						DisplayMessage(&i);
-						sys_state.ss.st_cmd.se.makechange.exe_st = EXE_WAIT;
+						DisplayMessageUsePAD("钱箱金额不够，不能找零");
+						SetCmdMakechange(EXE_WAIT);
 						trade_state = IDLE;
 						break;
 					}
@@ -300,11 +299,8 @@ void TaskTrade(void *pdata)
 					else
 					{
 						//	设备正在找零或打印，不能进行找零
-						memset(promptmess, 0, sizeof(promptmess));
-						sprintf(promptmess, "设备正在找零或打印，不能进行新的找零或打印");
-						i = 0x33;
-						DisplayMessage(&i);
-						sys_state.ss.st_cmd.se.makechange.exe_st = EXE_WAIT;
+						DisplayMessageUsePAD("设备正在找零或打印，不能进行新的找零或打印");
+						SetCmdMakechange(EXE_WAIT);
 						trade_state = IDLE;
 						break;
 					}
@@ -320,7 +316,7 @@ void TaskTrade(void *pdata)
 					{
 						OSTimeDly(2);
 					}
-					sys_state.ss.st_cmd.se.makechange.exe_st = EXE_RUNNING;
+					SetCmdMakechange(EXE_RUNNING);
 					trade_state = PRINT;
 				}
 			}
@@ -331,8 +327,8 @@ void TaskTrade(void *pdata)
 			{
 				if (device_control.cmd.changemoney.exe_st == EXE_RUN_END)
 				{
-					sys_state.ss.st_cmd.se.makechange.exe_st = EXE_RUN_END;		//	找零结束
-					sys_state.ss.st_cmd.se.print.exe_st = EXE_RUNNING;			//	开始打印
+					SetCmdMakechange(EXE_RUN_END);		//	找零结束
+					SetCmdPrint(EXE_RUNNING);			//	开始打印
 					//	读取找零结果
 					while (ChipDataUpload(CHIP_READ, 0x00, CONTROL_TRADE_STATE_INDEX_ADDR, CONTROL_TRADE_STATE_LENGHT, CONTROL_TRADE_STATE_ADDR) != TRUE)
 					{
@@ -357,8 +353,7 @@ void TaskTrade(void *pdata)
 			sprintf(promptmess, "实找%d元: 1元 %d个; %d元 %d张; %d元 %d张",
 			        (device_control.trade.cr.coin_dis + device_control.trade.cr.cass1_dis * 5 + device_control.trade.cr.cass2_dis * 10),
 			        device_control.trade.cr.coin_dis, GetCashbox2Value(), device_control.trade.cr.cass1_dis, GetCashbox3Value(), device_control.trade.cr.cass2_dis);
-			i = 0x33;
-			DisplayMessage(&i);
+			DisplayMessageUsePAD(promptmess);
 			
 			//	更新余额
 			SetCashbox1Balance(GetCashbox1Balance() - device_control.trade.cr.coin_dis);
@@ -423,7 +418,7 @@ void TaskTrade(void *pdata)
 			if (GetTradeUploadState() == 0)
 			{
 				SetTradeUploadState(1);		//	进行上传数据
-				SetSaveConfig(EXE_WRITED);
+				SetCmdSaveConfig(EXE_WRITED);
 			}
 			trade_state = TRADE_END;
 
@@ -440,7 +435,7 @@ void TaskTrade(void *pdata)
 					{
 						OSTimeDly(2);
 					}
-					sys_state.ss.st_cmd.se.print.exe_st = EXE_RUN_END;
+					SetCmdPrint(EXE_RUN_END);
 					trade_state = IDLE;
 				}
 			}

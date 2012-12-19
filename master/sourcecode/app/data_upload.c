@@ -76,7 +76,7 @@ void TaskDataUpload(void *pdata)
 					{
 						//	数据发送完毕
 						SetTradeUploadState(0);
-						SetSaveConfig(EXE_WRITED);
+						SetCmdSaveConfig(EXE_WRITED);
 					}
 				}
 				else if (upload_manage_temp.out == upload_manage_temp.in)

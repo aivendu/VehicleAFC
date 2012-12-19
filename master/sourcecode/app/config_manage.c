@@ -132,16 +132,16 @@ void TaskSysConfig(void *pdata)
 	while (1)
 	{
 		OSTimeDly(10);
-		if (GetSaveConfig() == EXE_WRITED)
+		if (GetCmdSaveConfig() == EXE_WRITED)
 		{
-			SetSaveConfig(EXE_RUNNING);
+			SetCmdSaveConfig(EXE_RUNNING);
 			//	存储系统配置
 			WriteExternMemery(&config_ram, CONFIG_SAVE_START_ADDR, sizeof(_config_s));
 			//	更新从芯片配置选项
 		}
 		else
 		{
-			SetSaveConfig(EXE_WAIT);
+			SetCmdSaveConfig(EXE_WAIT);
 		}
 		memset(temp, 0, sizeof(temp));
 		if (ChipDataUpload(CHIP_READ, 0x06, CONFIG_VERSION_INDEX_ADDR, sizeof(config_ram.config_version), temp) == TRUE)
